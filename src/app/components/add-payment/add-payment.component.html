@@ -1,0 +1,19 @@
+<h1>Add Payment</h1>
+
+<form class="form-group" (submit)="onAddPayment()" [formGroup]="paymentForm">
+  <p class="mb-0">Payer: </p>
+  <div class="radio form-check form-check-inline ml-1 mt-0" *ngFor="let user of users"> 
+    <input type="radio" name="payer" [value]="user.id" formControlName="payer">
+    {{ user.name }}
+  </div>
+
+  <p class="mb-0">Receiver: </p>
+  <div class="radio form-check form-check-inline ml-1 mt-0" *ngFor="let user of users"> 
+    <input type="radio" name="receiver" [value]="user.id" formControlName="receiver">
+    {{ user.name }}
+  </div>
+  <input class="form-control" type="number" name="value" formControlName="value" placeholder="Value"/>
+
+  <button class="btn btn-primary mt-2" type="submit">Add Payment</button>
+
+</form>

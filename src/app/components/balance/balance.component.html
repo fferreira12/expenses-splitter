@@ -1,0 +1,27 @@
+<div class="container">
+  <h1>Saldos</h1>
+  <table class="table">
+    <thead class="thead-light">
+      <tr>
+        <th>People</th>
+        <th>Fair Share</th>
+        <th>Expenses Paid</th>
+        <th>Payments Made</th>
+        <th>Payments Received</th>
+        <th>Balance</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let user of users">
+        <td>{{ user.name }}</td>
+        <td>{{ fairShares[user.id] | currency: "R$ " }}</td>
+        <td>{{ paidValues[user.id] | currency: "R$ " }}</td>
+        <td>{{ splitterService.getPaymentsMade(user) | currency: "R$ " }}</td>
+        <td>
+          {{ splitterService.getPaymentsReceived(user) | currency: "R$ " }}
+        </td>
+        <td>{{ balances[user.id] | currency: "R$ " }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

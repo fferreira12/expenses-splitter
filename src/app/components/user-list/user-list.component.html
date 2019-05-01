@@ -1,0 +1,11 @@
+<div *ngIf="users.length > 0">
+  <h1>People</h1>
+  <ul class="list-group">
+    <li *ngFor="let user of users" class="list-group-item">
+      <button class="btn btn-danger btn-sm" (click)="onRemoveUser(user)">
+        X
+      </button>
+      <span> {{ user.name }}</span>
+    </li>
+  </ul>
+</div>

@@ -1,0 +1,35 @@
+<div *ngIf="expenses.length > 0">
+  <h1>Expenses</h1>
+
+  <table class="table">
+    <thead class="thead-light">
+      <tr>
+        <th>Expense</th>
+        <th>Value</th>
+        <th>Users</th>
+        <th>Options</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let expense of expenses">
+        <td>{{ expense.name }}</td>
+        <td>{{ expense.value | currency: "R$ " }}</td>
+        <td>
+          <span
+            *ngFor="let user of expense.users"
+            [ngClass]="{ payer: user.id === expense.payer.id }"
+            >{{ user.name }}
+          </span>
+        </td>
+        <td>
+          <button
+            class="btn btn-danger btn-sm"
+            (click)="onRemoveExpense(expense)"
+          >
+            X
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

@@ -1,0 +1,52 @@
+<h1>Add People</h1>
+<form
+  class="form-group"
+  (submit)="onAddExpense($event)"
+  [formGroup]="expenseForm"
+>
+  <input
+    class="form-control"
+    type="text"
+    name="expense-name"
+    placeholder="Expense"
+    formControlName="expenseName"
+  />
+
+  <label
+    formArrayName="users"
+    *ngFor="let user of users; let i = index"
+    class="form-check form-check-inline"
+  >
+    <input
+      type="checkbox"
+      [formControlName]="i"
+      [value]="user.id"
+      (change)="checkCheckBoxvalue($event)"
+    />
+    {{ user.name }}
+  </label>
+  <br/>
+  <div
+    class="radio"
+    *ngFor="let user of users"
+    class="form-check form-check-inline"
+  >
+    <input
+      type="radio"
+      name="payer"
+      [value]="user.id"
+      formControlName="payer"
+    />
+    {{ user.name }}
+  </div>
+  <input
+    class="form-control"
+    type="number"
+    name="value"
+    formControlName="value"
+    placeholder="Value"
+  />
+  <button class="btn btn-primary mt-2" type="submit">
+    Add Expense
+  </button>
+</form>
