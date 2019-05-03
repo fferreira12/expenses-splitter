@@ -18,12 +18,13 @@ import { ExpensesComponent } from "./components/expenses/expenses.component";
 import { PaymentsComponent } from "./components/payments/payments.component";
 import { SignupComponent } from './components/auth/signup/signup.component';
 import { SigninComponent } from './components/auth/signin/signin.component';
+import { AuthGuardService } from './services/auth-guard.service';
 
 const appRoutes: Routes = [
-  { path: "users", component: UsersComponent },
-  { path: "expenses", component: ExpensesComponent },
-  { path: "payments", component: PaymentsComponent },
-  { path: "balance", component: BalanceComponent },
+  { path: "users", component: UsersComponent, canActivate: [AuthGuardService] },
+  { path: "expenses", component: ExpensesComponent, canActivate: [AuthGuardService] },
+  { path: "payments", component: PaymentsComponent, canActivate: [AuthGuardService] },
+  { path: "balance", component: BalanceComponent, canActivate: [AuthGuardService] },
   { path: "signup", component: SignupComponent },
   { path: "signin", component: SigninComponent }
 ];

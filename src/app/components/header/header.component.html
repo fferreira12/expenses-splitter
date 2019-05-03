@@ -1,16 +1,18 @@
 <ul class="nav nav-tabs">
-  <li class="nav-item">
-    <a class="nav-link" routerLink="/users" routerLinkActive="active">Users</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link" routerLink="/expenses" routerLinkActive="active">Expenses</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link" routerLink="/payments" routerLinkActive="active">Payments</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link" routerLink="/balance" routerLinkActive="active">Balance</a>
-  </li>
+  <ng-template [ngIf]="authService.isAuthenticated()">
+    <li class="nav-item">
+      <a class="nav-link" routerLink="/users" routerLinkActive="active">Users</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" routerLink="/expenses" routerLinkActive="active">Expenses</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" routerLink="/payments" routerLinkActive="active">Payments</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" routerLink="/balance" routerLinkActive="active">Balance</a>
+    </li>
+  </ng-template>
   <ng-template [ngIf]="!authService.isAuthenticated()">
     <li class="nav-item">
       <a class="nav-link" routerLink="/signup" routerLinkActive="active">Sign Up</a>
@@ -20,6 +22,6 @@
     </li>
   </ng-template>
   <li class="nav-item" *ngIf="authService.isAuthenticated()">
-    <a class="nav-link" routerLink="/" (click)="authService.logout()">Log Out</a>
+    <a class="nav-link" routerLink="/signin" (click)="authService.logout()">Log Out</a>
   </li>
 </ul>

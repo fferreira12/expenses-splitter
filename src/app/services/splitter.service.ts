@@ -141,7 +141,6 @@ export class SplitterService {
     return fairShares;
   }
 
-  //TODO: Update to take into account user payments (one user to another)
   getBalances() {
     let balance = {};
     this.users.forEach(user => {
