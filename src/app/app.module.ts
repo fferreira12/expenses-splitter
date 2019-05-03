@@ -16,12 +16,16 @@ import { HeaderComponent } from "./components/header/header.component";
 import { UsersComponent } from "./components/users/users.component";
 import { ExpensesComponent } from "./components/expenses/expenses.component";
 import { PaymentsComponent } from "./components/payments/payments.component";
+import { SignupComponent } from './components/auth/signup/signup.component';
+import { SigninComponent } from './components/auth/signin/signin.component';
 
 const appRoutes: Routes = [
   { path: "users", component: UsersComponent },
   { path: "expenses", component: ExpensesComponent },
   { path: "payments", component: PaymentsComponent },
-  { path: "balance", component: BalanceComponent }
+  { path: "balance", component: BalanceComponent },
+  { path: "signup", component: SignupComponent },
+  { path: "signin", component: SigninComponent }
 ];
 
 @NgModule({
@@ -37,7 +41,9 @@ const appRoutes: Routes = [
     HeaderComponent,
     UsersComponent,
     ExpensesComponent,
-    PaymentsComponent
+    PaymentsComponent,
+    SignupComponent,
+    SigninComponent
   ],
   imports: [
     BrowserModule,

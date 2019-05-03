@@ -11,4 +11,15 @@
   <li class="nav-item">
     <a class="nav-link" routerLink="/balance" routerLinkActive="active">Balance</a>
   </li>
+  <ng-template [ngIf]="!authService.isAuthenticated()">
+    <li class="nav-item">
+      <a class="nav-link" routerLink="/signup" routerLinkActive="active">Sign Up</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" routerLink="/signin" routerLinkActive="active">Sign In</a>
+    </li>
+  </ng-template>
+  <li class="nav-item" *ngIf="authService.isAuthenticated()">
+    <a class="nav-link" routerLink="/" (click)="authService.logout()">Log Out</a>
+  </li>
 </ul>
