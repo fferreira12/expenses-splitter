@@ -7,6 +7,7 @@
         <th>Expense</th>
         <th>Value</th>
         <th>Users</th>
+        <th>File</th>
         <th>Options</th>
       </tr>
     </thead>
@@ -20,6 +21,9 @@
             [ngClass]="{ payer: user.id === expense.payer.id }"
             >{{ user.name }}
           </span>
+        </td>
+        <td>
+          <a [href]="expense.fileLocation" *ngIf="expense.fileLocation">Download File</a>
         </td>
         <td>
           <button

@@ -9,7 +9,7 @@ import { Expense } from 'src/app/models/expense.model';
 })
 export class ExpenseListComponent implements OnInit {
 
-  expenses: Expense[];
+  expenses: Expense[] = [];
 
   constructor(
     private splitterService: SplitterService
