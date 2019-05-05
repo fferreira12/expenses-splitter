@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
 import * as firebase from 'firebase';
+import { AuthService } from './services/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -9,6 +10,10 @@ import * as firebase from 'firebase';
 })
 export class AppComponent implements OnInit {
   title = 'expense-splitter-frontend';
+
+  constructor(private authService: AuthService) {
+    
+  }
 
   ngOnInit() {
     firebase.initializeApp({
@@ -20,5 +25,7 @@ export class AppComponent implements OnInit {
       messagingSenderId: "774324107394",
       appId: "1:774324107394:web:0dc06aa30af836d5"
     });
+    firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+    this.authService.init();
   }
 }

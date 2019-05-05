@@ -2,6 +2,7 @@ import * as firebase from 'firebase';
 
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
+import { LocalstorageService } from './localstorage.service';
 
 @Injectable({
   providedIn: 'root'
@@ -12,8 +13,31 @@ export class AuthService {
   userId: string;
   userIdObservable: BehaviorSubject<string>;
 
-  constructor() { 
+  constructor(private localStorage: LocalstorageService) { 
     this.userIdObservable = new BehaviorSubject('');
+    
+  }
+
+  init(){
+    if(this.localStorage.get('user-id') != null) {
+      this.userId = this.localStorage.get('user-id');
+    }
+    if(this.localStorage.get('user-token') != null) {
+      this.token = this.localStorage.get('user-token')
+      //firebase.auth().signInWithCustomToken(this.token);
+    }
+    firebase.auth().onAuthStateChanged(function(user) {
+      if (user) {
+        console.log('signed in');
+        console.log(user);
+        this.userId = user.uid;
+        user.getIdToken(false).then(token => {
+          this.token = token;
+        })
+      } else {
+        console.log('not signed in');
+      }
+    });
   }
 
   signupUser(email: string, password: string) {
@@ -28,12 +52,14 @@ export class AuthService {
     .then(
       result => {
         this.userId = result.user.uid;
+        this.localStorage.save("user-id", this.userId);
         this.userIdObservable.next(this.userId);
         return result.user.getIdToken();
       }
     )
     .then(token => {
       this.token = token;
+      this.localStorage.save("user-token", this.token);
       //console.log('token was sucessfully saved:\n' + this.token);
     })
     .catch(
@@ -46,10 +72,12 @@ export class AuthService {
   }
 
   logout() {
-    firebase.auth().signOut();
     this.userId = "";
     this.userIdObservable.next(this.userId);
     this.token = null;
+    this.localStorage.save("user-id", null);
+    this.localStorage.save("user-token", null);
+    firebase.auth().signOut();
   }
 
   getToken() {
@@ -61,6 +89,9 @@ export class AuthService {
   }
 
   getUserId() {
+    if(this.userId !== null && this.userId !== null) {
+      return this.userId;
+    }
     return firebase.auth().currentUser ? firebase.auth().currentUser.uid : "";
   }
 
