@@ -17,7 +17,8 @@ export class AppComponent implements OnInit {
       databaseURL: "https://expenses-splitter.firebaseio.com",
       projectId: "expenses-splitter",
       storageBucket: "expenses-splitter.appspot.com",
-      messagingSenderId: "774324107394"
+      messagingSenderId: "774324107394",
+      appId: "1:774324107394:web:0dc06aa30af836d5"
     });
   }
 }

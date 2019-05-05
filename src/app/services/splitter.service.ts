@@ -55,29 +55,37 @@ export class SplitterService {
     this.storage.get().then(data => {
       console.log("getting users");
       console.log(JSON.parse(data.data()["users"]));
-      try {
-        let users = JSON.parse(data.data()["users"]);
-        this.users = users as User[] | [];
-      } catch {
-        this.users = [];
-      }
-      try {
-        let expenses = JSON.parse(data.data()["expenses"]);
-        this.expenses = expenses as Expense[] | [];
-      } catch {
-        this.expenses = [];
-      }
-      try {
-        let payments = JSON.parse(data.data()["payments"]);
-        this.payments = payments as Payment[] | [];
-      } catch {
-        this.payments = [];
-      }
-
-      this.usersObservable.next(this.users);
-      this.expensesObservable.next(this.expenses);
-      this.paymentsObservable.next(this.payments);
+      let parsedData = data.data();
+      this.tryParseData(parsedData);
+      this.emitAllCurrentData();
     });
+  }
+
+  tryParseData(data) {
+    try {
+      let users = JSON.parse(data["users"]);
+      this.users = users as User[] | [];
+    } catch {
+      this.users = [];
+    }
+    try {
+      let expenses = JSON.parse(data["expenses"]);
+      this.expenses = expenses as Expense[] | [];
+    } catch {
+      this.expenses = [];
+    }
+    try {
+      let payments = JSON.parse(data["payments"]);
+      this.payments = payments as Payment[] | [];
+    } catch {
+      this.payments = [];
+    }
+  }
+
+  private emitAllCurrentData() {
+    this.usersObservable.next(this.users);
+    this.expensesObservable.next(this.expenses);
+    this.paymentsObservable.next(this.payments);
   }
 
   addUser(user: User) {
