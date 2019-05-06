@@ -15,6 +15,9 @@ export class UserListComponent implements OnInit {
 
   ngOnInit() {
     this.users = this.splitterService.getUsers();
+    this.splitterService.subscribeToUsers(users => {
+      this.users = users;
+    })
   }
 
   onRemoveUser(user: User) {

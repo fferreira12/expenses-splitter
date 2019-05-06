@@ -1,6 +1,7 @@
 import * as firebase from 'firebase';
 
 import { Injectable } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -8,8 +9,12 @@ import { Injectable } from '@angular/core';
 export class AuthService {
 
   token: string;
+  userId: string;
+  userIdObservable: BehaviorSubject<string>;
 
-  constructor() { }
+  constructor() { 
+    this.userIdObservable = new BehaviorSubject('');
+  }
 
   signupUser(email: string, password: string) {
     return firebase.auth().createUserWithEmailAndPassword(email, password)
@@ -22,11 +27,13 @@ export class AuthService {
     return firebase.auth().signInWithEmailAndPassword(email, password)
     .then(
       result => {
-        return result.user.getIdToken()
+        this.userId = result.user.uid;
+        this.userIdObservable.next(this.userId);
+        return result.user.getIdToken();
       }
     )
     .then(token => {
-      this.token = token
+      this.token = token;
       //console.log('token was sucessfully saved:\n' + this.token);
     })
     .catch(
@@ -34,8 +41,14 @@ export class AuthService {
     )
   }
 
+  subscribeToUserId(subscriber) {
+    this.userIdObservable.subscribe(subscriber);
+  }
+
   logout() {
     firebase.auth().signOut();
+    this.userId = "";
+    this.userIdObservable.next(this.userId);
     this.token = null;
   }
 
@@ -45,6 +58,10 @@ export class AuthService {
         (token: string) => this.token = token
       );
     return this.token;
+  }
+
+  getUserId() {
+    return firebase.auth().currentUser ? firebase.auth().currentUser.uid : "";
   }
 
   isAuthenticated() {

@@ -5,20 +5,23 @@ import { Observable, Subject } from "rxjs";
 import { Expense } from "../models/expense.model";
 import { Payment } from "../models/payment.model";
 import { LocalstorageService } from "./localstorage.service";
+import { FirebaseService } from "./firebase.service";
+//import { AuthGuardervice } from './auth-guard.service';
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: "root"
 })
 export class SplitterService {
-  users: User[];
-  expenses: Expense[];
-  payments: Payment[];
+  users: User[] = [];
+  expenses: Expense[] = [];
+  payments: Payment[] = [];
 
   usersObservable: Subject<User[]>;
   expensesObservable: Subject<Expense[]>;
   paymentsObservable: Subject<Payment[]>;
 
-  constructor(private storage: LocalstorageService) {
+  constructor(private storage: FirebaseService, private authService: AuthService) {
     //console.log("creating instance of Splitter Service");
     // this.users = [
     //   new User("Fernando"),
@@ -26,13 +29,55 @@ export class SplitterService {
     //   new User("Henrique"),
     //   new User("Vitor")
     // ];
-    this.users = storage.get("users") || [];
-    this.expenses = storage.get("expenses") || [];
-    this.payments = storage.get("payments") || [];
 
+    // this.users = storage.get("users") || [];
+    // this.expenses = storage.get("expenses") || [];
+    // this.payments = storage.get("payments") || [];
+
+    this.authService.subscribeToUserId(userId => {
+      if(userId == "") {
+        this.users = [];
+        this.expenses = [];
+        this.payments = [];
+      } else {
+        this.getData();
+      }
+    })
+
+    this.getData();
+    
     this.usersObservable = new Subject();
     this.expensesObservable = new Subject();
     this.paymentsObservable = new Subject();
+  }
+
+  getData(){
+    this.storage.get().then(data => {
+      console.log("getting users");
+      console.log(JSON.parse(data.data()["users"]));
+      try {
+        let users = JSON.parse(data.data()["users"]);
+        this.users = users as User[] | [];
+      } catch {
+        this.users = [];
+      }
+      try {
+        let expenses = JSON.parse(data.data()["expenses"]);
+        this.expenses = expenses as Expense[] | [];
+      } catch {
+        this.expenses = [];
+      }
+      try {
+        let payments = JSON.parse(data.data()["payments"]);
+        this.payments = payments as Payment[] | [];
+      } catch {
+        this.payments = [];
+      }
+
+      this.usersObservable.next(this.users);
+      this.expensesObservable.next(this.expenses);
+      this.paymentsObservable.next(this.payments);
+    });
   }
 
   addUser(user: User) {
@@ -59,7 +104,7 @@ export class SplitterService {
     let userIds = this.users.map(user => user.id);
 
     for (let i = this.expenses.length - 1; i >= 0; --i) {
-      let expense = this.expenses[i]
+      let expense = this.expenses[i];
       let missing = !expense.users.every(user => {
         return userIds.includes(user.id);
       });
@@ -68,7 +113,7 @@ export class SplitterService {
       }
     }
 
-    for(let i = this.payments.length - 1; i >= 0; --i) {
+    for (let i = this.payments.length - 1; i >= 0; --i) {
       let payment = this.payments[i];
       let missing =
         !userIds.includes(payment.payer.id) ||
