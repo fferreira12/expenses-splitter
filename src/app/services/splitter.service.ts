@@ -53,8 +53,8 @@ export class SplitterService {
 
   getData(){
     this.storage.get().then(data => {
-      console.log("getting users");
-      console.log(JSON.parse(data.data()["users"]));
+      //console.log("getting users");
+      //console.log(JSON.parse(data.data()["users"]));
       let parsedData = data.data();
       this.tryParseData(parsedData);
       this.emitAllCurrentData();

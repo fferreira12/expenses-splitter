@@ -32,7 +32,7 @@ export class AddPaymentComponent implements OnInit {
   }
 
   onAddPayment(){
-    console.log('on add payment');
+    //console.log('on add payment');
     let payer = this.users.find(user => user.id == this.paymentForm.controls.payer.value);
     let receiver = this.users.find(user => user.id == this.paymentForm.controls.receiver.value);
     let value = this.paymentForm.controls.value.value

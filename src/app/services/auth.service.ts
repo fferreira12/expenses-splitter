@@ -28,14 +28,14 @@ export class AuthService {
     }
     firebase.auth().onAuthStateChanged(function(user) {
       if (user) {
-        console.log('signed in');
-        console.log(user);
+        //console.log('signed in');
+        //console.log(user);
         this.userId = user.uid;
         user.getIdToken(false).then(token => {
           this.token = token;
         })
       } else {
-        console.log('not signed in');
+        //console.log('not signed in');
       }
     });
   }

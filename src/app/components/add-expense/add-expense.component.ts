@@ -1,9 +1,11 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, ViewChild } from "@angular/core";
 import { SplitterService } from "src/app/services/splitter.service";
 import { FormGroup, FormControl, FormBuilder, FormArray } from "@angular/forms";
 import { User } from "src/app/models/user.model";
 import { Expense } from "src/app/models/expense.model";
 import { FirebaseService } from "src/app/services/firebase.service";
+
+import {} from 'googlemaps';
 
 @Component({
   selector: "app-add-expense",
@@ -17,6 +19,9 @@ export class AddExpenseComponent implements OnInit {
   file: File = null;
   url: string;
   uploadComplete: boolean = false;
+
+  @ViewChild("gmap") gmapElement: any;
+  map: google.maps.Map;
 
   constructor(
     private splitterService: SplitterService,
@@ -41,6 +46,31 @@ export class AddExpenseComponent implements OnInit {
 
       this.addCheckboxes();
     });
+    if ("geolocation" in navigator) {
+      /* geolocation is available */
+      console.log("geolocation ON");
+      navigator.geolocation.getCurrentPosition(position => {
+        this.updateLocation(position);
+      });
+    } else {
+      /* geolocation IS NOT available */
+      console.log("geolocation OFF");
+    }
+  }
+
+  updateLocation(position: Position) {
+    var mapProp = {
+      center: new google.maps.LatLng(
+        position.coords.latitude,
+        position.coords.longitude
+      ),
+      zoom: 15,
+      mapTypeId: google.maps.MapTypeId.ROADMAP
+    };
+    this.map = new google.maps.Map(this.gmapElement.nativeElement, mapProp);
+    console.log(position);
+    var marker = new google.maps.Marker({ position: mapProp.center });
+    marker.setMap(this.map);
   }
 
   onChooseFile(event) {
@@ -49,7 +79,9 @@ export class AddExpenseComponent implements OnInit {
 
   onUploadFile() {
     let task = this.firebaseService.uploadFile(this.file);
-    task.then(snapshot => snapshot.ref.getDownloadURL().then(url => (this.url = url)));
+    task.then(snapshot =>
+      snapshot.ref.getDownloadURL().then(url => (this.url = url))
+    );
     task.on(
       "state_changed",
 
@@ -57,8 +89,8 @@ export class AddExpenseComponent implements OnInit {
         var percentage =
           (100 * snapshot.bytesTransferred) / snapshot.totalBytes;
         this.uploadProgress = percentage;
-        
-        console.log(`${percentage}% complete`);
+
+        //console.log(`${percentage}% complete`);
       },
 
       function error(err) {
@@ -67,7 +99,7 @@ export class AddExpenseComponent implements OnInit {
 
       () => {
         this.uploadComplete = true;
-        console.log("upload complete");
+        //console.log("upload complete");
       }
     );
   }
@@ -121,8 +153,8 @@ export class AddExpenseComponent implements OnInit {
     //console.log(expense);
     expense.setFileLocation(this.url);
 
-    console.log("expense added");
-    console.log(expense);
+    //console.log("expense added");
+    //console.log(expense);
 
     this.splitterService.addExpense(expense);
   }
