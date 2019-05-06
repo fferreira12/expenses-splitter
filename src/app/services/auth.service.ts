@@ -41,14 +41,14 @@ export class AuthService {
   }
 
   signupUser(email: string, password: string) {
-    firebase.auth().createUserWithEmailAndPassword(email, password)
+    return firebase.auth().createUserWithEmailAndPassword(email, password)
       .catch(
         error => console.log(error)
       )
   }
 
   signinUser(email: string, password: string) {
-    firebase.auth().signInWithEmailAndPassword(email, password)
+    return firebase.auth().signInWithEmailAndPassword(email, password)
     .then(
       result => {
         this.userId = result.user.uid;
