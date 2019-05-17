@@ -46,7 +46,18 @@
     formControlName="value"
     placeholder="Value"
   />
-  <button class="btn btn-primary mt-2" type="submit">
+
+  <input type="file" name="file" id="file" class="form-control" formControlName="file" (change)="onChooseFile($event)">
+
+  <button class="btn btn-primary mt-2" (click)="onUploadFile()">
+    Upload File
+  </button>
+
+  <button class="btn btn-primary mt-2" type="submit" [ngClass]="{'disabled':!uploadComplete}">
     Add Expense
   </button>
 </form>
+
+<div class="progress">
+  <div class="progress-bar" role="progressbar" [ngStyle]="{'width':uploadProgress+'%'}" [ngClass]="{'bg-success': uploadComplete}"></div>
+</div>
