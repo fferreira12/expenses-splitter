@@ -2,8 +2,7 @@ import { Component, OnInit } from "@angular/core";
 import { SplitterService } from "src/app/services/splitter.service";
 import { FormGroup, FormControl, FormBuilder, FormArray } from "@angular/forms";
 import { User } from "src/app/models/user.model";
-import { Expense } from "src/app/models/expense.model";
-import { FirebaseService } from "src/app/services/firebase.service";
+import { Expense } from 'src/app/models/expense.model';
 
 @Component({
   selector: "app-add-expense",
@@ -13,15 +12,10 @@ import { FirebaseService } from "src/app/services/firebase.service";
 export class AddExpenseComponent implements OnInit {
   expenseForm: FormGroup;
   users: User[];
-  uploadProgress: number = 0;
-  file: File = null;
-  url: string;
-  uploadComplete: boolean = false;
 
   constructor(
     private splitterService: SplitterService,
-    private formBuilder: FormBuilder,
-    private firebaseService: FirebaseService
+    private formBuilder: FormBuilder
   ) {}
 
   ngOnInit() {
@@ -30,71 +24,32 @@ export class AddExpenseComponent implements OnInit {
       expenseName: new FormControl(null),
       users: new FormArray([]),
       value: new FormControl(null),
-      payer: new FormControl(null),
-      file: new FormControl(null)
+      payer: new FormControl(null)
     });
     this.addCheckboxes();
     this.splitterService.subscribeToUsers(users => {
       this.users = users;
-
+      
       this.expenseForm.controls.users = this.formBuilder.array([]);
 
       this.addCheckboxes();
     });
   }
 
-  onChooseFile(event) {
-    this.file = event.target.files[0];
-  }
-
-  onUploadFile() {
-    let task = this.firebaseService.uploadFile(this.file);
-    task.then(snapshot => snapshot.ref.getDownloadURL().then(url => (this.url = url)));
-    task.on(
-      "state_changed",
-
-      snapshot => {
-        var percentage =
-          (100 * snapshot.bytesTransferred) / snapshot.totalBytes;
-        this.uploadProgress = percentage;
-        
-        console.log(`${percentage}% complete`);
-      },
-
-      function error(err) {
-        console.log(err);
-      },
-
-      () => {
-        this.uploadComplete = true;
-        console.log("upload complete");
-      }
-    );
-  }
-
-  cannAddExpense() {
-    return this.file == null || this.uploadComplete;
-  }
-
   onAddExpense(event) {
     event.preventDefault();
-
-    if (!this.cannAddExpense()) {
-      return;
-    }
 
     let expenseName = this.expenseForm.controls.expenseName.value;
     let payerId = this.expenseForm.controls.payer.value;
     let usersIds = (this.expenseForm.controls.users as FormArray).controls
-      .map(formControl => {
-        // console.log(formControl);
-        return (formControl as FormControl).value;
-      })
-      .map((playerIsParticipating, i) => {
-        if (playerIsParticipating) {
-          return this.users[i].id;
-        }
-      });
+    .map(formControl => {
+      // console.log(formControl);
+      return (formControl as FormControl).value;
+    }).map( (playerIsParticipating, i) => {
+      if(playerIsParticipating) {
+        return this.users[i].id;
+      }
+    });
     let value = this.expenseForm.controls.value.value;
 
     const expense = new Expense(expenseName, value);
@@ -119,10 +74,6 @@ export class AddExpenseComponent implements OnInit {
     expense.setPayer(payer);
 
     //console.log(expense);
-    expense.setFileLocation(this.url);
-
-    console.log("expense added");
-    console.log(expense);
 
     this.splitterService.addExpense(expense);
   }
@@ -137,8 +88,9 @@ export class AddExpenseComponent implements OnInit {
   }
 
   checkCheckBoxvalue(event) {
-    if (event.target.checked) {
+    if(event.target.checked) {
       //event.target.value = event.target.name;
+      
     }
     //console.log(this.expenseForm.controls.users)
     // console.log(event);
