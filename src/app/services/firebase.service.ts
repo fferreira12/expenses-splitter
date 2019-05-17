@@ -63,13 +63,4 @@ export class FirebaseService {
       .doc(this.userId)
       .onSnapshot(subscriber);
   }
-
-  uploadFile(file: File) {
-    let filePath = 'expenses/' + this.userId + '/' + file.name;
-
-    let storageRef = firebase.storage().ref(filePath);
-
-    //return task
-    return storageRef.put(file);
-  }
 }
