@@ -1,0 +1,37 @@
+[debug] [2019-05-03T16:04:53.752Z] ----------------------------------------------------------------------
+[debug] [2019-05-03T16:04:53.754Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\fernandoferreira\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js login --no-localhost
+[debug] [2019-05-03T16:04:53.755Z] CLI Version:   6.8.0
+[debug] [2019-05-03T16:04:53.755Z] Platform:      win32
+[debug] [2019-05-03T16:04:53.755Z] Node Version:  v10.15.3
+[debug] [2019-05-03T16:04:53.756Z] Time:          Fri May 03 2019 13:04:53 GMT-0300 (GMT-03:00)
+[debug] [2019-05-03T16:04:53.756Z] ----------------------------------------------------------------------
+[debug] 
+[info] 
+[info] Visit this URL on any device to log in:
+[info] https://accounts.google.com/o/oauth2/auth?client_id=563584335869-fgrhgmd47bqnekij5i8b5pr03ho849e6.apps.googleusercontent.com&scope=email%20openid%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fcloudplatformprojects.readonly%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Ffirebase%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fcloud-platform&response_type=code&state=997566644&redirect_uri=urn%3Aietf%3Awg%3Aoauth%3A2.0%3Aoob
+[info] 
+[debug] [2019-05-03T16:05:10.481Z] >>> HTTP REQUEST POST https://accounts.google.com/o/oauth2/token  
+
+[debug] [2019-05-03T16:05:10.994Z] <<< HTTP RESPONSE 200
+[debug] [2019-05-03T16:05:11.007Z] Error: EPERM: operation not permitted, rename 'C:\Users\fernandoferreira\.config\configstore\firebase-tools.json.3042281580' -> 'C:\Users\fernandoferreira\.config\configstore\firebase-tools.json'
+    at Object.renameSync (fs.js:593:3)
+    at Function.writeFileSync [as sync] (C:\Users\fernandoferreira\AppData\Roaming\npm\node_modules\firebase-tools\node_modules\configstore\node_modules\write-file-atomic\index.js:124:8)
+    at Configstore.set (C:\Users\fernandoferreira\AppData\Roaming\npm\node_modules\firebase-tools\node_modules\configstore\index.js:62:21)
+    at Configstore.set (C:\Users\fernandoferreira\AppData\Roaming\npm\node_modules\firebase-tools\node_modules\configstore\index.js:93:11)
+    at C:\Users\fernandoferreira\AppData\Roaming\npm\node_modules\firebase-tools\lib\commands\login.js:38:21
+    at process._tickCallback (internal/process/next_tick.js:68:7)
+[error] 
+[error] Error: An unexpected error has occurred.
+[debug] [2019-05-03T16:06:43.813Z] ----------------------------------------------------------------------
+[debug] [2019-05-03T16:06:43.815Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\fernandoferreira\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js login
+[debug] [2019-05-03T16:06:43.816Z] CLI Version:   6.8.0
+[debug] [2019-05-03T16:06:43.816Z] Platform:      win32
+[debug] [2019-05-03T16:06:43.816Z] Node Version:  v10.15.3
+[debug] [2019-05-03T16:06:43.818Z] Time:          Fri May 03 2019 13:06:43 GMT-0300 (GMT-03:00)
+[debug] [2019-05-03T16:06:43.818Z] ----------------------------------------------------------------------
+[debug] 
+[info] 
+[info] Visit this URL on any device to log in:
+[info] https://accounts.google.com/o/oauth2/auth?client_id=563584335869-fgrhgmd47bqnekij5i8b5pr03ho849e6.apps.googleusercontent.com&scope=email%20openid%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fcloudplatformprojects.readonly%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Ffirebase%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fcloud-platform&response_type=code&state=984476902&redirect_uri=http%3A%2F%2Flocalhost%3A9005
+[info] 
+[info] Waiting for authentication...
