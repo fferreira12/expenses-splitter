@@ -19,8 +19,10 @@ import { PaymentsComponent } from "./components/payments/payments.component";
 import { SignupComponent } from './components/auth/signup/signup.component';
 import { SigninComponent } from './components/auth/signin/signin.component';
 import { AuthGuardService } from './services/auth-guard.service';
+import { HomeComponent } from './components/home/home.component';
 
 const appRoutes: Routes = [
+  { path: "home", component: HomeComponent, canActivate: [AuthGuardService] },
   { path: "users", component: UsersComponent, canActivate: [AuthGuardService] },
   { path: "expenses", component: ExpensesComponent, canActivate: [AuthGuardService] },
   { path: "payments", component: PaymentsComponent, canActivate: [AuthGuardService] },
@@ -44,7 +46,8 @@ const appRoutes: Routes = [
     ExpensesComponent,
     PaymentsComponent,
     SignupComponent,
-    SigninComponent
+    SigninComponent,
+    HomeComponent
   ],
   imports: [
     BrowserModule,
