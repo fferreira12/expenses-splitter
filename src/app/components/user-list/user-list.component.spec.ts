@@ -1,6 +1,10 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { UserListComponent } from './user-list.component';
+import { SplitterService } from 'src/app/services/splitter.service';
+import { splitterServiceStub } from 'src/test/splitter.service.stub';
+import { AddUserComponent } from '../add-user/add-user.component';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 
 describe('UserListComponent', () => {
   let component: UserListComponent;
@@ -8,7 +12,9 @@ describe('UserListComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ UserListComponent ]
+      declarations: [ UserListComponent, AddUserComponent ],
+      imports: [ ReactiveFormsModule, FormsModule ],
+      providers: [{provide: SplitterService, useValue: splitterServiceStub }]
     })
     .compileComponents();
   }));

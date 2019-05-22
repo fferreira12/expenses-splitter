@@ -1,6 +1,8 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { BalanceComponent } from './balance.component';
+import { SplitterService } from 'src/app/services/splitter.service';
+import { splitterServiceStub } from 'src/test/splitter.service.stub';
 
 describe('BalanceComponent', () => {
   let component: BalanceComponent;
@@ -8,7 +10,8 @@ describe('BalanceComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ BalanceComponent ]
+      declarations: [ BalanceComponent ],
+      providers: [{provide: SplitterService, useValue: splitterServiceStub }]
     })
     .compileComponents();
   }));
