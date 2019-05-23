@@ -20,6 +20,7 @@ import { SignupComponent } from './components/auth/signup/signup.component';
 import { SigninComponent } from './components/auth/signin/signin.component';
 import { AuthGuardService } from './services/auth-guard.service';
 import { HomeComponent } from './components/home/home.component';
+import { ProjectListComponent } from './components/project-list/project-list.component';
 
 const appRoutes: Routes = [
   { path: "", component: HomeComponent, canActivate: [AuthGuardService] },
@@ -48,7 +49,8 @@ const appRoutes: Routes = [
     PaymentsComponent,
     SignupComponent,
     SigninComponent,
-    HomeComponent
+    HomeComponent,
+    ProjectListComponent
   ],
   imports: [
     BrowserModule,

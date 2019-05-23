@@ -1,11 +1,9 @@
 import { SplitterService } from "src/app/services/splitter.service";
 
-let splitterServiceStub: Partial<SplitterService>;
+let splitterServiceStub; //: Partial<SplitterService>;
 
 splitterServiceStub = {
-  users: [],
-  expenses: [],
-  payments: [],
+  
   getUsers: function() {
     return [];
   },

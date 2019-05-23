@@ -7,6 +7,9 @@
   <div class="collapse navbar-collapse" id="navbarText">
     <ul class="navbar-nav mr-auto" *ngIf="authService.isAuthenticated()">
       <li class="nav-item">
+        <app-project-list></app-project-list>
+      </li>
+      <li class="nav-item">
         <a class="nav-link" routerLink="/users" routerLinkActive="active">Users</a>
       </li>
       <li class="nav-item">
