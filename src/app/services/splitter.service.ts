@@ -31,6 +31,8 @@ export class SplitterService {
     private storage: FirebaseService,
     private authService: AuthService
   ) {
+    this.resetProjects();
+
     this.authService.subscribeToUserId(userId => {
       if (userId == "") {
         this.currentProject.setData();
@@ -68,6 +70,23 @@ export class SplitterService {
 
   }
 
+  deleteProject(project: Project) {
+    this.allProjects.splice(this.allProjects.indexOf(project),1);
+    this.storage.delete(project.projectId);
+    if (this.allProjects.includes(this.currentProject)) {
+      this.emitAllCurrentData();
+    } else {
+      if(this.allProjects.length == 0) {
+        this.createNewProject("Default Project");
+      }
+      this.setCurrentProject(this.allProjects[0]);
+    }
+  }
+
+  resetProjects() {
+    this.allProjects = [];
+  }
+
   subscribeToCurrentProject(subscriber) {
     this.currentProjectObservable.subscribe(subscriber);
   }
@@ -87,7 +106,18 @@ export class SplitterService {
   }
 
   tryParseData(data) {
-    let d = JSON.parse(data[Object.keys(data)[0]]) as Partial<Project>;
+    this.resetProjects();
+
+    let d;
+    try {
+      d = JSON.parse(data[Object.keys(data)[0]]) as Partial<Project>;
+    } catch {
+      this.currentProject = new Project();
+      this.allProjects = [];
+      this.allProjects.push(this.currentProject);
+      this.storage.save(this.currentProject.projectId, this.currentProject);
+      return;
+    }
 
     //get all projects
     for (let project in data) {

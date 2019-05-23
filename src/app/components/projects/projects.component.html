@@ -1,0 +1,28 @@
+<div class="container">
+    <h1>Add Project</h1>
+    <div class="form-group">
+      <form class="form-inline">
+        <input class="form-control" type="text" name="name" id="txtName" placeholder="Name" [formControl]="projectName">
+        <button class="btn btn-primary ml-1" (click)="onAddProject()">Add Project</button>
+      </form>
+    </div>
+
+  <h1>Projects</h1>
+  <table class="table">
+    <thead class="thead-light">
+      <tr>
+        <th>Name</th>
+        <th>Options</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let project of allProjects">
+        <td>{{ project.projectName }}</td>
+        <td>
+          <button class="btn btn-primary mr-2" (click)="onActivateProject(project)">Activate</button>
+          <button class="btn btn-danger" (click)="onDeleteProject(project)">Delete</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

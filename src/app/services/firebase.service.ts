@@ -43,6 +43,23 @@ export class FirebaseService {
     });
   }
 
+  delete(key: string) {
+    if (this.userId == "") {
+      this.userId = this.authService.getUserId();
+    }
+    let docRef = this.db.collection("user-data").doc(this.userId);
+    return docRef.get().then(docSnapshot => {
+      if (docSnapshot.exists) {
+        return this.db
+          .collection("user-data")
+          .doc(this.userId)
+          .update({
+            [key]: firebase.firestore.FieldValue.delete()
+          });
+      }
+    });
+  }
+
   get() {
     if (this.userId == "") {
       this.userId = this.authService.getUserId();
