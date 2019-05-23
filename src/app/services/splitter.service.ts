@@ -58,13 +58,14 @@ export class SplitterService {
 
   setCurrentProject(project: Project) {
     this.currentProject = project;
+    this.emitAllCurrentData();
   }
 
   createNewProject(projectName: string) {
     let p = new Project(null, projectName);
     this.allProjects.push(p);
     this.setCurrentProject(p);
-    this.emitAllCurrentData();
+
   }
 
   subscribeToCurrentProject(subscriber) {

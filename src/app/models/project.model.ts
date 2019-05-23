@@ -3,7 +3,7 @@ import { Expense } from './expense.model';
 import { Payment } from './payment.model';
 
 export class Project {
-  
+
   projectId: string;
   projectName: string;
   users: User[];
@@ -12,7 +12,7 @@ export class Project {
 
   constructor(projectId?: string, projectName?: string, users?:User[], expenses?: Expense[], payments?: Payment[]) {
     this.projectId = projectId || Math.random().toString().substr(2);
-    this.projectName = projectName || "default";
+    this.projectName = projectName || "Default";
     this.setData(users, expenses, payments);
   }
 
