@@ -7,54 +7,98 @@ import { Payment } from "../models/payment.model";
 import { LocalstorageService } from "./localstorage.service";
 import { FirebaseService } from "./firebase.service";
 //import { AuthGuardervice } from './auth-guard.service';
-import { AuthService } from './auth.service';
+import { AuthService } from "./auth.service";
+import { Project } from "../models/project.model";
 
 @Injectable({
   providedIn: "root"
 })
 export class SplitterService {
-  users: User[] = [];
-  expenses: Expense[] = [];
-  payments: Payment[] = [];
+  allProjects: Project[] = [];
+  currentProject: Project = new Project();
+
+  // users: User[] = [];
+  // expenses: Expense[] = [];
+  // payments: Payment[] = [];
 
   usersObservable: Subject<User[]>;
   expensesObservable: Subject<Expense[]>;
   paymentsObservable: Subject<Payment[]>;
+  currentProjectObservable: Subject<Project>;
+  allProjectsObservable: Subject<Project[]>;
 
-  constructor(private storage: FirebaseService, private authService: AuthService) {
-    //console.log("creating instance of Splitter Service");
-    // this.users = [
-    //   new User("Fernando"),
-    //   new User("Thiago"),
-    //   new User("Henrique"),
-    //   new User("Vitor")
-    // ];
-
-    // this.users = storage.get("users") || [];
-    // this.expenses = storage.get("expenses") || [];
-    // this.payments = storage.get("payments") || [];
+  constructor(
+    private storage: FirebaseService,
+    private authService: AuthService
+  ) {
+    this.resetProjects();
 
     this.authService.subscribeToUserId(userId => {
-      if(userId == "") {
-        this.users = [];
-        this.expenses = [];
-        this.payments = [];
+      if (userId == "") {
+        this.currentProject.setData();
       } else {
         this.getData();
       }
-    })
+    });
 
     this.getData();
-    
+
     this.usersObservable = new Subject();
     this.expensesObservable = new Subject();
     this.paymentsObservable = new Subject();
+    this.currentProjectObservable = new Subject();
+    this.allProjectsObservable = new Subject();
   }
 
-  getData(){
+  getAllProjects() {
+    return this.allProjects;
+  }
+
+  getCurrentProject() {
+    return this.currentProject;
+  }
+
+  setCurrentProject(project: Project) {
+    this.currentProject = project;
+    this.emitAllCurrentData();
+  }
+
+  createNewProject(projectName: string) {
+    let p = new Project(null, projectName);
+    this.allProjects.push(p);
+    this.setCurrentProject(p);
+
+  }
+
+  deleteProject(project: Project) {
+    this.allProjects.splice(this.allProjects.indexOf(project),1);
+    this.storage.delete(project.projectId);
+    if (this.allProjects.includes(this.currentProject)) {
+      this.emitAllCurrentData();
+    } else {
+      if(this.allProjects.length == 0) {
+        this.createNewProject("Default Project");
+      }
+      this.setCurrentProject(this.allProjects[0]);
+    }
+  }
+
+  resetProjects() {
+    this.allProjects = [];
+  }
+
+  subscribeToCurrentProject(subscriber) {
+    this.currentProjectObservable.subscribe(subscriber);
+  }
+
+  subscribeToAllProjects(subscriber) {
+    this.allProjectsObservable.subscribe(subscriber);
+  }
+
+  getData() {
     this.storage.get().then(data => {
-      console.log("getting users");
-      console.log(JSON.parse(data.data()["users"]));
+      // console.log("getting users");
+      // console.log(JSON.parse(data.data()["users"]));
       let parsedData = data.data();
       this.tryParseData(parsedData);
       this.emitAllCurrentData();
@@ -62,57 +106,71 @@ export class SplitterService {
   }
 
   tryParseData(data) {
+    this.resetProjects();
+
+    let d;
     try {
-      let users = JSON.parse(data["users"]);
-      this.users = users as User[] | [];
+      d = JSON.parse(data[Object.keys(data)[0]]) as Partial<Project>;
     } catch {
-      this.users = [];
+      this.currentProject = new Project();
+      this.allProjects = [];
+      this.allProjects.push(this.currentProject);
+      this.storage.save(this.currentProject.projectId, this.currentProject);
+      return;
     }
-    try {
-      let expenses = JSON.parse(data["expenses"]);
-      this.expenses = expenses as Expense[] | [];
-    } catch {
-      this.expenses = [];
+
+    //get all projects
+    for (let project in data) {
+      if (data.hasOwnProperty(project)) {
+        let p = new Project();
+        Object.assign(p, JSON.parse(data[project]) as Partial<Project>);
+        //if(p.expenses.length != 0 || p.payments.length != 0 || p.users.length != 0) {
+          this.allProjects.push(p);
+        //}
+      }
     }
-    try {
-      let payments = JSON.parse(data["payments"]);
-      this.payments = payments as Payment[] | [];
-    } catch {
-      this.payments = [];
-    }
+
+    let project = new Project();
+    this.currentProject = Object.assign(project, d);
+    console.log("d");
   }
 
   private emitAllCurrentData() {
-    this.usersObservable.next(this.users);
-    this.expensesObservable.next(this.expenses);
-    this.paymentsObservable.next(this.payments);
+    this.usersObservable.next(this.currentProject.users);
+    this.expensesObservable.next(this.currentProject.expenses);
+    this.paymentsObservable.next(this.currentProject.payments);
+    this.allProjectsObservable.next(this.allProjects);
+    this.currentProjectObservable.next(this.currentProject);
   }
 
   addUser(user: User) {
     if (user.name == null || user.name == "") {
       return;
     }
-    this.users.push(user);
-    this.storage.save("users", this.users);
-    this.usersObservable.next(this.users);
+    this.currentProject.users.push(user);
+    this.storage.save(this.currentProject.projectId, this.currentProject);
+    this.usersObservable.next(this.currentProject.users);
   }
 
   removeUser(user: User) {
-    this.users.splice(this.users.indexOf(user), 1);
+    this.currentProject.users.splice(
+      this.currentProject.users.indexOf(user),
+      1
+    );
 
     //FIX: not working
     //cascade remove any payments or expenses that had this user
     this.removeExpensesAndPaymentsWithNoAssociatedUser();
 
-    this.storage.save("users", this.users);
-    this.usersObservable.next(this.users);
+    this.storage.save(this.currentProject.projectId, this.currentProject);
+    this.usersObservable.next(this.currentProject.users);
   }
 
   removeExpensesAndPaymentsWithNoAssociatedUser() {
-    let userIds = this.users.map(user => user.id);
+    let userIds = this.currentProject.users.map(user => user.id);
 
-    for (let i = this.expenses.length - 1; i >= 0; --i) {
-      let expense = this.expenses[i];
+    for (let i = this.currentProject.expenses.length - 1; i >= 0; --i) {
+      let expense = this.currentProject.expenses[i];
       let missing = !expense.users.every(user => {
         return userIds.includes(user.id);
       });
@@ -121,8 +179,8 @@ export class SplitterService {
       }
     }
 
-    for (let i = this.payments.length - 1; i >= 0; --i) {
-      let payment = this.payments[i];
+    for (let i = this.currentProject.payments.length - 1; i >= 0; --i) {
+      let payment = this.currentProject.payments[i];
       let missing =
         !userIds.includes(payment.payer.id) ||
         !userIds.includes(payment.receiver.id);
@@ -133,7 +191,7 @@ export class SplitterService {
   }
 
   getUsers(): User[] {
-    return this.users;
+    return this.currentProject.users;
   }
 
   subscribeToUsers(observer) {
@@ -149,19 +207,22 @@ export class SplitterService {
       return;
     }
 
-    this.expenses.push(expense);
-    this.storage.save("expenses", this.expenses);
-    this.expensesObservable.next(this.expenses);
+    this.currentProject.expenses.push(expense);
+    this.storage.save(this.currentProject.projectId, this.currentProject);
+    this.expensesObservable.next(this.currentProject.expenses);
   }
 
   removeExpense(expense: Expense) {
-    this.expenses.splice(this.expenses.indexOf(expense), 1);
-    this.storage.save("expenses", this.expenses);
-    this.expensesObservable.next(this.expenses);
+    this.currentProject.expenses.splice(
+      this.currentProject.expenses.indexOf(expense),
+      1
+    );
+    this.storage.save(this.currentProject.projectId, this.currentProject);
+    this.expensesObservable.next(this.currentProject.expenses);
   }
 
   getExpenses(): Expense[] {
-    return this.expenses;
+    return this.currentProject.expenses;
   }
 
   subscribeToExpenses(observer) {
@@ -171,10 +232,10 @@ export class SplitterService {
   getPaidValues() {
     //console.log("inside get paid values");
     let paid = {};
-    this.users.forEach(user => {
+    this.currentProject.users.forEach(user => {
       paid[user.id] = 0;
     });
-    this.expenses.forEach(expense => {
+    this.currentProject.expenses.forEach(expense => {
       paid[expense.payer.id] += expense.value;
     });
     //console.log(paid);
@@ -183,10 +244,10 @@ export class SplitterService {
 
   getFairShares() {
     let fairShares = {};
-    this.users.forEach(user => {
+    this.currentProject.users.forEach(user => {
       fairShares[user.id] = 0;
     });
-    this.expenses.forEach(expense => {
+    this.currentProject.expenses.forEach(expense => {
       expense.users.forEach(user => {
         fairShares[user.id] += (expense.value * 1.0) / expense.users.length;
       });
@@ -196,22 +257,25 @@ export class SplitterService {
 
   getBalances() {
     let balance = {};
-    this.users.forEach(user => {
+    this.currentProject.users.forEach(user => {
       balance[user.id] = 0;
     });
 
-    if (this.expenses.length === 0 && this.payments.length === 0) {
+    if (
+      this.currentProject.expenses.length === 0 &&
+      this.currentProject.payments.length === 0
+    ) {
       return balance;
     }
 
     let paid = this.getPaidValues();
     let fairShares = this.getFairShares();
 
-    this.users.forEach(user => {
+    this.currentProject.users.forEach(user => {
       balance[user.id] = paid[user.id] - fairShares[user.id];
     });
 
-    this.payments.forEach(payment => {
+    this.currentProject.payments.forEach(payment => {
       balance[payment.payer.id] += payment.value;
       balance[payment.receiver.id] -= payment.value;
     });
@@ -231,23 +295,26 @@ export class SplitterService {
       return;
     }
 
-    this.payments.push(payment);
-    this.storage.save("payments", this.payments);
-    this.paymentsObservable.next(this.payments);
+    this.currentProject.payments.push(payment);
+    this.storage.save(this.currentProject.projectId, this.currentProject);
+    this.paymentsObservable.next(this.currentProject.payments);
 
     //FIX
     //this.expensesObservable.next(this.expenses);
   }
 
   removePayment(payment: Payment) {
-    this.payments.splice(this.payments.indexOf(payment), 1);
-    this.storage.save("payments", this.payments);
-    this.paymentsObservable.next(this.payments);
+    this.currentProject.payments.splice(
+      this.currentProject.payments.indexOf(payment),
+      1
+    );
+    this.storage.save(this.currentProject.projectId, this.currentProject);
+    this.paymentsObservable.next(this.currentProject.payments);
     //this.expensesObservable.next(this.expenses);
   }
 
   getPayments(): Payment[] {
-    return this.payments;
+    return this.currentProject.payments;
   }
 
   subscribeToPayments(observer) {
@@ -256,7 +323,7 @@ export class SplitterService {
 
   getPaymentsMade(user: User) {
     let total = 0;
-    this.payments.forEach(payment => {
+    this.currentProject.payments.forEach(payment => {
       if (payment.payer.id === user.id) {
         total += payment.value;
       }
@@ -266,7 +333,7 @@ export class SplitterService {
 
   getPaymentsReceived(user: User) {
     let total = 0;
-    this.payments.forEach(payment => {
+    this.currentProject.payments.forEach(payment => {
       if (payment.receiver.id === user.id) {
         total += payment.value;
       }

@@ -1,6 +1,7 @@
 import { AuthService } from 'src/app/services/auth.service';
 
-let mockAuthService: AuthService = {
+let mockAuthService = {//: AuthService = {
+  localStorage: null,
   token: "",
   userId: "",
   userIdObservable: null,

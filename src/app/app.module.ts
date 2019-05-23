@@ -20,10 +20,13 @@ import { SignupComponent } from './components/auth/signup/signup.component';
 import { SigninComponent } from './components/auth/signin/signin.component';
 import { AuthGuardService } from './services/auth-guard.service';
 import { HomeComponent } from './components/home/home.component';
+import { ProjectListComponent } from './components/project-list/project-list.component';
+import { ProjectsComponent } from './components/projects/projects.component';
 
 const appRoutes: Routes = [
   { path: "", component: HomeComponent, canActivate: [AuthGuardService] },
   { path: "home", component: HomeComponent, canActivate: [AuthGuardService] },
+  { path: "projects", component: ProjectsComponent, canActivate: [AuthGuardService] },
   { path: "users", component: UsersComponent, canActivate: [AuthGuardService] },
   { path: "expenses", component: ExpensesComponent, canActivate: [AuthGuardService] },
   { path: "payments", component: PaymentsComponent, canActivate: [AuthGuardService] },
@@ -48,7 +51,9 @@ const appRoutes: Routes = [
     PaymentsComponent,
     SignupComponent,
     SigninComponent,
-    HomeComponent
+    HomeComponent,
+    ProjectListComponent,
+    ProjectsComponent
   ],
   imports: [
     BrowserModule,
