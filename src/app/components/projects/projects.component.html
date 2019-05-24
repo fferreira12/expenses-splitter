@@ -16,19 +16,16 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let project of allProjects">
-        <td>{{ project.projectName }}</td>
+      <tr *ngFor="let p of allProjects; let i = index">
+        <td>{{ p.projectName }}</td>
         <td>
-          <button class="btn btn-primary mr-2" (click)="onActivateProject(project)">Activate</button>
-          <button class="btn btn-danger" data-toggle="modal" data-target="#deleteModal">Delete</button>
+          <button class="btn btn-primary mr-2" (click)="onActivateProject(p)">Activate</button>
+          <button class="btn btn-danger mr-2" data-toggle="modal" [attr.data-target]="'#deleteModal'+i">Delete</button>
+          <button class="btn btn-success" data-toggle="modal" [attr.data-target]="'#renameModal'+i">Rename</button>
         </td>
 
-
-
-
-
-        <!-- The Modal -->
-        <div class="modal" id="deleteModal">
+        <!-- The Delete Modal -->
+        <div class="modal" [id]="'deleteModal'+i">
           <div class="modal-dialog">
             <div class="modal-content">
 
@@ -40,20 +37,48 @@
 
               <!-- Modal body -->
               <div class="modal-body">
-                <p>Delete project <strong>{{ project.projectName }}</strong>?</p>
+                <p>Delete project <strong>{{ p.projectName }}</strong>?</p>
               </div>
 
               <!-- Modal footer -->
               <div class="modal-footer">
                 <button type="button" class="btn btn-danger" data-dismiss="modal"
-                  (click)="onDeleteProject(project)">Delete</button>
+                  (click)="onDeleteProject(p)">Delete</button>
               </div>
 
             </div>
           </div>
         </div>
 
+        <!-- The Rename Modal -->
+        <div class="modal" [id]="'renameModal'+i">
+          <div class="modal-dialog">
+            <div class="modal-content">
 
+              <!-- Modal Header -->
+              <div class="modal-header">
+                <h4 class="modal-title">Rename</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+              </div>
+
+              <!-- Modal body -->
+              <form>
+                <div class="modal-body">
+                  <p>Rename project <strong>{{ p.projectName }}</strong> to:</p>
+                  <input class="form-control" type="text" name="project-name" id="project-new-name"
+                    placeholder="New Project Name" [formControl]="projectNewName">
+                </div>
+
+                <!-- Modal footer -->
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-success" data-dismiss="modal"
+                    (click)="onRenameProject(p)">Rename</button>
+                </div>
+              </form>
+
+            </div>
+          </div>
+        </div>
 
 
 

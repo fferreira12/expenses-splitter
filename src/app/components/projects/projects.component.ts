@@ -11,6 +11,7 @@ import { FormControl } from '@angular/forms';
 export class ProjectsComponent implements OnInit {
 
   projectName = new FormControl('');
+  projectNewName = new FormControl('');
 
   allProjects: Project[];
   currentProject: Project;
@@ -30,15 +31,22 @@ export class ProjectsComponent implements OnInit {
   }
 
   onActivateProject(project: Project) {
+    //console.log('project to activate: ' + project.projectName);
     this.splitterService.setCurrentProject(project);
   }
 
   onDeleteProject(project: Project) {
+    //console.log('project to delete: ' + project.projectName);
     this.splitterService.deleteProject(project);
   }
 
   onAddProject() {
     this.splitterService.createNewProject(this.projectName.value);
+  }
+
+  onRenameProject(project: Project) {
+    //console.log('project to rename: ' + project.projectName);
+    this.splitterService.renameProject(project, this.projectNewName.value)
   }
 
 }

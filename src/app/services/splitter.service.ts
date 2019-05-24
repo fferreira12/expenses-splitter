@@ -70,6 +70,12 @@ export class SplitterService {
 
   }
 
+  renameProject(project: Project, newName: string) {
+    project.projectName = newName;
+    this.saveProjectData(project);
+    this.emitAllCurrentData();
+  }
+
   deleteProject(project: Project) {
     this.allProjects.splice(this.allProjects.indexOf(project),1);
     this.storage.delete(project.projectId);
@@ -115,7 +121,7 @@ export class SplitterService {
       this.currentProject = new Project();
       this.allProjects = [];
       this.allProjects.push(this.currentProject);
-      this.storage.save(this.currentProject.projectId, this.currentProject);
+      this.saveProjectData(this.currentProject);
       return;
     }
 
@@ -143,12 +149,16 @@ export class SplitterService {
     this.currentProjectObservable.next(this.currentProject);
   }
 
+  saveProjectData(project: Project) {
+    this.storage.save(project.projectId, project);
+  }
+
   addUser(user: User) {
     if (user.name == null || user.name == "") {
       return;
     }
     this.currentProject.users.push(user);
-    this.storage.save(this.currentProject.projectId, this.currentProject);
+    this.saveProjectData(this.currentProject);
     this.usersObservable.next(this.currentProject.users);
   }
 
@@ -162,7 +172,7 @@ export class SplitterService {
     //cascade remove any payments or expenses that had this user
     this.removeExpensesAndPaymentsWithNoAssociatedUser();
 
-    this.storage.save(this.currentProject.projectId, this.currentProject);
+    this.saveProjectData(this.currentProject);
     this.usersObservable.next(this.currentProject.users);
   }
 
@@ -208,7 +218,7 @@ export class SplitterService {
     }
 
     this.currentProject.expenses.push(expense);
-    this.storage.save(this.currentProject.projectId, this.currentProject);
+    this.saveProjectData(this.currentProject);
     this.expensesObservable.next(this.currentProject.expenses);
   }
 
@@ -217,7 +227,7 @@ export class SplitterService {
       this.currentProject.expenses.indexOf(expense),
       1
     );
-    this.storage.save(this.currentProject.projectId, this.currentProject);
+    this.saveProjectData(this.currentProject);
     this.expensesObservable.next(this.currentProject.expenses);
   }
 
@@ -296,7 +306,7 @@ export class SplitterService {
     }
 
     this.currentProject.payments.push(payment);
-    this.storage.save(this.currentProject.projectId, this.currentProject);
+    this.saveProjectData(this.currentProject);
     this.paymentsObservable.next(this.currentProject.payments);
 
     //FIX
@@ -308,7 +318,7 @@ export class SplitterService {
       this.currentProject.payments.indexOf(payment),
       1
     );
-    this.storage.save(this.currentProject.projectId, this.currentProject);
+    this.saveProjectData(this.currentProject);
     this.paymentsObservable.next(this.currentProject.payments);
     //this.expensesObservable.next(this.expenses);
   }
