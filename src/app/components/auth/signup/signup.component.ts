@@ -14,6 +14,7 @@ export class SignupComponent implements OnInit {
 
   error = null;
   loading: boolean = false;
+  //passwordsMatch: boolean;
 
   ngOnInit() {}
 
@@ -21,18 +22,23 @@ export class SignupComponent implements OnInit {
     this.loading = true;
     const email = form.value.email;
     const password = form.value.password;
+    const password2 = form.value.password2;
 
-    this.authService
-      .signupUser(email, password)
-      .then(data => {
-        this.loading = false;
-        if (data) {
-          this.router.navigate(["/signin"]);
-        } else {
-          this.error = {
-            message: "Could not create account"
-          };
-        }
-      });
+    if (password !== password2) {
+      this.error = new Error("Passwords must match");
+      this.loading = false;
+      return;
+    }
+
+    this.authService.signupUser(email, password).then(data => {
+      this.loading = false;
+      if (data) {
+        this.router.navigate(["/signin"]);
+      } else {
+        this.error = {
+          message: "Could not create account"
+        };
+      }
+    });
   }
 }
