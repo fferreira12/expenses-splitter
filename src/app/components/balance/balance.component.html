@@ -12,13 +12,14 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let user of users">
+      <tr *ngFor="let user of users"
+        [ngClass]="{'text-success': balances[user.id] > 0, 'text-danger': balances[user.id] < 0}">
         <td>{{ user.name }}</td>
         <td>{{ fairShares[user.id] | currency: "R$ " }}</td>
         <td>{{ paidValues[user.id] | currency: "R$ " }}</td>
-        <td>{{ splitterService.getPaymentsMade(user) | currency: "R$ " }}</td>
+        <td>{{ getPaymentsMade(user) | currency: "R$ " }}</td>
         <td>
-          {{ splitterService.getPaymentsReceived(user) | currency: "R$ " }}
+          {{ getPaymentsReceived(user) | currency: "R$ " }}
         </td>
         <td>{{ balances[user.id] | currency: "R$ " }}</td>
       </tr>

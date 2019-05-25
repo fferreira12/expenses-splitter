@@ -36,7 +36,6 @@ export class BalanceComponent implements OnInit {
     this.splitterService.subscribeToUsers(users => {
       this.users = users;
       this.updateValuesSharesAndBalance();
-
     });
   }
 
@@ -44,5 +43,13 @@ export class BalanceComponent implements OnInit {
     this.paidValues = this.splitterService.getPaidValues();
     this.fairShares = this.splitterService.getFairShares();
     this.balances = this.splitterService.getBalances();
+  }
+
+  getPaymentsMade(user: User) {
+    return this.splitterService.getPaymentsMade(user);
+  }
+
+  getPaymentsReceived(user: User) {
+    return this.splitterService.getPaymentsReceived(user);
   }
 }
