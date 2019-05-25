@@ -66,6 +66,7 @@ export class SplitterService {
   createNewProject(projectName: string) {
     let p = new Project(null, projectName);
     this.allProjects.push(p);
+    this.saveProjectData(p);
     this.setCurrentProject(p);
   }
 
