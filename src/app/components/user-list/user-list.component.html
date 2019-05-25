@@ -5,7 +5,10 @@
       <button class="btn btn-danger btn-sm" (click)="onRemoveUser(user)">
         X
       </button>
-      <span> {{ user.name }}</span>
+      <span class="ml-3" *ngIf="!isEditing(user)" (click)="onEditUsername(user)"> {{ user.name }}</span>
+      <input tabindex="-1" [(ngModel)]="editingUser.name" (focusout)="onLeaveFocus(user)" type="text"
+        class="form-control username ml-3" *ngIf="isEditing(user)">
+
     </li>
   </ul>
 </div>

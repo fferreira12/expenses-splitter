@@ -1,0 +1,11 @@
+.list-group-item span {
+  cursor: pointer;
+  display: inline-block;
+  min-width: 70px;
+}
+
+.username {
+  display: inline-block;
+  width: 50%;
+  min-width: 50px;
+}

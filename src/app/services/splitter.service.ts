@@ -67,7 +67,6 @@ export class SplitterService {
     let p = new Project(null, projectName);
     this.allProjects.push(p);
     this.setCurrentProject(p);
-
   }
 
   renameProject(project: Project, newName: string) {
@@ -76,13 +75,24 @@ export class SplitterService {
     this.emitAllCurrentData();
   }
 
+  renameUser(user: User, newName: string) {
+    if (!this.currentProject.users.includes(user)) {
+      return;
+    } else {
+      let index = this.currentProject.users.indexOf(user);
+      this.currentProject.users[index].name = newName;
+      this.saveProjectData(this.currentProject);
+      this.emitAllCurrentData();
+    }
+  }
+
   deleteProject(project: Project) {
-    this.allProjects.splice(this.allProjects.indexOf(project),1);
+    this.allProjects.splice(this.allProjects.indexOf(project), 1);
     this.storage.delete(project.projectId);
     if (this.allProjects.includes(this.currentProject)) {
       this.emitAllCurrentData();
     } else {
-      if(this.allProjects.length == 0) {
+      if (this.allProjects.length == 0) {
         this.createNewProject("Default Project");
       }
       this.setCurrentProject(this.allProjects[0]);
@@ -131,7 +141,7 @@ export class SplitterService {
         let p = new Project();
         Object.assign(p, JSON.parse(data[project]) as Partial<Project>);
         //if(p.expenses.length != 0 || p.payments.length != 0 || p.users.length != 0) {
-          this.allProjects.push(p);
+        this.allProjects.push(p);
         //}
       }
     }
