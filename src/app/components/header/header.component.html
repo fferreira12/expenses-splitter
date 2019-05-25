@@ -36,7 +36,10 @@
       </ul>
     </ng-template>
     <ng-template [ngIf]="authService.isAuthenticated()">
-      <ul class="navbar-nav">
+      <ul class="navbar-nav d-flex align-items-baseline">
+        <li class="navitem">
+          <a class="nav-link small">{{ currentLoggedInAs }}</a>
+        </li>
         <li class="nav-item">
           <a class="nav-link" routerLink="/signin" (click)="authService.logout()">Log Out</a>
         </li>
