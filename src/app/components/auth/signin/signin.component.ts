@@ -11,14 +11,20 @@ import { AuthService } from 'src/app/services/auth.service';
 })
 export class SigninComponent implements OnInit {
 
+  loading:boolean = false;
+
   constructor(private authService: AuthService, private router: Router) { }
 
   ngOnInit() {
   }
 
   onSignin(form: NgForm) {
+    this.loading = true;
     this.authService.signinUser(form.value.email, form.value.password)
-    .then(data => this.router.navigate(['/users']));
+    .then(data => {
+      this.loading = false;
+      this.router.navigate(['/home'])
+    });
   }
 
 }

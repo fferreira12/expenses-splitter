@@ -11,6 +11,9 @@
           <input type="password" id="password" name="password" ngModel class="form-control">
         </div>
         <button class="btn btn-primary" type="submit" [disabled]="!f.valid">Sign In</button>
+        <div *ngIf="loading" class="spinner-border text-primary ml-3" role="status">
+            <span class="sr-only">Loading...</span>
+          </div>
       </form>
     </div>
   </div>
