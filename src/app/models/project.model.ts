@@ -84,7 +84,7 @@ export class Project {
 
   addExpense(expense: Expense) {
     if (
-      !expense.users.includes(expense.payer) ||
+      !expense.allPayersAreParticipating(expense.payers) ||
       expense.value == null ||
       expense.value == 0
     ) {
@@ -114,7 +114,7 @@ export class Project {
       payment.value == null ||
       payment.value <= 0
     ) {
-      console.log("invalid payment");
+      //console.log("invalid payment");
       return false;
     }
 
@@ -136,10 +136,11 @@ export class Project {
     let paid = {};
     this.users.forEach(user => {
       paid[user.id] = 0;
+      this.expenses.forEach(expense => {
+        paid[user.id] += expense.getAmountPaid(user);
+      });
     });
-    this.expenses.forEach(expense => {
-      paid[expense.payer.id] += expense.value;
-    });
+
     //console.log(paid);
     return paid;
   }

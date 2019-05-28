@@ -39,7 +39,7 @@ export class AuthService {
           this.token = token;
         });
       } else {
-        console.log("not signed in");
+        //console.log("not signed in");
       }
     });
   }

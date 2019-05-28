@@ -1,52 +1,31 @@
 <h1>Add Expense</h1>
-<form
-  class="form-group"
-  (submit)="onAddExpense($event)"
-  [formGroup]="expenseForm"
->
-  <input
-    class="form-control"
-    type="text"
-    name="expense-name"
-    placeholder="Expense"
-    formControlName="expenseName"
-  />
-  Participants: <br/>
-  <label
-    formArrayName="users"
-    *ngFor="let user of users; let i = index"
-    class="form-check form-check-inline"
-  >
-    <input
-      type="checkbox"
-      [formControlName]="i"
-      [value]="user.id"
-      (change)="checkCheckBoxvalue($event)"
-    />
+<form class="form-group" (submit)="onAddExpense($event)" [formGroup]="expenseForm">
+  <input class="form-control" type="text" name="expense-name" placeholder="Expense" formControlName="expenseName" />
+  Participants: <br />
+  <label formArrayName="users" *ngFor="let user of users; let i = index" class="form-check form-check-inline">
+    <input type="checkbox" [formControlName]="i" [value]="user.id" (change)="checkCheckBoxvalue($event)" />
     {{ user.name }}
   </label>
-  <br/>
-  Payer: <br/>
-  <div
-    class="radio"
-    *ngFor="let user of users"
-    class="form-check form-check-inline"
-  >
-    <input
-      type="radio"
-      name="payer"
-      [value]="user.id"
-      formControlName="payer"
-    />
-    {{ user.name }}
-  </div>
-  <input
-    class="form-control"
-    type="number"
-    name="value"
-    formControlName="value"
-    placeholder="Value"
-  />
+  <br />
+  Payers: <br />
+  <input type="checkbox" name="singlepayers" id="true" (change)="onSinglePlayerCheck($event)"> Many Payers <br />
+  <ng-template [ngIf]="singlePayer">
+    <div class="radio" *ngFor="let user of users" class="form-check form-check-inline">
+      <input type="radio" [value]="user.id" formControlName="payer" />
+      {{ user.name }}
+    </div>
+  </ng-template>
+  <ng-template [ngIf]="!singlePayer">
+    <div class="radio" formArrayName="payers" *ngFor="let user of users; let i = index"
+      class="form-check form-check-inline">
+      <!-- <input type="checkbox" [formControlName]="'p'+i" [value]="user.id" (change)="checkCheckBoxvalue($event)" /> -->
+      {{ user.name }}
+      <input class="form-control value-form" type="number" [formControlName]="i">
+    </div>
+  </ng-template>
+  <input *ngIf="singlePayer" class="form-control" type="number" name="value" formControlName="value"
+    placeholder="Value" />
+  <br />
   <button class="btn btn-primary mt-2" type="submit">
     Add Expense
   </button>
