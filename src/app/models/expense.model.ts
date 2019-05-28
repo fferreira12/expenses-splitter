@@ -35,7 +35,7 @@ export class Expense {
 
   isPayer(user: User): boolean {
     return this.payers.some(p => {
-      return p.payer == user;
+      return p.payer.id == user.id;
     });
   }
 

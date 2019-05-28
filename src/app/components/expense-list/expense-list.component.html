@@ -16,6 +16,7 @@
         <td>{{ expense.value | currency: "R$ " }}</td>
         <td>
           <span *ngFor="let user of expense.users" [ngClass]="{ payer: checkIsPayer(expense, user) }">{{ user.name }}
+            <span *ngIf="getAmountPaid(expense, user) > 0">(R$ {{getAmountPaid(expense, user)}})</span> <br/>
           </span>
         </td>
         <td>

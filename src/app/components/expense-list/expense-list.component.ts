@@ -25,9 +25,11 @@ export class ExpenseListComponent implements OnInit {
   }
 
   checkIsPayer(expense: Expense, user: User) {
-    //FIX: should use method isPayer of expense class, but was 'not existing' (maybe after parsed method does not exist)
-    return expense.payers.some(p => {
-      return p.payer.id == user.id;
-    });
+    return (Expense.createExpense(expense)).isPayer(user);
   }
+
+  getAmountPaid(expense: Expense, user: User) {
+    return (Expense.createExpense(expense)).getAmountPaid(user);
+  }
+
 }
