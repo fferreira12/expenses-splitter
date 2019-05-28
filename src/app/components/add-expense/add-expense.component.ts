@@ -2,7 +2,7 @@ import { Component, OnInit } from "@angular/core";
 import { SplitterService } from "src/app/services/splitter.service";
 import { FormGroup, FormControl, FormBuilder, FormArray } from "@angular/forms";
 import { User } from "src/app/models/user.model";
-import { Expense } from 'src/app/models/expense.model';
+import { Expense } from "src/app/models/expense.model";
 
 @Component({
   selector: "app-add-expense",
@@ -12,6 +12,7 @@ import { Expense } from 'src/app/models/expense.model';
 export class AddExpenseComponent implements OnInit {
   expenseForm: FormGroup;
   users: User[];
+  singlePayer: boolean = true;
 
   constructor(
     private splitterService: SplitterService,
@@ -24,12 +25,13 @@ export class AddExpenseComponent implements OnInit {
       expenseName: new FormControl(null),
       users: new FormArray([]),
       value: new FormControl(null),
-      payer: new FormControl(null)
+      payer: new FormControl(null),
+      payers: new FormArray([])
     });
     this.addCheckboxes();
     this.splitterService.subscribeToUsers(users => {
       this.users = users;
-      
+
       this.expenseForm.controls.users = this.formBuilder.array([]);
 
       this.addCheckboxes();
@@ -42,24 +44,20 @@ export class AddExpenseComponent implements OnInit {
     let expenseName = this.expenseForm.controls.expenseName.value;
     let payerId = this.expenseForm.controls.payer.value;
     let usersIds = (this.expenseForm.controls.users as FormArray).controls
-    .map(formControl => {
-      // console.log(formControl);
-      return (formControl as FormControl).value;
-    }).map( (playerIsParticipating, i) => {
-      if(playerIsParticipating) {
-        return this.users[i].id;
-      }
-    });
+      .map(formControl => {
+        return (formControl as FormControl).value;
+      })
+      .map((playerIsParticipating, i) => {
+        if (playerIsParticipating) {
+          return this.users[i].id;
+        }
+      });
     let value = this.expenseForm.controls.value.value;
 
     const expense = new Expense(expenseName, value);
 
-    //console.log(usersIds);
     let filteredUsers = this.users.filter(user => {
-      //console.log(user.id);
       let isIn = usersIds.includes(user.id);
-      // console.log(user.id);
-      // console.log(isIn);
       return isIn;
     });
 
@@ -67,32 +65,50 @@ export class AddExpenseComponent implements OnInit {
       expense.addUser(user);
     });
 
-    let payer = this.users.find(user => {
-      return user.id === payerId;
-    });
-
-    expense.setPayer(payer);
-
-    //console.log(expense);
+    let payer;
+    if (this.singlePayer) {
+      payer = this.users.find(user => {
+        return user.id === payerId;
+      });
+      expense.setPayer(payer);
+    } else {
+      let payers = [];
+      let total = 0;
+      this.users.forEach((u, i) => {
+        let val = (this.expenseForm.controls.payers as FormArray).controls[i]
+          .value;
+        if (val > 0) {
+          payers.push({ payer: u, amount: val });
+          total += val;
+        }
+      });
+      expense.value = total;
+      expense.setPayers(payers);
+    }
 
     this.splitterService.addExpense(expense);
   }
 
   addCheckboxes() {
-    //console.log('has now ' + this.users.length + ' users');
     this.users.map((o, i) => {
       const control = new FormControl(true);
-      //console.log(control);
+      const valueControl = new FormControl(0);
       (this.expenseForm.controls.users as FormArray).push(control);
+      (this.expenseForm.controls.payers as FormArray).push(valueControl);
     });
   }
 
   checkCheckBoxvalue(event) {
-    if(event.target.checked) {
+    if (event.target.checked) {
       //event.target.value = event.target.name;
-      
     }
     //console.log(this.expenseForm.controls.users)
     // console.log(event);
+  }
+
+  onSinglePlayerCheck(event) {
+    //console.log(event);
+
+    this.singlePayer = !event.target.checked;
   }
 }
