@@ -15,17 +15,12 @@
         <td>{{ expense.name }}</td>
         <td>{{ expense.value | currency: "R$ " }}</td>
         <td>
-          <span
-            *ngFor="let user of expense.users"
-            [ngClass]="{ payer: user.id === expense.payer.id }"
-            >{{ user.name }}
+          <span *ngFor="let user of expense.users" [ngClass]="{ payer: checkIsPayer(expense, user) }">{{ user.name }}
+            <span *ngIf="getAmountPaid(expense, user) > 0">(R$ {{getAmountPaid(expense, user)}})</span> <br/>
           </span>
         </td>
         <td>
-          <button
-            class="btn btn-danger btn-sm"
-            (click)="onRemoveExpense(expense)"
-          >
+          <button class="btn btn-danger btn-sm" (click)="onRemoveExpense(expense)">
             X
           </button>
         </td>

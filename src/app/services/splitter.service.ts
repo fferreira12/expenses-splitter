@@ -141,7 +141,7 @@ export class SplitterService {
 
     let project = new Project();
     this.currentProject = Object.assign(project, d);
-    console.log("d");
+    //console.log("d");
   }
 
   private emitAllCurrentData() {
