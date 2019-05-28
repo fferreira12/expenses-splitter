@@ -17,6 +17,13 @@ export class Expense {
     this.value = value;
   }
 
+  static createExpense(expense: Expense) {
+    let e = new Expense(expense.name, expense.value);
+    e.users = [...expense.users];
+    e.payers = [...expense.payers];
+    return e;
+  }
+
   addUser(user: User) {
     this.users.push(user);
   }
@@ -52,10 +59,7 @@ export class Expense {
     if (payers == null) {
       ps = this.payers;
     }
-    console.log("ps");
-    console.log(ps);
-    console.log("payers");
-    console.log(payers);
+
     return ps.every(p => {
       return this.users.includes(p.payer);
     });
@@ -64,8 +68,8 @@ export class Expense {
   getAmountPaid(user: User) {
     //multiple users
     let total = 0;
-    (this.payers as PayersArray).forEach(p => {
-      if (p.payer == user) {
+    this.payers.forEach(p => {
+      if (p.payer.id == user.id) {
         total += p.amount;
       }
     });

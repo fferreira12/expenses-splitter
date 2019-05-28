@@ -45,7 +45,6 @@ export class AddExpenseComponent implements OnInit {
     let payerId = this.expenseForm.controls.payer.value;
     let usersIds = (this.expenseForm.controls.users as FormArray).controls
       .map(formControl => {
-        // console.log(formControl);
         return (formControl as FormControl).value;
       })
       .map((playerIsParticipating, i) => {
@@ -57,12 +56,8 @@ export class AddExpenseComponent implements OnInit {
 
     const expense = new Expense(expenseName, value);
 
-    //console.log(usersIds);
     let filteredUsers = this.users.filter(user => {
-      //console.log(user.id);
       let isIn = usersIds.includes(user.id);
-      // console.log(user.id);
-      // console.log(isIn);
       return isIn;
     });
 
@@ -82,8 +77,6 @@ export class AddExpenseComponent implements OnInit {
       this.users.forEach((u, i) => {
         let val = (this.expenseForm.controls.payers as FormArray).controls[i]
           .value;
-        //console.log(val);
-
         if (val > 0) {
           payers.push({ payer: u, amount: val });
           total += val;
@@ -93,17 +86,13 @@ export class AddExpenseComponent implements OnInit {
       expense.setPayers(payers);
     }
 
-    //console.log(expense);
-
     this.splitterService.addExpense(expense);
   }
 
   addCheckboxes() {
-    //console.log('has now ' + this.users.length + ' users');
     this.users.map((o, i) => {
       const control = new FormControl(true);
       const valueControl = new FormControl(0);
-      //console.log(control);
       (this.expenseForm.controls.users as FormArray).push(control);
       (this.expenseForm.controls.payers as FormArray).push(valueControl);
     });

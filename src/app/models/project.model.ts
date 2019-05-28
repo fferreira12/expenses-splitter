@@ -137,7 +137,10 @@ export class Project {
     this.users.forEach(user => {
       paid[user.id] = 0;
       this.expenses.forEach(expense => {
-        paid[user.id] += expense.getAmountPaid(user);
+
+        let e = Expense.createExpense(expense);
+
+        paid[user.id] += (e).getAmountPaid(user);
       });
     });
 
@@ -171,6 +174,7 @@ export class Project {
     let paid = this.getPaidValues();
     let fairShares = this.getFairShares();
 
+
     this.users.forEach(user => {
       balance[user.id] = paid[user.id] - fairShares[user.id];
     });
@@ -179,6 +183,9 @@ export class Project {
       balance[payment.payer.id] += payment.value;
       balance[payment.receiver.id] -= payment.value;
     });
+
+
+
 
     return balance;
   }
