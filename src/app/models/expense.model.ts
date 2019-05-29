@@ -1,7 +1,6 @@
 import { User } from "./user.model";
 import { throwError } from "rxjs";
-
-type PayersArray = { payer: User; amount: number }[];
+import { PayersArray } from "../util/types";
 
 export class Expense {
   name: string;

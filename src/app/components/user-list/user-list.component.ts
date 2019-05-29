@@ -28,7 +28,7 @@ export class UserListComponent implements OnInit {
   onEditUsername(user: User) {
     this.editMode = !this.editMode;
     this.editingUser = user;
-    console.log("renaming " + user.name);
+    //console.log("renaming " + user.name);
   }
 
   isEditing(user: User) {

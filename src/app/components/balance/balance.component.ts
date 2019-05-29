@@ -2,6 +2,7 @@ import { Component, OnInit } from "@angular/core";
 import { SplitterService } from "src/app/services/splitter.service";
 import { Expense } from "src/app/models/expense.model";
 import { User } from "src/app/models/user.model";
+import { SimpleCalculator } from "src/app/util/payment-calculator";
 
 @Component({
   selector: "app-balance",
@@ -13,12 +14,17 @@ export class BalanceComponent implements OnInit {
   expenses: Expense[];
   paidValues: any;
   fairShares: any;
-  balances: any;
+  balances: any = {};
+  calculator: SimpleCalculator;
+  suggestedPayments: { payer: User; receiver: User; amount: number }[];
 
   constructor(private splitterService: SplitterService) {}
 
   ngOnInit() {
+    this.calculator = new SimpleCalculator();
+
     this.users = this.splitterService.getUsers();
+    this.calculator.setAllUsers(this.users);
     this.expenses = this.splitterService.getExpenses();
 
     this.updateValuesSharesAndBalance();
@@ -35,6 +41,7 @@ export class BalanceComponent implements OnInit {
 
     this.splitterService.subscribeToUsers(users => {
       this.users = users;
+      this.calculator.setAllUsers(this.users);
       this.updateValuesSharesAndBalance();
     });
   }
@@ -43,6 +50,8 @@ export class BalanceComponent implements OnInit {
     this.paidValues = this.splitterService.getPaidValues();
     this.fairShares = this.splitterService.getFairShares();
     this.balances = this.splitterService.getBalances();
+    this.suggestedPayments = this.calculator.calculate(this.balances);
+    //console.log(this.suggestedPayments);
   }
 
   getPaymentsMade(user: User) {

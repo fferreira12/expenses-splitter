@@ -25,4 +25,23 @@
       </tr>
     </tbody>
   </table>
+  <div *ngIf="suggestedPayments.length > 0">
+    <h1>Suggested Payments</h1>
+    <table class="table col-md-6">
+      <thead class="thead-light">
+        <tr>
+          <th>Payer</th>
+          <th>Amount</th>
+          <th>Receiver</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let p of suggestedPayments">
+          <td>{{ p.payer.name }}</td>
+          <td>{{ p.amount | currency: "R$ "}}</td>
+          <td>{{ p.receiver.name }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </div>
