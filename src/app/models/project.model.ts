@@ -1,6 +1,7 @@
 import { User } from "./user.model";
 import { Expense } from "./expense.model";
 import { Payment } from "./payment.model";
+import { uuid } from '../util/uuid';
 
 export class Project {
   projectId: string;
@@ -16,11 +17,7 @@ export class Project {
     expenses?: Expense[],
     payments?: Payment[]
   ) {
-    this.projectId =
-      projectId ||
-      Math.random()
-        .toString()
-        .substr(2);
+    this.projectId = projectId || uuid();
     this.projectName = projectName || "Default";
     this.setData(users, expenses, payments);
   }

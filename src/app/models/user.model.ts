@@ -1,3 +1,5 @@
+import { uuid } from '../util/uuid';
+
 export class User {
   id: string;
   name: string;
@@ -7,7 +9,7 @@ export class User {
     if (id != undefined) {
       this.id = id;
     } else {
-      this.id = Math.random().toString();
+      this.id = uuid();
     }
   }
 }
