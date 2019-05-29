@@ -1,15 +1,13 @@
 export class User {
-
-  id: number;
+  id: string;
   name: string;
 
-  constructor(name: string, id?:number) {
+  constructor(name: string, id?: string) {
     this.name = name;
-    if(id != undefined) {
+    if (id != undefined) {
       this.id = id;
     } else {
-      this.id = Math.random();
+      this.id = Math.random().toString();
     }
   }
-
 }
