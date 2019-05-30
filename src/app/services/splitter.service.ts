@@ -16,6 +16,7 @@ import { Project } from "../models/project.model";
 export class SplitterService {
   allProjects: Project[] = [];
   currentProject: Project = new Project();
+  isLoading: boolean = true;
 
   // users: User[] = [];
   // expenses: Expense[] = [];
@@ -26,6 +27,7 @@ export class SplitterService {
   paymentsObservable: Subject<Payment[]>;
   currentProjectObservable: Subject<Project>;
   allProjectsObservable: Subject<Project[]>;
+  loadingObservable: Subject<boolean>;
 
   constructor(
     private storage: FirebaseService,
@@ -33,13 +35,17 @@ export class SplitterService {
   ) {
     this.resetProjects();
 
-    this.authService.subscribeToUserId(userId => {
-      if (userId == "") {
-        this.currentProject.setData();
-      } else {
-        this.getData();
-      }
-    });
+    try {
+      this.authService.subscribeToUserId(userId => {
+        if (userId == "") {
+          this.currentProject.setData();
+        } else {
+          this.getData();
+        }
+      });
+    } catch (e) {
+      console.log(e);
+    }
 
     this.getData();
 
@@ -48,6 +54,17 @@ export class SplitterService {
     this.paymentsObservable = new Subject();
     this.currentProjectObservable = new Subject();
     this.allProjectsObservable = new Subject();
+    this.loadingObservable = new Subject();
+
+    this.isLoading = false;
+  }
+
+  subscribeToLoading(subscriber) {
+    this.loadingObservable.subscribe(subscriber);
+  }
+
+  getLoadingStatus() {
+    return this.isLoading;
   }
 
   getAllProjects() {
@@ -145,15 +162,23 @@ export class SplitterService {
   }
 
   private emitAllCurrentData() {
+    this.isLoading = true;
+    this.loadingObservable.next(this.isLoading);
     this.usersObservable.next(this.currentProject.users);
     this.expensesObservable.next(this.currentProject.expenses);
     this.paymentsObservable.next(this.currentProject.payments);
     this.allProjectsObservable.next(this.allProjects);
     this.currentProjectObservable.next(this.currentProject);
+    this.isLoading = false;
+    this.loadingObservable.next(this.isLoading);
   }
 
   saveProjectData(project: Project) {
+    this.isLoading = true;
+    this.loadingObservable.next(this.isLoading);
     this.storage.save(project.projectId, project);
+    this.isLoading = false;
+    this.loadingObservable.next(this.isLoading);
   }
 
   addUser(user: User) {
