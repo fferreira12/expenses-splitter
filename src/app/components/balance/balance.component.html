@@ -13,7 +13,7 @@
     </thead>
     <tbody>
       <tr *ngFor="let user of users"
-        [ngClass]="{'text-success': balances[user.id] > 0, 'text-danger': balances[user.id] < 0}">
+        [ngClass]="{'text-success': balances[user.id] > 0.01, 'text-danger': balances[user.id] < -0.01}">
         <td>{{ user.name }}</td>
         <td>{{ fairShares[user.id] | currency: "R$ " }}</td>
         <td>{{ paidValues[user.id] | currency: "R$ " }}</td>
