@@ -25,6 +25,7 @@
       </tr>
     </tbody>
   </table>
+
   <div *ngIf="suggestedPayments.length > 0">
     <h1>Suggested Payments</h1>
     <table class="table col-md-6">
@@ -33,6 +34,7 @@
           <th>Payer</th>
           <th>Amount</th>
           <th>Receiver</th>
+          <th>Options</th>
         </tr>
       </thead>
       <tbody>
@@ -40,6 +42,7 @@
           <td>{{ p.payer.name }}</td>
           <td>{{ p.amount | currency: "R$ "}}</td>
           <td>{{ p.receiver.name }}</td>
+          <td><button class="btn btn-success" (click)="onAddToPayments(p)">Add To Payments</button></td>
         </tr>
       </tbody>
     </table>
