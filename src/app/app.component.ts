@@ -1,18 +1,21 @@
-import { Component, OnInit } from '@angular/core';
-
-import * as firebase from 'firebase';
-import { AuthService } from './services/auth.service';
+import { Component, OnInit } from "@angular/core";
+import { TranslateService } from "@ngx-translate/core";
+import * as firebase from "firebase";
+import { AuthService } from "./services/auth.service";
 
 @Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  selector: "app-root",
+  templateUrl: "./app.component.html",
+  styleUrls: ["./app.component.css"]
 })
 export class AppComponent implements OnInit {
-  title = 'expense-splitter-frontend';
+  title = "expense-splitter-frontend";
 
-  constructor(private authService: AuthService) {
-    
+  constructor(
+    private authService: AuthService,
+    private translate: TranslateService
+  ) {
+    translate.setDefaultLang("en");
   }
 
   ngOnInit() {
@@ -27,5 +30,9 @@ export class AppComponent implements OnInit {
     });
     firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL);
     this.authService.init();
+  }
+
+  switchLanguage(language: string) {
+    this.translate.use(language);
   }
 }

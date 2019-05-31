@@ -1,27 +1,30 @@
 <div class="container">
-  <h1>Add Project</h1>
+  <h1>{{'AddProject' | translate}}</h1>
   <div class="form-group">
     <form class="form-inline">
-      <input class="form-control" type="text" name="name" id="txtName" placeholder="Name" [formControl]="projectName">
-      <button class="btn btn-primary ml-1" (click)="onAddProject()">Add Project</button>
+      <input class="form-control" type="text" name="name" id="txtName" placeholder="{{'Name' | translate}}"
+        [formControl]="projectName">
+      <button class="btn btn-primary ml-1" (click)="onAddProject()">{{'AddProject' | translate}}</button>
     </form>
   </div>
 
-  <h1>Projects</h1>
+  <h1>{{'Projects' | translate}}</h1>
   <table class="table">
     <thead class="thead-light">
       <tr>
-        <th>Name</th>
-        <th>Options</th>
+        <th>{{'Name' | translate}}</th>
+        <th>{{'Options' | translate}}</th>
       </tr>
     </thead>
     <tbody>
       <tr *ngFor="let p of allProjects; let i = index">
         <td>{{ p.projectName }}</td>
         <td>
-          <button class="btn btn-primary mr-2" (click)="onActivateProject(p)">Activate</button>
-          <button class="btn btn-danger mr-2" data-toggle="modal" [attr.data-target]="'#deleteModal'+i">Delete</button>
-          <button class="btn btn-success" data-toggle="modal" [attr.data-target]="'#renameModal'+i">Rename</button>
+          <button class="btn btn-primary mr-2" (click)="onActivateProject(p)">{{'Activate' | translate}}</button>
+          <button class="btn btn-danger mr-2" data-toggle="modal"
+            [attr.data-target]="'#deleteModal'+i">{{'Delete' | translate}}</button>
+          <button class="btn btn-success" data-toggle="modal"
+            [attr.data-target]="'#renameModal'+i">{{'Rename' | translate}}</button>
         </td>
 
         <!-- The Delete Modal -->
@@ -31,19 +34,19 @@
 
               <!-- Modal Header -->
               <div class="modal-header">
-                <h4 class="modal-title">Delete </h4>
+                <h4 class="modal-title">{{'Delete' | translate}}</h4>
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
               </div>
 
               <!-- Modal body -->
               <div class="modal-body">
-                <p>Delete project <strong>{{ p.projectName }}</strong>?</p>
+                <p>{{'DeleteProject?' | translate}} <strong>{{ p.projectName }}</strong>?</p>
               </div>
 
               <!-- Modal footer -->
               <div class="modal-footer">
                 <button type="button" class="btn btn-danger" data-dismiss="modal"
-                  (click)="onDeleteProject(p)">Delete</button>
+                  (click)="onDeleteProject(p)">{{'Delete' | translate}}</button>
               </div>
 
             </div>
@@ -57,22 +60,22 @@
 
               <!-- Modal Header -->
               <div class="modal-header">
-                <h4 class="modal-title">Rename</h4>
+                <h4 class="modal-title">{{'Rename' | translate}}</h4>
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
               </div>
 
               <!-- Modal body -->
               <form>
                 <div class="modal-body">
-                  <p>Rename project <strong>{{ p.projectName }}</strong> to:</p>
+                  <p>{{'RenameProject?' | translate}} <strong>{{ p.projectName }}</strong> {{'To' | translate}}:</p>
                   <input class="form-control" type="text" name="project-name" id="project-new-name"
-                    placeholder="New Project Name" [formControl]="projectNewName">
+                    placeholder="{{'NewProjectName' | translate}}" [formControl]="projectNewName">
                 </div>
 
                 <!-- Modal footer -->
                 <div class="modal-footer">
                   <button type="button" class="btn btn-success" data-dismiss="modal"
-                    (click)="onRenameProject(p)">Rename</button>
+                    (click)="onRenameProject(p)">{{'Rename' | translate}}</button>
                 </div>
               </form>
 

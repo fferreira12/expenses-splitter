@@ -1,5 +1,5 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-  <a class="navbar-brand" routerLink="/home">Expenses Splitter</a>
+  <a class="navbar-brand" routerLink="/home">{{'ExpensesSplitter' | translate}}</a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText"
     aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
@@ -10,38 +10,45 @@
         <app-project-list></app-project-list>
       </li>
       <li class="nav-item">
-        <a class="nav-link" routerLink="/projects" routerLinkActive="active">Projects</a>
+        <a class="nav-link" routerLink="/projects" routerLinkActive="active">{{'Projects' | translate}}</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" routerLink="/users" routerLinkActive="active">Users</a>
+        <a class="nav-link" routerLink="/users" routerLinkActive="active">{{'Users' | translate}}</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" routerLink="/expenses" routerLinkActive="active">Expenses</a>
+        <a class="nav-link" routerLink="/expenses" routerLinkActive="active">{{'Expenses' | translate}}</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" routerLink="/payments" routerLinkActive="active">Payments</a>
+        <a class="nav-link" routerLink="/payments" routerLinkActive="active">{{'Payments' | translate}}</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" routerLink="/balance" routerLinkActive="active">Balance</a>
+        <a class="nav-link" routerLink="/balance" routerLinkActive="active">{{'Balance' | translate}}</a>
+      </li>
+    </ul>
+    <ul class="navbar-nav ml-auto">
+      <li class="nav-item">
+        <app-language-list></app-language-list>
       </li>
     </ul>
     <ng-template [ngIf]="!authService.isAuthenticated()">
-      <ul class="navbar-nav ml-auto">
+      <ul class="navbar-nav d-flex align-items-baseline">
         <li class="nav-item">
-          <a class="nav-link" routerLink="/signup" routerLinkActive="active">Sign Up</a>
+          <a class="nav-link" routerLink="/signup" routerLinkActive="active">{{'SignUp' | translate}}</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" routerLink="/signin" routerLinkActive="active">Sign In</a>
+          <a class="nav-link" routerLink="/signin" routerLinkActive="active">{{'SignIn' | translate}}</a>
         </li>
       </ul>
     </ng-template>
+
     <ng-template [ngIf]="authService.isAuthenticated()">
       <ul class="navbar-nav d-flex align-items-baseline">
+
         <li class="navitem">
           <a class="nav-link small">{{ currentLoggedInAs }}</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" routerLink="/signin" (click)="authService.logout()">Log Out</a>
+          <a class="nav-link" routerLink="/signin" (click)="authService.logout()">{{'LogOut' | translate}}</a>
         </li>
       </ul>
     </ng-template>

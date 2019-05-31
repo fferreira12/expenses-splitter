@@ -1,24 +1,23 @@
 <div *ngIf="payments.length > 0">
-  <h1>Payments</h1>
+  <h1>{{'Payments' | translate}}</h1>
 
   <table class="table">
-      <thead class="thead-light">
-        <tr>
-          <th>Payer</th>
-          <th>Receiver</th>
-          <th>Value</th>
-          <th>Options</th>
-        </tr>
-      </thead>
-      <tbody *ngFor="let payment of payments">
-        <tr>
-          <td>{{ payment.payer.name }}</td>
-          <td>{{ payment.receiver.name }}</td>
-          <td>{{ payment.value | currency:"R$ " }}</td>
-          <td><button class="btn btn-danger btn-sm" (click)="onRemovePayment(payment)">X</button></td>
-        </tr>
-      </tbody>
-    </table>
+    <thead class="thead-light">
+      <tr>
+        <th>{{'Payer' | translate}}</th>
+        <th>{{'Receiver' | translate}}</th>
+        <th>{{'Value' | translate}}</th>
+        <th>{{'Options' | translate}}</th>
+      </tr>
+    </thead>
+    <tbody *ngFor="let payment of payments">
+      <tr>
+        <td>{{ payment.payer.name }}</td>
+        <td>{{ payment.receiver.name }}</td>
+        <td>{{ payment.value | currency:"R$ " }}</td>
+        <td><button class="btn btn-danger btn-sm" (click)="onRemovePayment(payment)">X</button></td>
+      </tr>
+    </tbody>
+  </table>
 
 </div>
-

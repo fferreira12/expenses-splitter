@@ -1,14 +1,14 @@
 <div class="container">
-  <h1>Balance</h1>
+  <h1>{{'Balance' | translate}}</h1>
   <table class="table">
     <thead class="thead-light">
       <tr>
-        <th>People</th>
-        <th>Fair Share</th>
-        <th>Expenses Paid</th>
-        <th>Payments Made</th>
-        <th>Payments Received</th>
-        <th>Balance</th>
+        <th>{{'People' | translate}}</th>
+        <th>{{'FairShare' | translate}}</th>
+        <th>{{'ExpensesPaid' | translate}}</th>
+        <th>{{'PaymentsMade' | translate}}</th>
+        <th>{{'PaymentsReceived' | translate}}</th>
+        <th>{{'Balance' | translate}}</th>
       </tr>
     </thead>
     <tbody>
@@ -27,14 +27,14 @@
   </table>
 
   <div *ngIf="suggestedPayments.length > 0">
-    <h1>Suggested Payments</h1>
-    <table class="table col-md-6">
+    <h1>{{'SuggestedPayments' | translate}}</h1>
+    <table class="table col-md-8">
       <thead class="thead-light">
         <tr>
-          <th>Payer</th>
-          <th>Amount</th>
-          <th>Receiver</th>
-          <th>Options</th>
+          <th>{{'Payer' | translate}}</th>
+          <th>{{'Amount' | translate}}</th>
+          <th>{{'Receiver' | translate}}</th>
+          <th>{{'Options' | translate}}</th>
         </tr>
       </thead>
       <tbody>
@@ -42,7 +42,7 @@
           <td>{{ p.payer.name }}</td>
           <td>{{ p.amount | currency: "R$ "}}</td>
           <td>{{ p.receiver.name }}</td>
-          <td><button class="btn btn-success" (click)="onAddToPayments(p)">Add To Payments</button></td>
+          <td><button class="btn btn-success" (click)="onAddToPayments(p)">{{'AddToPayments' | translate}}</button></td>
         </tr>
       </tbody>
     </table>

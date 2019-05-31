@@ -3,6 +3,10 @@ import { NgModule } from "@angular/core";
 import { ReactiveFormsModule, FormsModule } from "@angular/forms";
 import { Routes, RouterModule } from "@angular/router";
 
+import { HttpClientModule, HttpClient } from "@angular/common/http";
+import { TranslateModule, TranslateLoader } from "@ngx-translate/core";
+import { TranslateHttpLoader } from "@ngx-translate/http-loader";
+
 import { AppRoutingModule } from "./app-routing.module";
 import { AppComponent } from "./app.component";
 import { AddUserComponent } from "./components/add-user/add-user.component";
@@ -23,6 +27,11 @@ import { HomeComponent } from "./components/home/home.component";
 import { ProjectListComponent } from "./components/project-list/project-list.component";
 import { ProjectsComponent } from "./components/projects/projects.component";
 import { LoadingComponent } from "./components/loading/loading.component";
+import { LanguageListComponent } from "./components/language-list/language-list.component";
+
+export function HttpLoaderFactory(http: HttpClient) {
+  return new TranslateHttpLoader(http);
+}
 
 const appRoutes: Routes = [
   { path: "", component: HomeComponent, canActivate: [AuthGuardService] },
@@ -71,14 +80,23 @@ const appRoutes: Routes = [
     SigninComponent,
     HomeComponent,
     ProjectListComponent,
-    ProjectsComponent
+    ProjectsComponent,
+    LanguageListComponent
   ],
   imports: [
     BrowserModule,
+    HttpClientModule,
     AppRoutingModule,
     ReactiveFormsModule,
     FormsModule,
-    RouterModule.forRoot(appRoutes)
+    RouterModule.forRoot(appRoutes),
+    TranslateModule.forRoot({
+      loader: {
+        provide: TranslateLoader,
+        useFactory: HttpLoaderFactory,
+        deps: [HttpClient]
+      }
+    })
   ],
   providers: [],
   bootstrap: [AppComponent]

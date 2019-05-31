@@ -1,13 +1,13 @@
 <div *ngIf="expenses.length > 0">
-  <h1>Expenses</h1>
+  <h1>{{'Expenses' | translate}}</h1>
 
   <table class="table">
     <thead class="thead-light">
       <tr>
-        <th>Expense</th>
-        <th>Value</th>
-        <th>Users</th>
-        <th>Options</th>
+        <th>{{'Expense' | translate}}</th>
+        <th>{{'Value' | translate}}</th>
+        <th>{{'Users' | translate}}</th>
+        <th>{{'Options' | translate}}</th>
       </tr>
     </thead>
     <tbody>
@@ -16,7 +16,7 @@
         <td>{{ expense.value | currency: "R$ " }}</td>
         <td>
           <span *ngFor="let user of expense.users" [ngClass]="{ payer: checkIsPayer(expense, user) }">{{ user.name }}
-            <span *ngIf="getAmountPaid(expense, user) > 0">(R$ {{getAmountPaid(expense, user)}})</span> <br/>
+            <span *ngIf="getAmountPaid(expense, user) > 0">(R$ {{getAmountPaid(expense, user)}})</span> <br />
           </span>
         </td>
         <td>
