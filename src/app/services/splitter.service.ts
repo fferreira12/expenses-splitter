@@ -4,11 +4,12 @@ import { User } from "../models/user.model";
 import { Observable, Subject } from "rxjs";
 import { Expense } from "../models/expense.model";
 import { Payment } from "../models/payment.model";
-import { LocalstorageService } from "./localstorage.service";
-import { FirebaseService } from "./firebase.service";
+//import { LocalstorageService } from "./localstorage.service";
+//import { FirebaseService } from "./firebase.service";
 //import { AuthGuardervice } from './auth-guard.service';
 import { AuthService } from "./auth.service";
 import { Project } from "../models/project.model";
+import { Firebasev2Service } from "./firebasev2.service";
 
 @Injectable({
   providedIn: "root"
@@ -17,6 +18,7 @@ export class SplitterService {
   allProjects: Project[] = [];
   currentProject: Project = new Project();
   isLoading: boolean = true;
+  userId: string = null;
 
   // users: User[] = [];
   // expenses: Expense[] = [];
@@ -30,16 +32,19 @@ export class SplitterService {
   loadingObservable: Subject<boolean>;
 
   constructor(
-    private storage: FirebaseService,
+    private storage: Firebasev2Service,
     private authService: AuthService
   ) {
     this.resetProjects();
 
     try {
+      this.userId = this.authService.getUserId();
       this.authService.subscribeToUserId(userId => {
         if (userId == "") {
           this.currentProject.setData();
         } else {
+          this.userId = userId;
+          this.storage.setUserId(userId);
           this.getData();
         }
       });
@@ -102,15 +107,16 @@ export class SplitterService {
 
   deleteProject(project: Project) {
     this.allProjects.splice(this.allProjects.indexOf(project), 1);
-    this.storage.delete(project.projectId);
-    if (this.allProjects.includes(this.currentProject)) {
-      this.emitAllCurrentData();
-    } else {
-      if (this.allProjects.length == 0) {
-        this.createNewProject("Default Project");
+    this.storage.deleteProject(project.projectId).then(() => {
+      if (this.allProjects.includes(this.currentProject)) {
+        this.emitAllCurrentData();
+      } else {
+        if (this.allProjects.length == 0) {
+          this.createNewProject("Default Project");
+        }
+        this.setCurrentProject(this.allProjects[0]);
       }
-      this.setCurrentProject(this.allProjects[0]);
-    }
+    });
   }
 
   resetProjects() {
@@ -125,10 +131,27 @@ export class SplitterService {
     this.allProjectsObservable.subscribe(subscriber);
   }
 
+  prepareStorage() {
+    if (this.storage.userId == null && this.userId != null) {
+      this.storage.setUserId(this.userId);
+      return true;
+    }
+    if (this.storage.userId == null) {
+      return false;
+    }
+    return true;
+  }
+
   getData() {
-    this.storage.get().then(data => {
-      let parsedData = data.data();
-      this.tryParseData(parsedData);
+    if (!this.prepareStorage()) {
+      return;
+    }
+    this.storage.getProjectsOfUser().then(data => {
+      console.log("data");
+      console.log(data);
+
+      // let parsedData = data.data();
+      this.tryParseData(data);
       this.emitAllCurrentData();
     });
   }
@@ -136,29 +159,24 @@ export class SplitterService {
   tryParseData(data) {
     this.resetProjects();
 
-    let d;
-    try {
-      d = JSON.parse(data[Object.keys(data)[0]]) as Partial<Project>;
-    } catch {
+    for (let p in data) {
+      let project = new Project(data[p].id, data[p].data.data.projectName);
+      if (data[p].data.hasOwnProperty("data")) {
+        let parsed = JSON.parse(data[p].data.data);
+        Object.assign(project, parsed as Partial<Project>);
+      }
+      this.allProjects.push(project);
+    }
+
+    if (this.allProjects.length == 0) {
       this.currentProject = new Project();
       this.allProjects = [];
       this.allProjects.push(this.currentProject);
       this.saveProjectData(this.currentProject);
-      return;
+    } else {
+      this.currentProject = this.allProjects[0];
     }
-
-    //get all projects
-    for (let project in data) {
-      if (data.hasOwnProperty(project)) {
-        let p = new Project();
-        Object.assign(p, JSON.parse(data[project]) as Partial<Project>);
-        this.allProjects.push(p);
-      }
-    }
-
-    let project = new Project();
-    this.currentProject = Object.assign(project, d);
-    //console.log("d");
+    this.emitAllCurrentData();
   }
 
   private emitAllCurrentData() {
@@ -175,8 +193,15 @@ export class SplitterService {
 
   saveProjectData(project: Project) {
     this.isLoading = true;
+    if (!this.prepareStorage()) {
+      this.isLoading = false;
+      return;
+    }
     this.loadingObservable.next(this.isLoading);
-    this.storage.save(project.projectId, project);
+    if (this.storage.userId == null) {
+      this.storage.setUserId(this.userId);
+    }
+    this.storage.saveProject(project);
     this.isLoading = false;
     this.loadingObservable.next(this.isLoading);
   }
