@@ -48,5 +48,7 @@
   "Amount": "Quantia",
   "Password": "Senha",
   "RepeatPassword": "Repita a senha",
-  "AddNewProject": "Adicionar Novo Projeto"
+  "AddNewProject": "Adicionar Novo Projeto",
+  "Invite": "Convidar",
+  "Shared": "Compartilhado"
 }

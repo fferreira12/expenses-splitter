@@ -18,13 +18,23 @@
     </thead>
     <tbody>
       <tr *ngFor="let p of allProjects; let i = index">
-        <td>{{ p.projectName }}</td>
+        <td class="align-middle" [ngClass]="{'self-project': selfProject(p), 'not-self-project': !selfProject(p)}">
+          {{ p.projectName }}</td>
         <td>
-          <button class="btn btn-primary mr-2" (click)="onActivateProject(p)">{{'Activate' | translate}}</button>
-          <button class="btn btn-danger mr-2" data-toggle="modal"
-            [attr.data-target]="'#deleteModal'+i">{{'Delete' | translate}}</button>
-          <button class="btn btn-success" data-toggle="modal"
-            [attr.data-target]="'#renameModal'+i">{{'Rename' | translate}}</button>
+          <form class="form-inline">
+            <button class="btn btn-primary mr-2" (click)="onActivateProject(p)">{{'Activate' | translate}}</button>
+            <button class="btn btn-danger mr-2" data-toggle="modal"
+              [attr.data-target]="'#deleteModal'+i">{{'Delete' | translate}}</button>
+            <button class="btn btn-success" data-toggle="modal"
+              [attr.data-target]="'#renameModal'+i">{{'Rename' | translate}}</button>
+            <input class="form-control ml-2" type="email" placeholder="{{'Email' | translate}}" #inviteMail>
+            <button class="btn btn-warning ml-2"
+              (click)="onInviteUser(p, inviteMail.value)">{{'Invite' | translate}}</button>
+            <ul class="editors-list" *ngIf="p.editors.length > 0">
+              <li *ngFor="let e of p.editors"><button type="button" class="btn btn-sm btn-outline-danger"
+                  (click)="onRemoveEditor(p, e)">x</button> {{e}}</li>
+            </ul>
+          </form>
         </td>
 
         <!-- The Delete Modal -->

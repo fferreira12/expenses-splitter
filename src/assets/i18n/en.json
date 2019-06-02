@@ -47,5 +47,7 @@
   "AddToPayments": "Add To Payments",
   "Password": "Password",
   "RepeatPassword": "Repeat Password",
-  "AddNewProject": "Add New Project"
+  "AddNewProject": "Add New Project",
+  "Invite": "Invite",
+  "Shared": "Shared"
 }

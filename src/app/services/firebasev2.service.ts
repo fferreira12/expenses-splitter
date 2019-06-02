@@ -28,13 +28,17 @@ export class Firebasev2Service {
     }
   }
 
-  saveProject(project: Project) {
+  saveProject(ownerId: string, project: Project) {
     this.verifyUserId();
     //let name = project.projectName;
     this.db
       .collection("projects")
       .doc(project.projectId)
-      .set({ userId: this.userId, data: JSON.stringify(project) });
+      .set({
+        userId: ownerId,
+        editors: project.editors,
+        data: JSON.stringify(project)
+      });
   }
 
   // saveUser(projectId: string, user: User) {
@@ -68,6 +72,32 @@ export class Firebasev2Service {
     return result;
   }
 
+  getProjectsUserCanEdit(email: string) {
+    console.log("getting all projects that " + email + " can edit");
+
+    if (!email) {
+      return Promise.resolve(null);
+    }
+    let result = this.db
+      .collection("projects")
+      .where("editors", "array-contains", email)
+      .get()
+      .then(snapshot => {
+        let allProjects = [];
+        snapshot.docs.map(docSnap => {
+          let id = docSnap.id;
+          //only get projects current user is not the owner
+          if (id != this.userId) {
+            allProjects.push({ id, data: docSnap.data() });
+          }
+        });
+        return allProjects;
+      });
+    console.log(result);
+
+    return result;
+  }
+
   getProject(projectId: string) {
     return this.db
       .collection("projects")
@@ -82,6 +112,64 @@ export class Firebasev2Service {
       .collection("projects")
       .doc(projectId)
       .delete();
+  }
+
+  addEditorToProject(projectId: string, editorEmail: string) {
+    this.db
+      .collection("projects")
+      .doc(projectId)
+      .get()
+      .then(docSnap => {
+        let data = docSnap.data();
+        let editors = data.editors;
+        if (!editors) {
+          editors = [];
+        }
+        if (editors.includes(editorEmail)) {
+          return;
+        }
+        editors.push(editorEmail);
+        this.db
+          .collection("projects")
+          .doc(projectId)
+          .set(
+            {
+              editors: editors
+            },
+            { merge: true }
+          );
+        console.log("editors");
+        console.log(editors);
+      });
+  }
+
+  removeEditorFromProject(projectId: string, editorEmail: string) {
+    this.db
+      .collection("projects")
+      .doc(projectId)
+      .get()
+      .then(docSnap => {
+        let data = docSnap.data();
+        let editors = data.editors;
+        if (!editors) {
+          return;
+        }
+        if (!editors.includes(editorEmail)) {
+          return;
+        }
+        editors.splice(editors.indexOf(editorEmail), 1);
+        this.db
+          .collection("projects")
+          .doc(projectId)
+          .set(
+            {
+              editors: editors
+            },
+            { merge: true }
+          );
+        console.log("editors");
+        console.log(editors);
+      });
   }
 
   // getUsers(projectId: string) {}

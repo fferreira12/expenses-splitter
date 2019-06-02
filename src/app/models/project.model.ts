@@ -1,9 +1,12 @@
 import { User } from "./user.model";
 import { Expense } from "./expense.model";
 import { Payment } from "./payment.model";
-import { uuid } from '../util/uuid';
+import { uuid } from "../util/uuid";
 
 export class Project {
+  editors: string[] = [];
+  ownerId: string;
+
   projectId: string;
   projectName: string;
   users: User[];
@@ -28,12 +31,34 @@ export class Project {
     this.payments = payments || [];
   }
 
+  setOwner(ownerId: string) {
+    this.ownerId = ownerId;
+  }
+
+  setEditorEmails(editorEmails: string[]) {
+    this.editors = editorEmails;
+  }
+
   addUser(user: User) {
     if (user.name == null || user.name == "") {
       return false;
     }
     this.users.push(user);
     return true;
+  }
+
+  addEditor(email: string) {
+    if (this.editors.includes(email)) {
+      return;
+    }
+    this.editors.push(email);
+  }
+
+  removeEditor(email: string) {
+    if (!this.editors.includes(email)) {
+      return;
+    }
+    this.editors.splice(this.editors.indexOf(email), 1);
   }
 
   removeUser(user: User) {
@@ -134,10 +159,9 @@ export class Project {
     this.users.forEach(user => {
       paid[user.id] = 0;
       this.expenses.forEach(expense => {
-
         let e = Expense.createExpense(expense);
 
-        paid[user.id] += (e).getAmountPaid(user);
+        paid[user.id] += e.getAmountPaid(user);
       });
     });
 
@@ -171,7 +195,6 @@ export class Project {
     let paid = this.getPaidValues();
     let fairShares = this.getFairShares();
 
-
     this.users.forEach(user => {
       balance[user.id] = paid[user.id] - fairShares[user.id];
     });
@@ -180,9 +203,6 @@ export class Project {
       balance[payment.payer.id] += payment.value;
       balance[payment.receiver.id] -= payment.value;
     });
-
-
-
 
     return balance;
   }

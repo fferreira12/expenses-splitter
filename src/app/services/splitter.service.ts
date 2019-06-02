@@ -15,10 +15,12 @@ import { Firebasev2Service } from "./firebasev2.service";
   providedIn: "root"
 })
 export class SplitterService {
-  allProjects: Project[] = [];
+  allSelfProjects: Project[] = [];
+  allProjectsCanEdit: Project[] = [];
   currentProject: Project = new Project();
   isLoading: boolean = true;
   userId: string = null;
+  userEmail: string = null;
 
   // users: User[] = [];
   // expenses: Expense[] = [];
@@ -39,12 +41,22 @@ export class SplitterService {
 
     try {
       this.userId = this.authService.getUserId();
+      //this.userEmail = this.authService.currentUser?.email;
       this.authService.subscribeToUserId(userId => {
         if (userId == "") {
           this.currentProject.setData();
         } else {
+          this.resetProjects();
           this.userId = userId;
+          //this.userEmail = this.authService.currentUser.email;
           this.storage.setUserId(userId);
+          this.getData();
+        }
+      });
+      this.authService.subscribeToUserEmail(email => {
+        if (email) {
+          this.userEmail = email;
+          this.resetProjects();
           this.getData();
         }
       });
@@ -52,7 +64,7 @@ export class SplitterService {
       console.log(e);
     }
 
-    this.getData();
+    //this.getData();
 
     this.usersObservable = new Subject();
     this.expensesObservable = new Subject();
@@ -61,6 +73,7 @@ export class SplitterService {
     this.allProjectsObservable = new Subject();
     this.loadingObservable = new Subject();
 
+    this.emitAllCurrentData();
     this.isLoading = false;
   }
 
@@ -72,8 +85,12 @@ export class SplitterService {
     return this.isLoading;
   }
 
-  getAllProjects() {
-    return this.allProjects;
+  getAllProjects(includeOthers: boolean = false) {
+    if (includeOthers) {
+      return [...this.allSelfProjects, ...this.allProjectsCanEdit];
+    } else {
+      return this.allSelfProjects;
+    }
   }
 
   getCurrentProject() {
@@ -87,7 +104,8 @@ export class SplitterService {
 
   createNewProject(projectName: string) {
     let p = new Project(null, projectName);
-    this.allProjects.push(p);
+    p.setOwner(this.userId);
+    this.allSelfProjects.push(p);
     this.saveProjectData(p);
     this.setCurrentProject(p);
   }
@@ -106,21 +124,26 @@ export class SplitterService {
   }
 
   deleteProject(project: Project) {
-    this.allProjects.splice(this.allProjects.indexOf(project), 1);
+    //only can edit projects owned
+    if (project.ownerId != this.userId) {
+      return;
+    }
+    this.allSelfProjects.splice(this.allSelfProjects.indexOf(project), 1);
     this.storage.deleteProject(project.projectId).then(() => {
-      if (this.allProjects.includes(this.currentProject)) {
+      if (this.allSelfProjects.includes(this.currentProject)) {
         this.emitAllCurrentData();
       } else {
-        if (this.allProjects.length == 0) {
+        if (this.allSelfProjects.length == 0) {
           this.createNewProject("Default Project");
         }
-        this.setCurrentProject(this.allProjects[0]);
+        this.setCurrentProject(this.allSelfProjects[0]);
       }
     });
   }
 
   resetProjects() {
-    this.allProjects = [];
+    this.allSelfProjects = [];
+    this.allProjectsCanEdit = [];
   }
 
   subscribeToCurrentProject(subscriber) {
@@ -146,36 +169,61 @@ export class SplitterService {
     if (!this.prepareStorage()) {
       return;
     }
+    this.resetProjects();
     this.storage.getProjectsOfUser().then(data => {
-      console.log("data");
-      console.log(data);
+      // console.log("data");
+      // console.log(data);
 
       // let parsedData = data.data();
       this.tryParseData(data);
       this.emitAllCurrentData();
     });
+    this.storage.getProjectsUserCanEdit(this.userEmail).then(data => {
+      if (!data) {
+        return;
+      }
+
+      this.tryParseData(data, false);
+      this.emitAllCurrentData();
+    });
   }
 
-  tryParseData(data) {
-    this.resetProjects();
-
+  tryParseData(data, self: boolean = true) {
     for (let p in data) {
       let project = new Project(data[p].id, data[p].data.data.projectName);
+      //project.setEditorEmails(parsed.editors);
       if (data[p].data.hasOwnProperty("data")) {
         let parsed = JSON.parse(data[p].data.data);
         Object.assign(project, parsed as Partial<Project>);
+        project.setEditorEmails(data[p].data.editors || []);
       }
-      this.allProjects.push(project);
+      let shouldAddToSelf = !this.allSelfProjects.some(prj => {
+        return prj.projectId == project.projectId;
+      });
+      let shouldAddToOthers = ![
+        ...this.allSelfProjects,
+        ...this.allProjectsCanEdit
+      ].some(prj => {
+        return prj.projectId == project.projectId;
+      });
+      if (self && shouldAddToSelf) {
+        this.allSelfProjects.push(project);
+      } else if (!self && shouldAddToOthers) {
+        this.allProjectsCanEdit.push(project);
+      }
     }
 
-    if (this.allProjects.length == 0) {
-      this.currentProject = new Project();
-      this.allProjects = [];
-      this.allProjects.push(this.currentProject);
-      this.saveProjectData(this.currentProject);
-    } else {
-      this.currentProject = this.allProjects[0];
+    if (self) {
+      if (this.allSelfProjects.length == 0) {
+        this.currentProject = new Project();
+        this.allSelfProjects = [];
+        this.allSelfProjects.push(this.currentProject);
+        this.saveProjectData(this.currentProject);
+      } else {
+        this.currentProject = this.allSelfProjects[0];
+      }
     }
+
     this.emitAllCurrentData();
   }
 
@@ -185,7 +233,10 @@ export class SplitterService {
     this.usersObservable.next(this.currentProject.users);
     this.expensesObservable.next(this.currentProject.expenses);
     this.paymentsObservable.next(this.currentProject.payments);
-    this.allProjectsObservable.next(this.allProjects);
+    this.allProjectsObservable.next([
+      ...this.allSelfProjects,
+      ...this.allProjectsCanEdit
+    ]);
     this.currentProjectObservable.next(this.currentProject);
     this.isLoading = false;
     this.loadingObservable.next(this.isLoading);
@@ -201,7 +252,10 @@ export class SplitterService {
     if (this.storage.userId == null) {
       this.storage.setUserId(this.userId);
     }
-    this.storage.saveProject(project);
+    if (!project.ownerId) {
+      project.setOwner(this.userId);
+    }
+    this.storage.saveProject(project.ownerId, project);
     this.isLoading = false;
     this.loadingObservable.next(this.isLoading);
   }
@@ -211,6 +265,22 @@ export class SplitterService {
       this.saveProjectData(this.currentProject);
       this.usersObservable.next(this.currentProject.users);
     }
+  }
+
+  addEditor(project: Project, email: string) {
+    this.storage.addEditorToProject(project.projectId, email);
+    project.addEditor(email);
+    this.emitAllCurrentData();
+  }
+
+  isSelfProject(project: Project) {
+    return this.allSelfProjects.includes(project);
+  }
+
+  removeEditor(project: Project, email: string) {
+    this.storage.removeEditorFromProject(project.projectId, email);
+    project.removeEditor(email);
+    this.emitAllCurrentData();
   }
 
   removeUser(user: User) {
