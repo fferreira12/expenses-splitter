@@ -184,33 +184,22 @@ export class SplitterService {
       }
 
       this.tryParseData(data, false);
+
+      //subscribe to realtime changes
+      this.storage.subscribeToProjectChanges(doc => {
+        console.log("new data from server");
+
+        let d = doc.data();
+        this.parseOne({ id: doc.id, data: d });
+      });
+
       this.emitAllCurrentData();
     });
   }
 
   tryParseData(data, self: boolean = true) {
     for (let p in data) {
-      let project = new Project(data[p].id, data[p].data.data.projectName);
-      //project.setEditorEmails(parsed.editors);
-      if (data[p].data.hasOwnProperty("data")) {
-        let parsed = JSON.parse(data[p].data.data);
-        Object.assign(project, parsed as Partial<Project>);
-        project.setEditorEmails(data[p].data.editors || []);
-      }
-      let shouldAddToSelf = !this.allSelfProjects.some(prj => {
-        return prj.projectId == project.projectId;
-      });
-      let shouldAddToOthers = ![
-        ...this.allSelfProjects,
-        ...this.allProjectsCanEdit
-      ].some(prj => {
-        return prj.projectId == project.projectId;
-      });
-      if (self && shouldAddToSelf) {
-        this.allSelfProjects.push(project);
-      } else if (!self && shouldAddToOthers) {
-        this.allProjectsCanEdit.push(project);
-      }
+      this.parseOne(data[p]); //id, data > data, userId
     }
 
     if (self) {
@@ -224,6 +213,44 @@ export class SplitterService {
       }
     }
 
+    this.emitAllCurrentData();
+  }
+
+  parseOne(pro: any) {
+    let proj = JSON.parse(pro.data.data);
+    let project = new Project(pro.id, proj.projectName);
+    //project.setEditorEmails(parsed.editors);
+    if (pro.data.hasOwnProperty("data")) {
+      let parsed = JSON.parse(pro.data.data);
+      Object.assign(project, parsed as Partial<Project>);
+      project.setEditorEmails(proj.editors || []);
+    }
+    let shouldAddToSelf = !this.allSelfProjects.some(prj => {
+      return prj.projectId == project.projectId;
+    });
+    let shouldAddToOthers = ![
+      ...this.allSelfProjects,
+      ...this.allProjectsCanEdit
+    ].some(prj => {
+      return prj.projectId == project.projectId;
+    });
+    if (self && shouldAddToSelf) {
+      this.allSelfProjects.push(project);
+    } else if (!self && shouldAddToOthers) {
+      this.allProjectsCanEdit.push(project);
+    } else {
+      this.updateProject(project);
+    }
+  }
+
+  updateProject(project: Project) {
+    [...this.allSelfProjects, ...this.allProjectsCanEdit].forEach(p => {
+      if (p.projectId == project.projectId) {
+        p.projectName = project.projectName;
+        p.setData(project.users, project.expenses, project.payments);
+        p.setEditorEmails(project.editors);
+      }
+    });
     this.emitAllCurrentData();
   }
 
@@ -274,7 +301,10 @@ export class SplitterService {
   }
 
   isSelfProject(project: Project) {
-    return this.allSelfProjects.includes(project);
+    if (!this.userId) {
+      this.userId = this.authService.getUserId();
+    }
+    return project.ownerId == this.userId;
   }
 
   removeEditor(project: Project, email: string) {

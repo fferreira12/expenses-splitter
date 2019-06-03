@@ -12,7 +12,9 @@ import { Payment } from "../models/payment.model";
 })
 export class Firebasev2Service {
   userId: string = null;
+  userEmail: string = null;
   db: firebase.firestore.Firestore;
+  allProjectIds: string[] = [];
 
   constructor() {
     this.db = firebase.firestore();
@@ -63,6 +65,7 @@ export class Firebasev2Service {
         let allProjects = [];
         snapshot.docs.map(docSnap => {
           let id = docSnap.id;
+          this.addToAllProjectIds(id);
           allProjects.push({ id, data: docSnap.data() });
         });
         return allProjects;
@@ -74,7 +77,7 @@ export class Firebasev2Service {
 
   getProjectsUserCanEdit(email: string) {
     console.log("getting all projects that " + email + " can edit");
-
+    this.userEmail = email;
     if (!email) {
       return Promise.resolve(null);
     }
@@ -86,6 +89,7 @@ export class Firebasev2Service {
         let allProjects = [];
         snapshot.docs.map(docSnap => {
           let id = docSnap.id;
+          this.addToAllProjectIds(id);
           //only get projects current user is not the owner
           if (id != this.userId) {
             allProjects.push({ id, data: docSnap.data() });
@@ -96,6 +100,27 @@ export class Firebasev2Service {
     console.log(result);
 
     return result;
+  }
+
+  addToAllProjectIds(id: string) {
+    if (!this.allProjectIds.includes(id)) {
+      this.allProjectIds.push(id);
+    }
+  }
+
+  subscribeToProjectChanges(subscriber) {
+    if (this.allProjectIds.length == 0) {
+      return;
+    }
+
+    this.allProjectIds.forEach(id => {
+      this.db
+        .collection("projects")
+        .doc(id)
+        .onSnapshot(doc => {
+          subscriber(doc);
+        });
+    });
   }
 
   getProject(projectId: string) {
