@@ -1,0 +1,14 @@
+.editors-list {
+  display: inline;
+  list-style: none;
+}
+
+.self-project {
+  font-weight: bold;
+}
+
+.not-self-project {
+  color: rgb(14, 138, 240);
+
+  font-style: italic;
+}

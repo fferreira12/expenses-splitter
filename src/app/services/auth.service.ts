@@ -13,6 +13,8 @@ export class AuthService {
   userIdObservable: BehaviorSubject<string>;
   userObservable: BehaviorSubject<firebase.User> = new BehaviorSubject(null);
   currentUser: firebase.User;
+  userEmail: string = null;
+  userEmailObservable: BehaviorSubject<string> = new BehaviorSubject(null);
 
   constructor(private localStorage: LocalstorageService) {
     this.userIdObservable = new BehaviorSubject("");
@@ -33,8 +35,11 @@ export class AuthService {
         //console.log(user);
         this.userId = user.uid;
         this.currentUser = user;
+        this.userEmail = this.currentUser.email;
         //console.log("calling user observable");
         this.userObservable.next(this.currentUser);
+        this.userIdObservable.next(this.userId);
+        this.userEmailObservable.next(this.userEmail);
         user.getIdToken(false).then(token => {
           this.token = token;
         });
@@ -46,6 +51,10 @@ export class AuthService {
 
   subscribeToUser(subscriber) {
     return this.userObservable.subscribe(subscriber);
+  }
+
+  subscribeToUserEmail(subscriber) {
+    return this.userEmailObservable.subscribe(subscriber);
   }
 
   signupUser(email: string, password: string) {

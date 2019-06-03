@@ -3,6 +3,7 @@ import { SplitterService } from "src/app/services/splitter.service";
 import { Expense } from "src/app/models/expense.model";
 import { User } from "src/app/models/user.model";
 import { SimpleCalculator } from "src/app/util/payment-calculator";
+import { Payment } from 'src/app/models/payment.model';
 
 @Component({
   selector: "app-balance",
@@ -60,5 +61,13 @@ export class BalanceComponent implements OnInit {
 
   getPaymentsReceived(user: User) {
     return this.splitterService.getPaymentsReceived(user);
+  }
+
+  onAddToPayments(p: any) {
+    let payer = new User(p.payer.name, p.payer.id);
+    let receiver = new User(p.receiver.name, p.receiver.id);
+    let value = p.amount;
+    let pay = new Payment(payer, receiver, value);
+    this.splitterService.addPayment(pay);
   }
 }

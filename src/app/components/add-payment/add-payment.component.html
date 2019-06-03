@@ -1,19 +1,20 @@
-<h1>Add Payment</h1>
+<h1>{{'AddPayment' | translate}}</h1>
 
 <form class="form-group" (submit)="onAddPayment()" [formGroup]="paymentForm">
-  <p class="mb-0">Payer: </p>
-  <div class="radio form-check form-check-inline ml-1 mt-0" *ngFor="let user of users"> 
+  <p class="mb-0">{{'Payer' | translate}}: </p>
+  <div class="radio form-check form-check-inline ml-1 mt-0" *ngFor="let user of users">
     <input type="radio" name="payer" [value]="user.id" formControlName="payer">
     {{ user.name }}
   </div>
 
-  <p class="mb-0">Receiver: </p>
-  <div class="radio form-check form-check-inline ml-1 mt-0" *ngFor="let user of users"> 
+  <p class="mb-0">{{'Receiver' | translate}}: </p>
+  <div class="radio form-check form-check-inline ml-1 mt-0" *ngFor="let user of users">
     <input type="radio" name="receiver" [value]="user.id" formControlName="receiver">
     {{ user.name }}
   </div>
-  <input class="form-control" type="number" name="value" formControlName="value" placeholder="Value"/>
+  <input class="form-control" type="number" name="value" formControlName="value"
+    placeholder="{{'Value' | translate}}" />
 
-  <button class="btn btn-primary mt-2" type="submit">Add Payment</button>
+  <button class="btn btn-primary mt-2" type="submit">{{'AddPayment' | translate}}</button>
 
 </form>

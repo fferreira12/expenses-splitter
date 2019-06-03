@@ -1,7 +1,8 @@
-<h1>Add People</h1>
+<h1>{{'AddPeople' | translate}}</h1>
 <div class="form-group">
   <form class="form-inline">
-    <input class="form-control" type="text" name="name" id="txtName" placeholder="Name" [formControl]="name">
-    <button class="btn btn-primary ml-1" (click)="onAddUser()">Add People</button>
+    <input class="form-control" type="text" name="name" id="txtName" placeholder="{{'Name' | translate}}"
+      [formControl]="name">
+    <button class="btn btn-primary ml-1" (click)="onAddUser()">{{'AddPeople' | translate}}</button>
   </form>
 </div>

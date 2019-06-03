@@ -3,43 +3,44 @@
 
     <div class="card" style="width: 18rem;">
       <div class="card-body d-flex flex-column">
-        <h5 class="card-title">Projects</h5>
-        <p class="card-text">Create and edit the projects. Each project has its own users, expenses and payments.</p>
-        <a class="btn btn-primary mt-auto" routerLink="/projects">Go to Projects</a>
+        <h5 class="card-title">{{'Projects' | translate}}</h5>
+        <p class="card-text">{{'ProjectsDesc' | translate}}</p>
+        <a class="btn btn-primary mt-auto" routerLink="/projects">{{'GoToProjects' | translate}}</a>
       </div>
     </div>
 
     <div class="card" style="width: 18rem;">
       <div class="card-body d-flex flex-column">
-        <h5 class="card-title">Users</h5>
-        <p class="card-text">Defines the users that will participate in the expenses</p>
-        <a class="btn btn-primary mt-auto" routerLink="/users">Go to Users</a>
+        <h5 class="card-title">{{'Users' | translate}}</h5>
+        <p class="card-text">{{'UserDesc' | translate}}</p>
+        <a class="btn btn-primary mt-auto" routerLink="/users">{{'GoToUser' | translate}}</a>
       </div>
     </div>
 
     <div class="card" style="width: 18rem;">
       <div class="card-body d-flex flex-column">
-        <h5 class="card-title">Expenses</h5>
-        <p class="card-text">Defines the expenses, the participants and who paid for it</p>
-        <a class="btn btn-primary mt-auto" routerLink="/expenses">Go to Expenses</a>
+        <h5 class="card-title">{{'Expenses' | translate}}</h5>
+        <p class="card-text">{{'ExpensesDesc' | translate}}</p>
+        <a class="btn btn-primary mt-auto" routerLink="/expenses">{{'GoToExpenses' | translate}}</a>
       </div>
     </div>
 
     <div class="card" style="width: 18rem;">
       <div class="card-body d-flex flex-column">
-        <h5 class="card-title">Payments</h5>
-        <p class="card-text">Sets up the payments between participants that were made already</p>
-        <a class="btn btn-primary mt-auto" routerLink="/payments">Go to Payments</a>
+        <h5 class="card-title">{{'Payments' | translate}}</h5>
+        <p class="card-text">{{'PaymentsDesc' | translate}}</p>
+        <a class="btn btn-primary mt-auto" routerLink="/payments">{{'GoToPayments' | translate}}</a>
       </div>
     </div>
 
     <div class="card" style="width: 18rem;">
       <div class="card-body d-flex flex-column">
-        <h5 class="card-title">Balance</h5>
-        <p class="card-text">See who is to receive or pay and the amounts</p>
-        <a class="btn btn-primary mt-auto" routerLink="/balance">Go to Balance</a>
+        <h5 class="card-title">{{'Balance' | translate}}</h5>
+        <p class="card-text">{{'BalanceDesc' | translate}}</p>
+        <a class="btn btn-primary mt-auto" routerLink="/balance">{{'GoToBalance' | translate}}</a>
       </div>
     </div>
 
   </div>
 </div>
+<app-loading></app-loading>
