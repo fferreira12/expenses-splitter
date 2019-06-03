@@ -297,6 +297,7 @@ export class SplitterService {
   addEditor(project: Project, email: string) {
     this.storage.addEditorToProject(project.projectId, email);
     project.addEditor(email);
+    this.saveProjectData(project);
     this.emitAllCurrentData();
   }
 
@@ -310,6 +311,7 @@ export class SplitterService {
   removeEditor(project: Project, email: string) {
     this.storage.removeEditorFromProject(project.projectId, email);
     project.removeEditor(email);
+    this.saveProjectData(project);
     this.emitAllCurrentData();
   }
 
