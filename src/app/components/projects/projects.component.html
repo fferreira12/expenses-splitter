@@ -27,14 +27,23 @@
               [attr.data-target]="'#deleteModal'+i">{{'Delete' | translate}}</button>
             <button class="btn btn-success" data-toggle="modal"
               [attr.data-target]="'#renameModal'+i">{{'Rename' | translate}}</button>
-            <input class="form-control ml-2" type="email" placeholder="{{'Email' | translate}}" #inviteMail>
-            <button class="btn btn-warning ml-2"
-              (click)="onInviteUser(p, inviteMail.value)">{{'Invite' | translate}}</button>
+
+            <button *ngIf="!addingUser" (click)="onToggleInviteUser()"
+              class="btn btn-warning ml-2 fas fa-user-plus"></button>
+
+            <div *ngIf="addingUser">
+              <input class="form-control ml-2" type="email" placeholder="{{'Email' | translate}}" #inviteMail>
+              <button class="btn btn-warning ml-2"
+                (click)="onInviteUser(p, inviteMail.value)">{{'Invite' | translate}}</button>
+            </div>
+
             <ul class="editors-list" *ngIf="p.editors.length > 0">
-              <li *ngFor="let e of p.editors"><button type="button" class="btn btn-sm btn-outline-danger"
-                  (click)="onRemoveEditor(p, e)">x</button> {{e}}</li>
+              <li *ngFor="let e of p.editors"><button type="button"
+                  class="btn btn-sm btn-outline-danger fas fa-trash-alt" (click)="onRemoveEditor(p, e)"></button> <span
+                  class="badge badge-primary ml-2">{{e}}</span></li>
             </ul>
           </form>
+
         </td>
 
         <!-- The Delete Modal -->
@@ -101,6 +110,7 @@
       </tr>
     </tbody>
   </table>
+
 </div>
 
 <app-loading></app-loading>

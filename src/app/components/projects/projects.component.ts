@@ -11,6 +11,7 @@ import { FormControl } from "@angular/forms";
 export class ProjectsComponent implements OnInit {
   projectName = new FormControl("");
   projectNewName = new FormControl("");
+  addingUser: boolean = false;
 
   allProjects: Project[];
   currentProject: Project;
@@ -48,9 +49,15 @@ export class ProjectsComponent implements OnInit {
     this.splitterService.renameProject(project, this.projectNewName.value);
   }
 
+  onToggleInviteUser() {
+    this.addingUser = !this.addingUser;
+  }
+
   onInviteUser(project: Project, email: string) {
     console.log("invited " + email + " to edit project " + project.projectName);
     this.splitterService.addEditor(project, email);
+
+    this.addingUser = false;
   }
 
   onRemoveEditor(project: Project, email: string) {
