@@ -11,7 +11,8 @@
     "e2e": "ng e2e",
     "s3:delete": "aws s3 rm s3://angular-expenses-splitter --recursive",
     "s3:upload": "aws s3 cp ./dist/expense-splitter-frontend s3://angular-expenses-splitter --recursive --include \"*\"",
-    "s3": "npm run build:prod && npm run s3:delete && npm run s3:upload"
+    "s3": "npm run build:prod && npm run s3:delete && npm run s3:upload",
+    "firebase": "npm run build:prod && firebase deploy"
   },
   "private": true,
   "dependencies": {
