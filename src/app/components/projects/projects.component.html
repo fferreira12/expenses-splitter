@@ -17,7 +17,7 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let p of allProjects; let i = index">
+      <tr *ngFor="let p of allProjects; let i = index" [ngClass]="{'bg-warning':isCurrentProject(p)}">
         <td class="align-middle" [ngClass]="{'self-project': selfProject(p), 'not-self-project': !selfProject(p)}">
           {{ p.projectName }}</td>
         <td>
