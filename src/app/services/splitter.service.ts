@@ -99,6 +99,7 @@ export class SplitterService {
 
   setCurrentProject(project: Project) {
     this.currentProject = project;
+    this.storage.saveLastProject(project);
     this.emitAllCurrentData();
   }
 
@@ -209,7 +210,16 @@ export class SplitterService {
         this.allSelfProjects.push(this.currentProject);
         this.saveProjectData(this.currentProject);
       } else {
-        this.currentProject = this.allSelfProjects[0];
+        //this.currentProject = this.allSelfProjects[0];
+        //console.log('before getting last project');
+        
+        this.storage.getLastProject().then(doc => {
+          let data = doc.data();
+          let p = this.getAllProjects().find(p => {
+            return p.projectId === data.projectId;
+          });
+          this.setCurrentProject(p);
+        });
       }
     }
 

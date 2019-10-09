@@ -41,6 +41,23 @@ export class Firebasev2Service {
         editors: project.editors,
         data: JSON.stringify(project)
       });
+    this.saveLastProject(project);
+  }
+
+  saveLastProject(project: Project) {
+    this.db
+    .collection("last-projects")
+    .doc(this.userId)
+    .set({
+      projectId: project.projectId,
+      projectName: project.projectName,
+      userId: this.userId
+    });
+  }
+
+  getLastProject() {
+    this.verifyUserId();
+    return this.db.collection('last-projects').doc(this.userId).get();
   }
 
   // saveUser(projectId: string, user: User) {
