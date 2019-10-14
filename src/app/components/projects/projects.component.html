@@ -38,6 +38,7 @@
             </div>
 
             <ul class="editors-list" *ngIf="p.editors.length > 0">
+              <li *ngIf="!selfProject(p)"><span class="badge badge-primary ml-2">Owner: {{p.ownerEmail}}</span></li>
               <li *ngFor="let e of p.editors"><button type="button"
                   class="btn btn-sm btn-outline-danger fas fa-trash-alt" (click)="onRemoveEditor(p, e)"></button> <span
                   class="badge badge-primary ml-2">{{e}}</span></li>

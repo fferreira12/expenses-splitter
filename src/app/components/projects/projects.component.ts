@@ -69,6 +69,9 @@ export class ProjectsComponent implements OnInit {
   }
 
   isCurrentProject(project: Project) {
+    if(!project) {
+      return false;
+    }
     let current = this.splitterService.getCurrentProject();
     return project.projectName == current.projectName;
   }

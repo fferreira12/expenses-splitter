@@ -105,7 +105,7 @@ export class SplitterService {
 
   createNewProject(projectName: string) {
     let p = new Project(null, projectName);
-    p.setOwner(this.userId);
+    p.setOwner(this.userId, this.userEmail);
     this.allSelfProjects.push(p);
     this.saveProjectData(p);
     this.setCurrentProject(p);
@@ -218,7 +218,11 @@ export class SplitterService {
           let p = this.getAllProjects().find(p => {
             return p.projectId === data.projectId;
           });
-          this.setCurrentProject(p);
+          if(p){
+            this.setCurrentProject(p);
+          } else {
+            this.currentProject = this.allSelfProjects[0];
+          }
         });
       }
     }
@@ -290,7 +294,7 @@ export class SplitterService {
       this.storage.setUserId(this.userId);
     }
     if (!project.ownerId) {
-      project.setOwner(this.userId);
+      project.setOwner(this.userId, this.userEmail);
     }
     this.storage.saveProject(project.ownerId, project);
     this.isLoading = false;

@@ -6,6 +6,7 @@ import { uuid } from "../util/uuid";
 export class Project {
   editors: string[] = [];
   ownerId: string;
+  ownerEmail: string;
 
   projectId: string;
   projectName: string;
@@ -31,8 +32,9 @@ export class Project {
     this.payments = payments || [];
   }
 
-  setOwner(ownerId: string) {
+  setOwner(ownerId: string, ownerEmail: string) {
     this.ownerId = ownerId;
+    this.ownerEmail = ownerEmail;
   }
 
   setEditorEmails(editorEmails: string[]) {
