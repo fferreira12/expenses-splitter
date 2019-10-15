@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, Output, EventEmitter } from "@angular/core";
 import { AuthService } from "src/app/services/auth.service";
 import { SplitterService } from "src/app/services/splitter.service";
 
@@ -9,6 +9,7 @@ import { SplitterService } from "src/app/services/splitter.service";
 })
 export class HeaderComponent implements OnInit {
   currentLoggedInAs: string;
+  @Output() language = new EventEmitter<string>();
 
   constructor(public authService: AuthService) {}
 
@@ -19,5 +20,9 @@ export class HeaderComponent implements OnInit {
       }
       this.currentLoggedInAs = user.email;
     });
+  }
+
+  onChangeLanguage(lang: string) {
+    this.language.emit(lang);
   }
 }

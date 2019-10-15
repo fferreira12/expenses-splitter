@@ -55,6 +55,19 @@ export class Firebasev2Service {
     });
   }
 
+  saveLanguagePreference(language: string) {
+    var doc = this.db.collection('preferences').doc(this.userId);
+    doc.set({
+      language: language,
+      userId: this.userId
+    }, { merge: true });
+  }
+
+  getLanguagePreference() {
+    var doc = this.db.collection('preferences').doc(this.userId);
+    return doc.get();
+  }
+
   getLastProject() {
     this.verifyUserId();
     return this.db.collection('last-projects').doc(this.userId).get();

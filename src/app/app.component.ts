@@ -2,6 +2,7 @@ import { Component, OnInit } from "@angular/core";
 import { TranslateService } from "@ngx-translate/core";
 import * as firebase from "firebase";
 import { AuthService } from "./services/auth.service";
+import { SplitterService } from './services/splitter.service';
 
 @Component({
   selector: "app-root",
@@ -16,9 +17,6 @@ export class AppComponent implements OnInit {
     private translate: TranslateService
   ) {
     translate.setDefaultLang("en");
-  }
-
-  ngOnInit() {
     firebase.initializeApp({
       apiKey: "AIzaSyCd_YNHAiC18p5OXcXTMBRdUjXkdmww3jk",
       authDomain: "expenses-splitter.firebaseapp.com",
@@ -30,6 +28,10 @@ export class AppComponent implements OnInit {
     });
     firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL);
     this.authService.init();
+  }
+
+  ngOnInit() {
+    
   }
 
   switchLanguage(language: string) {

@@ -1,5 +1,8 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, Output, EventEmitter } from "@angular/core";
 import { TranslateService } from "@ngx-translate/core";
+import { Firebasev2Service } from 'src/app/services/firebasev2.service';
+import { SplitterService } from 'src/app/services/splitter.service';
+
 
 @Component({
   selector: "app-language-list",
@@ -8,15 +11,22 @@ import { TranslateService } from "@ngx-translate/core";
 })
 export class LanguageListComponent implements OnInit {
   currentLang: string = "EN";
+  @Output() language = new EventEmitter<string>();
 
   constructor(private translate: TranslateService) {
     translate.setDefaultLang("en");
+
   }
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.translate.onLangChange.subscribe(languageData => {
+      this.currentLang = languageData.lang.toUpperCase();
+    })
+  }
 
   onChangeLanguage(lang: string) {
     this.currentLang = lang;
-    this.translate.use(this.currentLang);
+    //this.translate.use(this.currentLang);
+    this.language.emit(lang);
   }
 }

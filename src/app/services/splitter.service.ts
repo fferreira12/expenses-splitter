@@ -10,6 +10,7 @@ import { Payment } from "../models/payment.model";
 import { AuthService } from "./auth.service";
 import { Project } from "../models/project.model";
 import { Firebasev2Service } from "./firebasev2.service";
+import { TranslateService } from '@ngx-translate/core';
 
 @Injectable({
   providedIn: "root"
@@ -35,7 +36,8 @@ export class SplitterService {
 
   constructor(
     private storage: Firebasev2Service,
-    private authService: AuthService
+    private authService: AuthService,
+    private translate: TranslateService
   ) {
     this.resetProjects();
 
@@ -58,6 +60,18 @@ export class SplitterService {
           this.userEmail = email;
           this.resetProjects();
           this.getData();
+
+          this.translate.onLangChange.subscribe(d => {
+            console.log('language has changed');
+            console.log(d);
+            this.saveLanguagePreference(d.lang);
+          });
+          
+          this.getLanguagePreference().then(doc => {
+            let data = doc.data();
+            console.log('got language, ', data);
+            this.translate.use(data.language);
+          });
         }
       });
     } catch (e) {
@@ -301,6 +315,8 @@ export class SplitterService {
     this.loadingObservable.next(this.isLoading);
   }
 
+
+
   addUser(user: User) {
     if (this.currentProject.addUser(user)) {
       this.saveProjectData(this.currentProject);
@@ -412,4 +428,17 @@ export class SplitterService {
   getPaymentsReceived(user: User) {
     return this.currentProject.getPaymentsReceived(user);
   }
+
+  getLanguagePreference() {
+    return this.storage.getLanguagePreference();
+  }
+
+  saveLanguagePreference(lang: string) {
+    console.log('saving lang ' + lang);
+    if(!lang) {
+      return;
+    }
+    this.storage.saveLanguagePreference(lang);
+  }
+
 }
