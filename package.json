@@ -7,6 +7,7 @@
     "start:prodtest": "ng serve --prod --aot",
     "build:prod": "ng build --prod --aot",
     "test": "ng test",
+    "test:nowatch": "ng test --watch=false",
     "lint": "ng lint",
     "e2e": "ng e2e",
     "s3:delete": "aws s3 rm s3://angular-expenses-splitter --recursive",
