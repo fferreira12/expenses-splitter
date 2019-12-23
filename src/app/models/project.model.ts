@@ -130,6 +130,16 @@ export class Project {
     }
   }
 
+  updateExpense(oldExpense: Expense, newExpense: Expense) {
+    let removed = this.removeExpense(oldExpense);
+    if(removed) {
+      this.addExpense(newExpense);
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   addPayment(payment: Payment) {
     if (
       payment.payer == null ||

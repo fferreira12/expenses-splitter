@@ -31,6 +31,7 @@
   "AddPeople": "Add People",
   "People": "People",
   "AddExpense": "Add Expense",
+  "EditExpense": "Edit Expense",
   "Expense": "Expense",
   "Participants": "Participants",
   "Payers": "Payers",
@@ -49,5 +50,6 @@
   "RepeatPassword": "Repeat Password",
   "AddNewProject": "Add New Project",
   "Invite": "Invite",
-  "Shared": "Shared"
+  "Shared": "Shared",
+  "Cancel": "Cancel"
 }

@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Expense } from 'src/app/models/expense.model';
 
 @Component({
   selector: 'app-expenses',
@@ -7,9 +8,15 @@ import { Component, OnInit } from '@angular/core';
 })
 export class ExpensesComponent implements OnInit {
 
+  editingExpense: Expense;
+
   constructor() { }
 
   ngOnInit() {
+  }
+
+  onEditExpense(expense: Expense) {
+    this.editingExpense = expense;
   }
 
 }

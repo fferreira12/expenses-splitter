@@ -1,5 +1,5 @@
 <div class="container">
-  <app-add-expense></app-add-expense>
-  <app-expense-list></app-expense-list>
+  <app-add-expense [editingExpense]="editingExpense"></app-add-expense>
+  <app-expense-list (editExpense)="onEditExpense($event)"></app-expense-list>
 </div>
 <app-loading></app-loading>

@@ -1,15 +1,15 @@
-<h1>{{'AddExpense' | translate}}</h1>
+<h1>{{ getTitle() | translate}}</h1>
 <form class="form-group" (submit)="onAddExpense($event)" [formGroup]="expenseForm">
   <input class="form-control" type="text" name="expense-name" placeholder="{{'Expense' | translate}}"
     formControlName="expenseName" />
   {{'Participants' | translate}}: <br />
   <label formArrayName="users" *ngFor="let user of users; let i = index" class="form-check form-check-inline">
-    <input type="checkbox" [formControlName]="i" [value]="user.id" (change)="checkCheckBoxvalue($event)" />
+    <input type="checkbox" [formControlName]="i" [value]="user.id" (change)="checkCheckBoxvalue($event)" [checked]="userIsParticipating(user)" />
     {{ user.name }}
   </label>
   <br />
   {{'Payers' | translate}}: <br />
-  <input type="checkbox" name="singlepayers" id="true" (change)="onSinglePlayerCheck($event)">
+  <input type="checkbox" name="singlepayers" id="true" (change)="onSinglePlayerCheck($event)" [checked]="!singlePayer">
   {{'ManyPayers' | translate}}
   <br />
   <ng-template [ngIf]="singlePayer">
@@ -29,7 +29,10 @@
   <input *ngIf="singlePayer" class="form-control" type="number" name="value" formControlName="value"
     placeholder="{{'Value' | translate}}" />
   <br />
-  <button class="btn btn-primary mt-2" type="submit">
-    {{'AddExpense' | translate}}
+  <button class="btn btn-danger mt-2" type="button" (click)="onCancelEdit()" *ngIf="_editingExpense">
+    {{ "Cancel" | translate}}
+  </button>
+  <button class="btn btn-primary mt-2 ml-2" type="submit">
+    {{ getTitle() | translate}}
   </button>
 </form>

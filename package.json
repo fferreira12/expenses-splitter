@@ -14,7 +14,7 @@
     "s3:upload": "aws s3 cp ./dist/expense-splitter-frontend s3://angular-expenses-splitter --recursive --include \"*\"",
     "s3": "npm run s3:delete && npm run s3:upload",
     "firebase": "firebase deploy",
-    "deploy": "npm run build:prod && npm run s3 && npm run firebase"
+    "deploy": "npm run build:prod && npm run firebase"
   },
   "private": true,
   "dependencies": {

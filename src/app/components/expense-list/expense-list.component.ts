@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, Output, EventEmitter } from "@angular/core";
 import { SplitterService } from "src/app/services/splitter.service";
 import { Expense } from "src/app/models/expense.model";
 import { User } from "src/app/models/user.model";
@@ -11,6 +11,8 @@ import { User } from "src/app/models/user.model";
 export class ExpenseListComponent implements OnInit {
   expenses: Expense[];
 
+  @Output() editExpense = new EventEmitter<Expense>();
+
   constructor(private splitterService: SplitterService) {}
 
   ngOnInit() {
@@ -22,6 +24,10 @@ export class ExpenseListComponent implements OnInit {
 
   onRemoveExpense(expense: Expense) {
     this.splitterService.removeExpense(expense);
+  }
+
+  onEditExpense(expense: Expense) {
+    this.editExpense.emit(expense);
   }
 
   checkIsPayer(expense: Expense, user: User) {

@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, Input } from "@angular/core";
 import { SplitterService } from "src/app/services/splitter.service";
 import { FormGroup, FormControl, FormBuilder, FormArray } from "@angular/forms";
 import { User } from "src/app/models/user.model";
@@ -13,6 +13,18 @@ export class AddExpenseComponent implements OnInit {
   expenseForm: FormGroup;
   users: User[];
   singlePayer: boolean = true;
+
+  editing: boolean = false;
+  _editingExpense: Expense = null;
+  oldExpense: Expense = null;
+
+  @Input() set editingExpense(expense: Expense) {
+    this.editing = true;
+    this.oldExpense = Object.freeze(expense);
+    this._editingExpense = expense;
+    this.updateForm();
+    window.scroll(0,0);
+  }
 
   constructor(
     private splitterService: SplitterService,
@@ -38,9 +50,60 @@ export class AddExpenseComponent implements OnInit {
     });
   }
 
+  getTitle() {
+    return this._editingExpense ? "EditExpense" : "AddExpense";
+  }
+
+  userIsParticipating(user: User) {
+    if (!this._editingExpense) {
+      return true;
+    }
+    return this._editingExpense.users.some(u => {
+      return u.id == user.id;
+    });
+  }
+
+  getPayer() {
+    if (this._editingExpense && this.singlePayer) {
+      return this._editingExpense.payers[0].payer;
+    }
+  }
+
+  updateForm() {
+    let onePayer = this._editingExpense.payers.length == 1;
+    this.singlePayer = onePayer;
+    let amountsPayed = this._editingExpense.payers.map(payer => {
+      return payer.amount;
+    });
+    this.expenseForm.patchValue({
+      expenseName: this._editingExpense.name,
+      users: this._editingExpense.users,
+      value: this._editingExpense.value,
+      payer: onePayer ? this._editingExpense.payers[0].payer.id : null,
+      payers: !onePayer ? amountsPayed : []
+    });
+    console.log("updated form", this.expenseForm);
+  }
+
   onAddExpense(event) {
     event.preventDefault();
+    let e = this.getNewExpenseFromForm();
+    //console.log("expense created", e);
+    if(this._editingExpense) {
+      this.editExpense();
+    } else {
+      this.splitterService.addExpense(e);
+    }
+  }
 
+  editExpense() {
+    let edited = this.splitterService.editExpense(this.oldExpense, this.getNewExpenseFromForm());
+    if(edited) {
+      this.onCancelEdit();
+    }
+  }
+
+  getNewExpenseFromForm(): Expense {
     let expenseName = this.expenseForm.controls.expenseName.value;
     let payerId = this.expenseForm.controls.payer.value;
     let usersIds = (this.expenseForm.controls.users as FormArray).controls
@@ -54,7 +117,7 @@ export class AddExpenseComponent implements OnInit {
       });
     let value = this.expenseForm.controls.value.value;
 
-    const expense = new Expense(expenseName, value);
+    let expense = new Expense(expenseName, value);
 
     let filteredUsers = this.users.filter(user => {
       let isIn = usersIds.includes(user.id);
@@ -84,9 +147,10 @@ export class AddExpenseComponent implements OnInit {
       });
       expense.value = total;
       expense.setPayers(payers);
+
     }
 
-    this.splitterService.addExpense(expense);
+    return expense;
   }
 
   addCheckboxes() {
@@ -110,5 +174,11 @@ export class AddExpenseComponent implements OnInit {
     //console.log(event);
 
     this.singlePayer = !event.target.checked;
+  }
+
+  onCancelEdit() {
+    this._editingExpense = null;
+    this.singlePayer = true;
+    this.expenseForm.reset();
   }
 }

@@ -372,6 +372,16 @@ export class SplitterService {
     }
   }
 
+  editExpense(oldExpense: Expense, newExpense: Expense) {
+    if(this.currentProject.updateExpense(oldExpense, newExpense)) {
+      this.saveProjectData(this.currentProject);
+      this.expensesObservable.next(this.currentProject.expenses);
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   removeExpense(expense: Expense) {
     if (this.currentProject.removeExpense(expense)) {
       this.saveProjectData(this.currentProject);
