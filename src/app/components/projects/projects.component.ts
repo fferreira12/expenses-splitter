@@ -16,6 +16,8 @@ export class ProjectsComponent implements OnInit {
   allProjects: Project[];
   currentProject: Project;
 
+  showArchivedProjects: boolean = false;
+
   constructor(private splitterService: SplitterService) {}
 
   ngOnInit() {
@@ -74,5 +76,14 @@ export class ProjectsComponent implements OnInit {
     }
     let current = this.splitterService.getCurrentProject();
     return project.projectName == current.projectName;
+  }
+
+  onArchiveProject(project: Project) {
+    //console.log('archiving project', project);
+    this.splitterService.archiveProject(project);
+  }
+
+  onUnarchiveProject(project: Project) {
+    this.splitterService.unArchiveProject(project);
   }
 }

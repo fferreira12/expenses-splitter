@@ -131,6 +131,16 @@ export class SplitterService {
     this.emitAllCurrentData();
   }
 
+  archiveProject(project: Project) {
+    this.storage.archiveProject(project, true);
+    this.emitAllCurrentData();
+  }
+
+  unArchiveProject(project: Project) {
+    this.storage.archiveProject(project, false);
+    this.emitAllCurrentData();
+  }
+
   renameUser(user: User, newName: string) {
     if (this.currentProject.renameUser(user, newName)) {
       this.saveProjectData(this.currentProject);

@@ -169,6 +169,15 @@ export class Firebasev2Service {
       .delete();
   }
 
+  archiveProject(project: Project, archive: boolean) {
+    project.archived = archive;
+    this.saveProject(project.ownerId, project);
+    this.db
+      .collection("projects")
+      .doc(project.projectId)
+      .update({archived: archive});
+  }
+
   addEditorToProject(projectId: string, editorEmail: string) {
     this.db
       .collection("projects")

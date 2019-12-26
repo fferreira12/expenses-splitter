@@ -52,5 +52,8 @@
   "AddNewProject": "Adicionar Novo Projeto",
   "Invite": "Convidar",
   "Shared": "Compartilhado",
-  "Cancel": "Cancelar"
+  "Cancel": "Cancelar",
+  "ShowArchivedProjects": "Mostrar Projetos Arquivados",
+  "Archive": "Arquivar",
+  "Unarchive": "Desarquivar"
 }

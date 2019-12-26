@@ -51,5 +51,8 @@
   "AddNewProject": "Add New Project",
   "Invite": "Invite",
   "Shared": "Shared",
-  "Cancel": "Cancel"
+  "Cancel": "Cancel",
+  "ShowArchivedProjects": "Show Archived Projects",
+  "Archive": "Archive",
+  "Unarchive": "Unarchive"
 }

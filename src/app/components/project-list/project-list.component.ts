@@ -14,6 +14,12 @@ export class ProjectListComponent implements OnInit {
   currentProject: Project;
   name = new FormControl('');
 
+  get unarchivedProjects(): Project[] {
+    return this.allProjects.filter(p => {
+      return this.currentProject.projectId == p.projectId || !p.archived;
+    });
+  }
+
   constructor(private splitterService: SplitterService) { }
 
   ngOnInit() {

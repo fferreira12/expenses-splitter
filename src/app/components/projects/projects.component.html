@@ -9,6 +9,12 @@
   </div>
 
   <h1>{{'Projects' | translate}}</h1>
+
+  <div>
+    <input type="checkbox" name="show-archived" [(ngModel)]="showArchivedProjects"> 
+    <label for="show-archived" class="ml-2">{{'ShowArchivedProjects' | translate}}</label>
+  </div>
+
   <table class="table">
     <thead class="thead-light">
       <tr>
@@ -17,7 +23,9 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let p of allProjects; let i = index" [ngClass]="{'bg-warning':isCurrentProject(p)}">
+      <ng-container *ngFor="let p of allProjects; let i = index">
+        <tr *ngIf="showArchivedProjects || isCurrentProject(p) || !p.archived" [ngClass]="{'bg-warning':isCurrentProject(p), 'archived':p.archived}">
+
         <td class="align-middle" [ngClass]="{'self-project': selfProject(p), 'not-self-project': !selfProject(p)}">
           {{ p.projectName }}</td>
         <td>
@@ -25,8 +33,10 @@
             <button class="btn btn-primary mr-2" (click)="onActivateProject(p)">{{'Activate' | translate}}</button>
             <button class="btn btn-danger mr-2" data-toggle="modal"
               [attr.data-target]="'#deleteModal'+i">{{'Delete' | translate}}</button>
-            <button class="btn btn-success" data-toggle="modal"
+            <button class="btn btn-success mr-2" data-toggle="modal"
               [attr.data-target]="'#renameModal'+i">{{'Rename' | translate}}</button>
+            <button class="btn btn-secondary" *ngIf="!p.archived" (click)="onArchiveProject(p)">{{'Archive' | translate}}</button>
+            <button class="btn btn-success" *ngIf="p.archived" (click)="onUnarchiveProject(p)">{{'Unarchive' | translate}}</button>
 
             <button *ngIf="!addingUser" (click)="onToggleInviteUser()"
               class="btn btn-warning ml-2 fas fa-user-plus"></button>
@@ -107,8 +117,8 @@
 
 
 
-
-      </tr>
+        </tr>
+      </ng-container>
     </tbody>
   </table>
 

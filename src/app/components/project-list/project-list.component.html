@@ -4,7 +4,7 @@
     {{ currentProject?.projectName }}
   </button>
   <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-    <a class="dropdown-item" *ngFor="let p of allProjects" (click)="onChangeProject(p)">{{p.projectName}}</a>
+    <a class="dropdown-item" *ngFor="let p of unarchivedProjects" (click)="onChangeProject(p)">{{p.projectName}}</a>
     <a class="dropdown-item" data-toggle="modal" data-target="#myModal">{{'AddNewProject' | translate}}</a>
   </div>
 </div>

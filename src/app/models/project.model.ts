@@ -14,6 +14,8 @@ export class Project {
   expenses: Expense[];
   payments: Payment[];
 
+  archived: boolean;
+
   constructor(
     projectId?: string,
     projectName?: string,
