@@ -5,8 +5,10 @@
     "ng": "ng",
     "start": "ng serve",
     "start:prodtest": "ng serve --prod --aot",
-    "build:prod": "ng build --prod --aot",
-    "test": "ng test",
+    "clean": "rimraf ./dist",
+    "build:prod": "ng build --prod",
+    "build:prodaot": "ng build --prod --aot",
+    "test": "ng test --watch=false --browsers=ChromeHeadlessCustom",
     "test:nowatch": "ng test --watch=false",
     "lint": "ng lint",
     "e2e": "ng e2e",
@@ -14,7 +16,8 @@
     "s3:upload": "aws s3 cp ./dist/expense-splitter-frontend s3://angular-expenses-splitter --recursive --include \"*\"",
     "s3": "npm run s3:delete && npm run s3:upload",
     "firebase": "firebase deploy",
-    "deploy": "npm run build:prod && npm run firebase"
+    "deploy": "npm run build:prodaot && npm run firebase",
+    "build:ci": "npm run clean && npm run test && npm run build:prod"
   },
   "private": true,
   "dependencies": {
@@ -56,6 +59,7 @@
     "karma-jasmine": "~1.1.2",
     "karma-jasmine-html-reporter": "^0.2.2",
     "protractor": "~5.4.0",
+    "puppeteer": "^2.0.0",
     "ts-node": "~7.0.0",
     "tslint": "~5.11.0",
     "typescript": "~3.2.2"
