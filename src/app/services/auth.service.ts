@@ -69,11 +69,7 @@ export class AuthService {
       .auth()
       .signInWithEmailAndPassword(email, password)
       .then(result => {
-        this.currentUser = result.user;
-        this.userId = result.user.uid;
-        this.localStorage.save("user-id", this.userId);
-        this.userIdObservable.next(this.userId);
-        return result.user.getIdToken();
+        return this.onSucessLogin(result);
       })
       .then(token => {
         this.token = token;
@@ -81,6 +77,29 @@ export class AuthService {
         //console.log('token was sucessfully saved:\n' + this.token);
       })
       .catch(error => console.log(error));
+  }
+
+  googleSignin() {
+    var provider = new firebase.auth.GoogleAuthProvider()
+    return firebase.auth().signInWithPopup(provider).then((result) => {
+      return this.onSucessLogin(result);
+
+    })
+    .then(token => {
+      this.token = token;
+      this.localStorage.save("user-token", this.token);
+      return this.currentUser;
+      //console.log('token was sucessfully saved:\n' + this.token);
+    })
+    .catch(error => console.log(error));
+  }
+
+  onSucessLogin(result: firebase.auth.UserCredential) {
+    this.currentUser = result.user;
+    this.userId = result.user.uid;
+    this.localStorage.save("user-id", this.userId);
+    this.userIdObservable.next(this.userId);
+    return result.user.getIdToken();
   }
 
   subscribeToUserId(subscriber) {
