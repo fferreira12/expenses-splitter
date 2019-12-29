@@ -67,7 +67,7 @@ export class SplitterService {
             this.saveLanguagePreference(d.lang);
           });
           
-          this.getLanguagePreference().then(doc => {
+          this.getLanguagePreference().subscribe(doc => {
             let data = doc.data();
             console.log('got language, ', data);
             this.translate.use(data.language);
@@ -195,15 +195,17 @@ export class SplitterService {
       return;
     }
     this.resetProjects();
-    this.storage.getProjectsOfUser().then(data => {
+    this.storage.getProjectsOfUser().subscribe(data => {
       // console.log("data");
       // console.log(data);
 
       // let parsedData = data.data();
+      console.log('parsing this', data);
+      
       this.tryParseData(data);
       this.emitAllCurrentData();
     });
-    this.storage.getProjectsUserCanEdit(this.userEmail).then(data => {
+    this.storage.getProjectsUserCanEdit(this.userEmail).subscribe(data => {
       if (!data) {
         return;
       }
@@ -213,6 +215,10 @@ export class SplitterService {
       //subscribe to realtime changes
       this.storage.subscribeToProjectChanges(doc => {
         console.log("new data from server");
+
+        if(!doc.data) {
+          return;
+        }
 
         let d = doc.data();
         this.parseOne({ id: doc.id, data: d });
@@ -237,8 +243,12 @@ export class SplitterService {
         //this.currentProject = this.allSelfProjects[0];
         //console.log('before getting last project');
         
-        this.storage.getLastProject().then(doc => {
+        this.storage.getLastProject().subscribe(doc => {
+          console.log('got last project', doc);
+          
           let data = doc.data();
+
+          console.log('last project data', data);
           let p = this.getAllProjects().find(p => {
             return p.projectId === data.projectId;
           });
@@ -255,6 +265,7 @@ export class SplitterService {
   }
 
   parseOne(pro: any) {
+    /*
     let proj = JSON.parse(pro.data.data);
     let project = new Project(pro.id, proj.projectName);
     //project.setEditorEmails(parsed.editors);
@@ -263,6 +274,15 @@ export class SplitterService {
       Object.assign(project, parsed as Partial<Project>);
       project.setEditorEmails(proj.editors || []);
     }
+     */
+
+    console.log('trying to parse: ', pro);
+    
+    let project = new Project(pro.id, pro.projectName);
+    Object.assign(project, pro);
+
+    console.log('parsed result: ', project);
+
     let shouldAddToSelf = !this.allSelfProjects.some(prj => {
       return prj.projectId == project.projectId;
     });
@@ -279,6 +299,9 @@ export class SplitterService {
     } else {
       this.updateProject(project);
     }
+   
+    return project;
+
   }
 
   updateProject(project: Project) {

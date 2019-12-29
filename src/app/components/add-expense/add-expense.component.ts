@@ -19,6 +19,9 @@ export class AddExpenseComponent implements OnInit {
   oldExpense: Expense = null;
 
   @Input() set editingExpense(expense: Expense) {
+    if(!expense) {
+      return;
+    }
     this.editing = true;
     this.oldExpense = Object.freeze(expense);
     this._editingExpense = expense;

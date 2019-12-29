@@ -1,4 +1,7 @@
-import * as firebase from "firebase";
+// import * as firebase from "firebase";
+
+import { AngularFireAuth } from '@angular/fire/auth';
+import { auth } from 'firebase/app';
 
 import { Injectable } from "@angular/core";
 import { BehaviorSubject } from "rxjs";
@@ -16,9 +19,10 @@ export class AuthService {
   userEmail: string = null;
   userEmailObservable: BehaviorSubject<string> = new BehaviorSubject(null);
 
-  constructor(private localStorage: LocalstorageService) {
+  constructor(private localStorage: LocalstorageService, public afAuth: AngularFireAuth) {
     this.userIdObservable = new BehaviorSubject("");
     //this.userObservable = new BehaviorSubject(null);
+    this.init();
   }
 
   init() {
@@ -29,7 +33,10 @@ export class AuthService {
       this.token = this.localStorage.get("user-token");
       //firebase.auth().signInWithCustomToken(this.token);
     }
-    firebase.auth().onAuthStateChanged(user => {
+
+    this.afAuth.auth.setPersistence(auth.Auth.Persistence.LOCAL)
+
+    this.afAuth.auth.onAuthStateChanged(user => {
       if (user) {
         //console.log("signed in");
         //console.log(user);
@@ -58,15 +65,13 @@ export class AuthService {
   }
 
   signupUser(email: string, password: string) {
-    return firebase
-      .auth()
+    return this.afAuth.auth
       .createUserWithEmailAndPassword(email, password)
       .catch(error => console.log(error));
   }
 
   signinUser(email: string, password: string) {
-    return firebase
-      .auth()
+    return this.afAuth.auth
       .signInWithEmailAndPassword(email, password)
       .then(result => {
         return this.onSucessLogin(result);
@@ -80,8 +85,8 @@ export class AuthService {
   }
 
   googleSignin() {
-    var provider = new firebase.auth.GoogleAuthProvider()
-    return firebase.auth().signInWithPopup(provider).then((result) => {
+    var provider = new auth.GoogleAuthProvider()
+    return this.afAuth.auth.signInWithPopup(provider).then((result) => {
       return this.onSucessLogin(result);
 
     })
@@ -112,12 +117,11 @@ export class AuthService {
     this.token = null;
     this.localStorage.save("user-id", null);
     this.localStorage.save("user-token", null);
-    firebase.auth().signOut();
+    this.afAuth.auth.signOut();
   }
 
   getToken() {
-    firebase
-      .auth()
+    this.afAuth.auth
       .currentUser.getIdToken()
       .then((token: string) => (this.token = token));
     return this.token;
@@ -127,7 +131,7 @@ export class AuthService {
     if (this.userId !== null && this.userId !== null) {
       return this.userId;
     }
-    return firebase.auth().currentUser ? firebase.auth().currentUser.uid : "";
+    return this.afAuth.auth.currentUser ? this.afAuth.auth.currentUser.uid : "";
   }
 
   isAuthenticated() {
