@@ -75,9 +75,11 @@ export class FirebaseService {
   }
 
   subscribeToChanges(subscriber) {
-    this.db
+    let sub = this.db
       .collection("user-data")
       .doc(this.userId)
       .onSnapshot(subscriber);
+
+      this.authService.registerSubscription(sub);
   }
 }

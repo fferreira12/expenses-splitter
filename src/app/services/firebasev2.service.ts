@@ -6,6 +6,7 @@ import { Project } from "../models/project.model";
 import { User } from "../models/user.model";
 import { Expense } from "../models/expense.model";
 import { Payment } from "../models/payment.model";
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: "root"
@@ -16,7 +17,7 @@ export class Firebasev2Service {
   db: firebase.firestore.Firestore;
   allProjectIds: string[] = [];
 
-  constructor() {
+  constructor(private auth: AuthService) {
     this.db = firebase.firestore();
   }
 
@@ -144,12 +145,15 @@ export class Firebasev2Service {
     }
 
     this.allProjectIds.forEach(id => {
-      this.db
+      let unsubscribe = this.db
         .collection("projects")
         .doc(id)
         .onSnapshot(doc => {
           subscriber(doc);
         });
+
+      this.auth.registerSnapshot(unsubscribe);
+
     });
   }
 
