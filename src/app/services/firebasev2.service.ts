@@ -1,11 +1,16 @@
 import { Injectable } from "@angular/core";
 
-import * as firebase from "firebase";
+//import * as firebase from "firebase";
 
 import { Project } from "../models/project.model";
 import { User } from "../models/user.model";
 import { Expense } from "../models/expense.model";
 import { Payment } from "../models/payment.model";
+import { AngularFirestore, AngularFirestoreDocument } from '@angular/fire/firestore';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { from } from 'rxjs';
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: "root"
@@ -13,11 +18,18 @@ import { Payment } from "../models/payment.model";
 export class Firebasev2Service {
   userId: string = null;
   userEmail: string = null;
-  db: firebase.firestore.Firestore;
+  //db: firebase.firestore.Firestore;
   allProjectIds: string[] = [];
+  projects$: Observable<Project[]>;
 
-  constructor() {
-    this.db = firebase.firestore();
+  constructor(private db: AngularFirestore) {
+    this.projects$ = this.db.collection<Project>("projects2").valueChanges();
+    this.projects$.pipe(map(projects => {
+      return projects.map(p => p.projectId);
+    }))
+    .subscribe((projectIds => {
+      this.allProjectIds = projectIds;
+    }))
   }
 
   setUserId(userId: string) {
@@ -33,6 +45,8 @@ export class Firebasev2Service {
   saveProject(ownerId: string, project: Project) {
     this.verifyUserId();
     //let name = project.projectName;
+    
+    /* OLD
     this.db
       .collection("projects")
       .doc(project.projectId)
@@ -41,6 +55,13 @@ export class Firebasev2Service {
         editors: project.editors,
         data: JSON.stringify(project)
       });
+    */
+
+    // NEW
+    project.ownerId = ownerId;
+    let plainJSProject = JSON.parse(JSON.stringify(project));
+    this.db.collection('projects2').doc<Project>(project.projectId).set(plainJSProject);
+
     this.saveLastProject(project);
   }
 
@@ -87,9 +108,15 @@ export class Firebasev2Service {
   // savePayment(payment: Payment) {}
 
   getProjectsOfUser() {
-    let result = this.db
-      .collection("projects")
-      .where("userId", "==", this.userId)
+    //console.log('getting projects of user: ', this.afAuth.auth.currentUser)
+    return this.db.collection<Project>("projects2").valueChanges().pipe(map(projects => {
+      return projects.filter(p => p.ownerId == this.userId);
+    }));
+      
+    
+    
+    /*
+    .where("userId", "==", this.userId)
       .get()
       .then(snapshot => {
         let allProjects = [];
@@ -103,14 +130,17 @@ export class Firebasev2Service {
     console.log(result);
 
     return result;
+    */
   }
 
   getProjectsUserCanEdit(email: string) {
     console.log("getting all projects that " + email + " can edit");
     this.userEmail = email;
     if (!email) {
-      return Promise.resolve(null);
+      return from<Project[]>([]);
     }
+
+    /*
     let result = this.db
       .collection("projects")
       .where("editors", "array-contains", email)
@@ -130,6 +160,13 @@ export class Firebasev2Service {
     console.log(result);
 
     return result;
+    */
+
+    return this.projects$.pipe(map(projectsArray => {
+      return projectsArray.filter(project => {
+        project.editors.some(editorEmail => editorEmail === email)
+      })
+    }))
   }
 
   addToAllProjectIds(id: string) {
@@ -143,19 +180,26 @@ export class Firebasev2Service {
       return;
     }
 
+    /*
     this.allProjectIds.forEach(id => {
-      this.db
+      let unsubscribe = this.db
         .collection("projects")
         .doc(id)
         .onSnapshot(doc => {
           subscriber(doc);
         });
+
+      this.auth.registerSnapshot(unsubscribe);
+
     });
+    */
+
+    this.projects$.subscribe(subscriber);
   }
 
   getProject(projectId: string) {
     return this.db
-      .collection("projects")
+      .collection("projects2")
       .doc(projectId)
       .get();
   }
@@ -164,7 +208,7 @@ export class Firebasev2Service {
     console.log("deleting " + projectId);
 
     return this.db
-      .collection("projects")
+      .collection("projects2")
       .doc(projectId)
       .delete();
   }
@@ -173,12 +217,28 @@ export class Firebasev2Service {
     project.archived = archive;
     this.saveProject(project.ownerId, project);
     this.db
-      .collection("projects")
+      .collection("projects2")
       .doc(project.projectId)
       .update({archived: archive});
   }
 
   addEditorToProject(projectId: string, editorEmail: string) {
+    let project: Observable<Project>;
+    project = this.db.doc<Project>('projects2/'+projectId).valueChanges();
+
+    project.subscribe(p => {
+      if(!p.editors.includes(editorEmail)) {
+        let editors = [
+          editorEmail,
+          ...p.editors
+        ]
+        return this.db.doc<Project>('projects2/'+projectId).update({
+          editors
+        })
+      }
+    });
+    
+    /*
     this.db
       .collection("projects")
       .doc(projectId)
@@ -205,9 +265,12 @@ export class Firebasev2Service {
         console.log("editors");
         console.log(editors);
       });
+      */
   }
 
   removeEditorFromProject(projectId: string, editorEmail: string) {
+    
+    /*
     this.db
       .collection("projects")
       .doc(projectId)
@@ -234,6 +297,20 @@ export class Firebasev2Service {
         console.log("editors");
         console.log(editors);
       });
+      */
+
+     let project: Observable<Project>;
+     project = this.db.doc<Project>('projects2/'+projectId).valueChanges();
+ 
+     project.subscribe(p => {
+       if(p.editors.includes(editorEmail)) {
+         
+        let editors = p.editors.filter(editor => editor !== editorEmail);
+         return this.db.doc<Project>('projects2/'+projectId).update({
+           editors
+         })
+       }
+     });
   }
 
   // getUsers(projectId: string) {}

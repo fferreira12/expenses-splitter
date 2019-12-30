@@ -19,6 +19,9 @@ export class AddExpenseComponent implements OnInit {
   oldExpense: Expense = null;
 
   @Input() set editingExpense(expense: Expense) {
+    if(!expense) {
+      return;
+    }
     this.editing = true;
     this.oldExpense = Object.freeze(expense);
     this._editingExpense = expense;
@@ -70,11 +73,10 @@ export class AddExpenseComponent implements OnInit {
   }
 
   updateForm() {
+    if(!this._editingExpense) return;
     let onePayer = this._editingExpense.payers.length == 1;
     this.singlePayer = onePayer;
-    let amountsPayed = this._editingExpense.payers.map(payer => {
-      return payer.amount;
-    });
+    let amountsPayed = this._editingExpense.payers.map(payer => payer.amount);
     this.expenseForm.patchValue({
       expenseName: this._editingExpense.name,
       users: this._editingExpense.users,

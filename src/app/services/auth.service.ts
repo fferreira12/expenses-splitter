@@ -1,8 +1,12 @@
-import * as firebase from "firebase";
+// import * as firebase from "firebase";
+
+import { AngularFireAuth } from '@angular/fire/auth';
+import { auth } from 'firebase/app';
 
 import { Injectable } from "@angular/core";
-import { BehaviorSubject } from "rxjs";
+import { BehaviorSubject, Subscription } from "rxjs";
 import { LocalstorageService } from "./localstorage.service";
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: "root"
@@ -15,10 +19,15 @@ export class AuthService {
   currentUser: firebase.User;
   userEmail: string = null;
   userEmailObservable: BehaviorSubject<string> = new BehaviorSubject(null);
+  
+  subscriptionsToCancelOnLogout: Subscription[] = [];
+  snapshotsToCancelOnLogout: (()=>void)[] = [];
 
-  constructor(private localStorage: LocalstorageService) {
+  constructor(private localStorage: LocalstorageService, public afAuth: AngularFireAuth, private router: Router) {
+
     this.userIdObservable = new BehaviorSubject("");
     //this.userObservable = new BehaviorSubject(null);
+    this.init();
   }
 
   init() {
@@ -29,7 +38,10 @@ export class AuthService {
       this.token = this.localStorage.get("user-token");
       //firebase.auth().signInWithCustomToken(this.token);
     }
-    firebase.auth().onAuthStateChanged(user => {
+
+    this.afAuth.auth.setPersistence(auth.Auth.Persistence.LOCAL)
+
+    this.afAuth.auth.onAuthStateChanged(user => {
       if (user) {
         //console.log("signed in");
         //console.log(user);
@@ -50,23 +62,23 @@ export class AuthService {
   }
 
   subscribeToUser(subscriber) {
-    return this.userObservable.subscribe(subscriber);
+    let sub = this.userObservable.subscribe(subscriber);
+    this.registerSubscription(sub);
   }
 
   subscribeToUserEmail(subscriber) {
-    return this.userEmailObservable.subscribe(subscriber);
+    let sub = this.userEmailObservable.subscribe(subscriber);
+    this.registerSubscription(sub);
   }
 
   signupUser(email: string, password: string) {
-    return firebase
-      .auth()
+    return this.afAuth.auth
       .createUserWithEmailAndPassword(email, password)
       .catch(error => console.log(error));
   }
 
   signinUser(email: string, password: string) {
-    return firebase
-      .auth()
+    return this.afAuth.auth
       .signInWithEmailAndPassword(email, password)
       .then(result => {
         return this.onSucessLogin(result);
@@ -80,8 +92,8 @@ export class AuthService {
   }
 
   googleSignin() {
-    var provider = new firebase.auth.GoogleAuthProvider()
-    return firebase.auth().signInWithPopup(provider).then((result) => {
+    var provider = new auth.GoogleAuthProvider()
+    return this.afAuth.auth.signInWithPopup(provider).then((result) => {
       return this.onSucessLogin(result);
 
     })
@@ -103,7 +115,8 @@ export class AuthService {
   }
 
   subscribeToUserId(subscriber) {
-    this.userIdObservable.subscribe(subscriber);
+    let sub = this.userIdObservable.subscribe(subscriber);
+    this.registerSubscription(sub);
   }
 
   logout() {
@@ -112,12 +125,15 @@ export class AuthService {
     this.token = null;
     this.localStorage.save("user-id", null);
     this.localStorage.save("user-token", null);
-    firebase.auth().signOut();
+    this.cancelAllSubscriptionsAndSnapshots();
+    this.afAuth.auth.signOut().then(() => {
+      this.router.navigate(['signin']);
+    });
+    
   }
 
   getToken() {
-    firebase
-      .auth()
+    this.afAuth.auth
       .currentUser.getIdToken()
       .then((token: string) => (this.token = token));
     return this.token;
@@ -127,10 +143,32 @@ export class AuthService {
     if (this.userId !== null && this.userId !== null) {
       return this.userId;
     }
-    return firebase.auth().currentUser ? firebase.auth().currentUser.uid : "";
+    return this.afAuth.auth.currentUser ? this.afAuth.auth.currentUser.uid : "";
   }
 
   isAuthenticated() {
     return this.token != null;
+  }
+
+  registerSubscription(subscription: Subscription) {
+    if(!this.subscriptionsToCancelOnLogout.includes(subscription)) {
+      this.subscriptionsToCancelOnLogout.push(subscription);
+    }
+  }
+
+  registerSnapshot(func: ()=>void) {
+    if(!this.snapshotsToCancelOnLogout.includes(func)) {
+      this.snapshotsToCancelOnLogout.push(func);
+    }
+  }
+
+  cancelAllSubscriptionsAndSnapshots() {
+    
+    this.subscriptionsToCancelOnLogout.forEach(sub => {
+      sub.unsubscribe();
+    });
+
+    this.snapshotsToCancelOnLogout.forEach(func => func());
+
   }
 }
