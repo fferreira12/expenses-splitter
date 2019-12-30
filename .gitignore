@@ -49,3 +49,6 @@ testem.log
 # System Files
 .DS_Store
 Thumbs.db
+
+# util service keys
+src/util/service-key.json
