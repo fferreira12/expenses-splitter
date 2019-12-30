@@ -42,7 +42,7 @@ export class Firebasev2Service {
     }
   }
 
-  saveProject(ownerId: string, project: Project) {
+  saveProject(ownerId: string, project: Project, isCurrentProject: boolean = true) {
     this.verifyUserId();
     //let name = project.projectName;
     
@@ -62,7 +62,9 @@ export class Firebasev2Service {
     let plainJSProject = JSON.parse(JSON.stringify(project));
     this.db.collection('projects2').doc<Project>(project.projectId).set(plainJSProject);
 
-    this.saveLastProject(project);
+    if(isCurrentProject) {
+      this.saveLastProject(project);
+    }
   }
 
   saveLastProject(project: Project) {
@@ -215,7 +217,7 @@ export class Firebasev2Service {
 
   archiveProject(project: Project, archive: boolean) {
     project.archived = archive;
-    this.saveProject(project.ownerId, project);
+    this.saveProject(project.ownerId, project, false);
     this.db
       .collection("projects2")
       .doc(project.projectId)
