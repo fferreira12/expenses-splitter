@@ -80,6 +80,6 @@ export class FirebaseService {
       .doc(this.userId)
       .onSnapshot(subscriber);
 
-      this.authService.registerSubscription(sub);
+      this.authService.registerSnapshot(sub);
   }
 }
