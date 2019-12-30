@@ -4,8 +4,9 @@ import { AngularFireAuth } from '@angular/fire/auth';
 import { auth } from 'firebase/app';
 
 import { Injectable } from "@angular/core";
-import { BehaviorSubject } from "rxjs";
+import { BehaviorSubject, Subscription } from "rxjs";
 import { LocalstorageService } from "./localstorage.service";
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: "root"
@@ -18,8 +19,12 @@ export class AuthService {
   currentUser: firebase.User;
   userEmail: string = null;
   userEmailObservable: BehaviorSubject<string> = new BehaviorSubject(null);
+  
+  subscriptionsToCancelOnLogout: Subscription[] = [];
+  snapshotsToCancelOnLogout: (()=>void)[] = [];
 
-  constructor(private localStorage: LocalstorageService, public afAuth: AngularFireAuth) {
+  constructor(private localStorage: LocalstorageService, public afAuth: AngularFireAuth, private router: Router) {
+
     this.userIdObservable = new BehaviorSubject("");
     //this.userObservable = new BehaviorSubject(null);
     this.init();
@@ -57,11 +62,13 @@ export class AuthService {
   }
 
   subscribeToUser(subscriber) {
-    return this.userObservable.subscribe(subscriber);
+    let sub = this.userObservable.subscribe(subscriber);
+    this.registerSubscription(sub);
   }
 
   subscribeToUserEmail(subscriber) {
-    return this.userEmailObservable.subscribe(subscriber);
+    let sub = this.userEmailObservable.subscribe(subscriber);
+    this.registerSubscription(sub);
   }
 
   signupUser(email: string, password: string) {
@@ -108,7 +115,8 @@ export class AuthService {
   }
 
   subscribeToUserId(subscriber) {
-    this.userIdObservable.subscribe(subscriber);
+    let sub = this.userIdObservable.subscribe(subscriber);
+    this.registerSubscription(sub);
   }
 
   logout() {
@@ -117,7 +125,11 @@ export class AuthService {
     this.token = null;
     this.localStorage.save("user-id", null);
     this.localStorage.save("user-token", null);
-    this.afAuth.auth.signOut();
+    this.cancelAllSubscriptionsAndSnapshots();
+    this.afAuth.auth.signOut().then(() => {
+      this.router.navigate(['signin']);
+    });
+    
   }
 
   getToken() {
@@ -136,5 +148,27 @@ export class AuthService {
 
   isAuthenticated() {
     return this.token != null;
+  }
+
+  registerSubscription(subscription: Subscription) {
+    if(!this.subscriptionsToCancelOnLogout.includes(subscription)) {
+      this.subscriptionsToCancelOnLogout.push(subscription);
+    }
+  }
+
+  registerSnapshot(func: ()=>void) {
+    if(!this.snapshotsToCancelOnLogout.includes(func)) {
+      this.snapshotsToCancelOnLogout.push(func);
+    }
+  }
+
+  cancelAllSubscriptionsAndSnapshots() {
+    
+    this.subscriptionsToCancelOnLogout.forEach(sub => {
+      sub.unsubscribe();
+    });
+
+    this.snapshotsToCancelOnLogout.forEach(func => func());
+
   }
 }

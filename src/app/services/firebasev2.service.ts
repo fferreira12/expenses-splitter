@@ -10,6 +10,7 @@ import { AngularFirestore, AngularFirestoreDocument } from '@angular/fire/firest
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { from } from 'rxjs';
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: "root"
@@ -181,12 +182,15 @@ export class Firebasev2Service {
 
     /*
     this.allProjectIds.forEach(id => {
-      this.db
+      let unsubscribe = this.db
         .collection("projects")
         .doc(id)
         .onSnapshot(doc => {
           subscriber(doc);
         });
+
+      this.auth.registerSnapshot(unsubscribe);
+
     });
     */
 

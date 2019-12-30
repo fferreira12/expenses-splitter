@@ -61,11 +61,13 @@ export class SplitterService {
           this.resetProjects();
           this.getData();
 
-          this.translate.onLangChange.subscribe(d => {
+          let sub = this.translate.onLangChange.subscribe(d => {
             console.log('language has changed');
             console.log(d);
             this.saveLanguagePreference(d.lang);
           });
+
+          this.authService.registerSubscription(sub);
           
           this.getLanguagePreference().subscribe(doc => {
             let data = doc.data();
@@ -92,7 +94,8 @@ export class SplitterService {
   }
 
   subscribeToLoading(subscriber) {
-    this.loadingObservable.subscribe(subscriber);
+    let sub = this.loadingObservable.subscribe(subscriber);
+    this.authService.registerSubscription(sub);
   }
 
   getLoadingStatus() {
@@ -172,11 +175,13 @@ export class SplitterService {
   }
 
   subscribeToCurrentProject(subscriber) {
-    this.currentProjectObservable.subscribe(subscriber);
+    let sub = this.currentProjectObservable.subscribe(subscriber);
+    this.authService.registerSubscription(sub);
   }
 
   subscribeToAllProjects(subscriber) {
-    this.allProjectsObservable.subscribe(subscriber);
+    let sub = this.allProjectsObservable.subscribe(subscriber);
+    this.authService.registerSubscription(sub);
   }
 
   prepareStorage() {
@@ -395,7 +400,8 @@ export class SplitterService {
   }
 
   subscribeToUsers(observer) {
-    this.usersObservable.subscribe(observer);
+    let sub = this.usersObservable.subscribe(observer);
+    this.authService.registerSubscription(sub);
   }
 
   addExpense(expense: Expense) {
@@ -427,7 +433,8 @@ export class SplitterService {
   }
 
   subscribeToExpenses(observer) {
-    this.expensesObservable.subscribe(observer);
+    let sub = this.expensesObservable.subscribe(observer);
+    this.authService.registerSubscription(sub);
   }
 
   getPaidValues() {
@@ -461,7 +468,8 @@ export class SplitterService {
   }
 
   subscribeToPayments(observer) {
-    this.paymentsObservable.subscribe(observer);
+    let sub = this.paymentsObservable.subscribe(observer);
+    this.authService.registerSubscription(sub);
   }
 
   getPaymentsMade(user: User) {
