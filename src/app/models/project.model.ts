@@ -80,8 +80,46 @@ export class Project {
     } else {
       let index = this.users.indexOf(user);
       this.users[index].name = newName;
+      //updates payments and expenses already made with older name
+      this.updateUsernameInExpensesMade(user, newName);
+      this.updateUsernameInPaymentsMade(user, newName);
       return true;
     }
+  }
+
+  updateUsernameInExpensesMade(user: User, newName: string) {
+    //update expense
+    this.expenses.forEach((expense, expenseIndex) => {
+      
+      //updates users
+      expense.users.forEach((u, userIndex) => {
+        if(u.id === user.id) {
+          this.expenses[expenseIndex].users[userIndex].name = newName;
+        }
+      });
+
+      //updates payers
+      expense.payers.forEach((payer, payerIndex) => {
+        if(payer.payer.id === user.id) {
+          this.expenses[expenseIndex].payers[payerIndex].payer.name = newName;
+        }
+      });
+
+    });
+  }
+
+  updateUsernameInPaymentsMade(user: User, newName: string) {
+    this.payments.forEach((payment, paymentIndex) => {
+
+      if(payment.payer.id === user.id) {
+        this.payments[paymentIndex].payer.name = newName;
+      }
+
+      if(payment.receiver.id === user.id) {
+        this.payments[paymentIndex].receiver.name = newName;
+      }
+
+    });
   }
 
   removeExpensesAndPaymentsWithNoAssociatedUser() {
