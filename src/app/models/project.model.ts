@@ -16,6 +16,8 @@ export class Project {
 
   archived: boolean;
 
+  weights: {user: User, weight: number}[];
+
   constructor(
     projectId?: string,
     projectName?: string,
@@ -221,15 +223,93 @@ export class Project {
     return paid;
   }
 
-  getFairShares() {
+  setUnevenSplit(weights: {user: User, weight: number}[]) {
+    if(weights.length < this.users.length) {
+      console.warn('Not all users are receiving a weight. Users with unset weights will receive a value of 1');
+    }
+
+    this.weights = [];
+
+    let userWithUnsetWeights: string[] = [];
+    this.users.forEach(user => {
+      let weight = weights.find(weight => weight.user.id === user.id);
+      if(weight) {
+        this.weights.push(weight);
+      } else {
+        this.weights.push({user, weight:1});
+        userWithUnsetWeights.push(user.name);
+      }
+    });
+
+    if(userWithUnsetWeights.length > 0) {
+      let s = userWithUnsetWeights.join(', ');
+      console.warn(`Users ${s.substring(0, s.length - 2)} did not have weights and will receive a weight value of 1`);
+
+    }
+  }
+
+  setEvenSplit() {
+    this.weights = undefined;
+  }
+
+  isEvenSplit(): boolean {
+    return !this.weights || this.weights.every(weight => {
+      return weight.weight === this.weights[0].weight;
+    });
+  }
+
+  getTotalWeight(expense: Expense) {
+    let totalWeight = 0.0;
+    let evenSplit = !this.weights;
+    if(evenSplit) {
+      totalWeight = expense.users.length;
+    } else {
+      let weightsToCount = this.weights
+      .filter(weight => { //filter to only use weights of users participating in this expense
+        return expense.users.some(user => user.id === weight.user.id)
+      });
+
+      weightsToCount.forEach(weight => {
+        totalWeight += parseFloat(weight.weight as any);
+      });
+    }
+    return totalWeight;
+  }
+
+  getWeightForUser(user: User): number {
+    if(!this.weights) {
+      return 1;
+    }
+    let weight = this.weights.find(weight => weight.user.id === user.id);
+    return weight ? weight.weight : 1.0;
+  }
+
+  setWeightForUser(user: User, weight: any) {
+    if(!this.weights) {
+      this.weights = [];
+    }
+    
+    this.weights = [
+      ...this.weights.filter(weight => weight.user.id !== user.id),
+      { user, weight: parseFloat(weight) }
+    ]
+  }
+
+  getFairShares(): { [uid: string]: number } {
     let fairShares = {};
     this.users.forEach(user => {
       fairShares[user.id] = 0;
     });
+
+    let evenSplit = !this.weights;
+
     this.expenses.forEach(expense => {
+      
       expense.users.forEach(user => {
-        fairShares[user.id] += (expense.value * 1.0) / expense.users.length;
+        let amount = (expense.value * this.getWeightForUser(user)) / this.getTotalWeight(expense);
+        fairShares[user.id] += amount;
       });
+
     });
     return fairShares;
   }

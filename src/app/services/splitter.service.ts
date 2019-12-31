@@ -34,6 +34,8 @@ export class SplitterService {
   allProjectsObservable: Subject<Project[]>;
   loadingObservable: Subject<boolean>;
 
+  weightsObservable: Subject<{ user: User, weight: number }[]>
+
   constructor(
     private storage: Firebasev2Service,
     private authService: AuthService,
@@ -88,6 +90,7 @@ export class SplitterService {
     this.currentProjectObservable = new Subject();
     this.allProjectsObservable = new Subject();
     this.loadingObservable = new Subject();
+    this.weightsObservable = new Subject();
 
     this.emitAllCurrentData();
     this.isLoading = false;
@@ -333,6 +336,7 @@ export class SplitterService {
     this.currentProjectObservable.next(this.currentProject);
     this.isLoading = false;
     this.loadingObservable.next(this.isLoading);
+    this.weightsObservable.next(this.getWeights())
   }
 
   saveProjectData(project: Project) {
@@ -435,6 +439,36 @@ export class SplitterService {
   subscribeToExpenses(observer) {
     let sub = this.expensesObservable.subscribe(observer);
     this.authService.registerSubscription(sub);
+  }
+
+  getWeights() {
+    return this.currentProject.weights;
+  }
+
+  getWeightForUser(user: User) {
+    return this.currentProject.getWeightForUser(user);
+  }
+
+  setWeightForUser(user: User, weight: number) {
+    this.currentProject.setWeightForUser(user, weight);
+    this.weightsObservable.next(this.getWeights());
+    this.saveProjectData(this.currentProject);
+    this.emitAllCurrentData();
+  }
+
+  setWeights(weigths: { user: User, weight: number }[]) {
+    this.currentProject.setUnevenSplit(weigths);
+    this.weightsObservable.next(this.getWeights());
+    this.saveProjectData(this.currentProject);
+    this.emitAllCurrentData();
+  }
+
+  isEvenSplit() {
+    return this.currentProject.isEvenSplit();
+  }
+
+  subscribeToWeights(observer) {
+    this.weightsObservable.subscribe(observer);
   }
 
   getPaidValues() {
