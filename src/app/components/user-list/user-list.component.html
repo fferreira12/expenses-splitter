@@ -3,11 +3,26 @@
   <ul class="list-group">
     <li *ngFor="let user of users" class="list-group-item">
       <button class="btn btn-danger btn-sm" (click)="onRemoveUser(user)">
-        X
+        <i class="far fa-trash-alt"></i>
       </button>
-      <span class="ml-3" *ngIf="!isEditing(user)" (click)="onEditUsername(user)"> {{ user.name }}</span>
-      <input tabindex="-1" [(ngModel)]="editingUser.name" (focusout)="onLeaveFocus(user)" type="text"
-        class="form-control username ml-3" *ngIf="isEditing(user)">
+      <button *ngIf="!isEditing(user)" class="btn btn-warning btn-sm ml-2" (click)="onEditUser(user)">
+        <i class="fas fa-edit"></i>
+      </button>
+      <button *ngIf="isEditing(user)" class="btn btn-success btn-sm ml-2" (click)="onSave(user)">
+        <i class="fas fa-check"></i>
+      </button>
+
+      <ng-container *ngIf="!isEditing(user)">
+        <span class="ml-3" (click)="onEditUser(user)"> {{ user.name }}</span>
+        <span class="ml-3" *ngIf="!evenSplit">Weight: {{getWeightForUser(user)}}</span>
+      </ng-container>
+
+      <ng-container *ngIf="isEditing(user)">
+        <input tabindex="-1" [(ngModel)]="editingUser.name" type="text"
+          class="form-control username ml-3">
+        <input tabindex="-1" [(ngModel)]="editingWeight" type="text"
+          class="form-control username ml-3">
+      </ng-container>
 
     </li>
   </ul>

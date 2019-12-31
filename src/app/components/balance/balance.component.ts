@@ -4,6 +4,7 @@ import { Expense } from "src/app/models/expense.model";
 import { User } from "src/app/models/user.model";
 import { SimpleCalculator } from "src/app/util/payment-calculator";
 import { Payment } from 'src/app/models/payment.model';
+import { WeightedCalculator } from 'src/app/util/weighted-calculator';
 
 @Component({
   selector: "app-balance",
@@ -16,13 +17,13 @@ export class BalanceComponent implements OnInit {
   paidValues: any;
   fairShares: any;
   balances: any = {};
-  calculator: SimpleCalculator;
+  calculator: WeightedCalculator;
   suggestedPayments: { payer: User; receiver: User; amount: number }[];
 
   constructor(private splitterService: SplitterService) {}
 
   ngOnInit() {
-    this.calculator = new SimpleCalculator();
+    this.calculator = new WeightedCalculator();
 
     this.users = this.splitterService.getUsers();
     this.calculator.setAllUsers(this.users);
@@ -45,12 +46,19 @@ export class BalanceComponent implements OnInit {
       this.calculator.setAllUsers(this.users);
       this.updateValuesSharesAndBalance();
     });
+
+    this.calculator.setFairShares(this.splitterService.getFairShares());
+    this.splitterService.subscribeToWeights(weights => {
+      this.fairShares = this.splitterService.getFairShares();
+      this.calculator.setFairShares(this.fairShares);
+    })
   }
 
   updateValuesSharesAndBalance() {
     this.paidValues = this.splitterService.getPaidValues();
     this.fairShares = this.splitterService.getFairShares();
     this.balances = this.splitterService.getBalances();
+    this.calculator.setFairShares(this.fairShares);
     this.suggestedPayments = this.calculator.calculate(this.balances);
     //console.log(this.suggestedPayments);
   }

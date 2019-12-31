@@ -244,16 +244,26 @@ export class Project {
     this.weights = undefined;
   }
 
+  isEvenSplit(): boolean {
+    return !this.weights || this.weights.every(weight => {
+      return weight.weight === this.weights[0].weight;
+    });
+  }
+
   getTotalWeight(expense: Expense) {
-    let totalWeight = 0;
+    let totalWeight = 0.0;
     let evenSplit = !this.weights;
     if(evenSplit) {
       totalWeight = expense.users.length;
     } else {
-      totalWeight = this.weights
+      let weightsToCount = this.weights
       .filter(weight => { //filter to only use weights of users participating in this expense
         return expense.users.some(user => user.id === weight.user.id)
-      }).reduce((total, current) => total + current.weight, 0) //reduce to sum the weights
+      });
+
+      weightsToCount.forEach(weight => {
+        totalWeight += parseFloat(weight.weight as any);
+      });
     }
     return totalWeight;
   }
@@ -263,7 +273,18 @@ export class Project {
       return 1;
     }
     let weight = this.weights.find(weight => weight.user.id === user.id);
-    return weight ? weight.weight : 1;
+    return weight ? weight.weight : 1.0;
+  }
+
+  setWeightForUser(user: User, weight: any) {
+    if(!this.weights) {
+      this.weights = [];
+    }
+    
+    this.weights = [
+      ...this.weights.filter(weight => weight.user.id !== user.id),
+      { user, weight: parseFloat(weight) }
+    ]
   }
 
   getFairShares(): { [uid: string]: number } {
@@ -277,7 +298,8 @@ export class Project {
     this.expenses.forEach(expense => {
       
       expense.users.forEach(user => {
-        fairShares[user.id] += (expense.value * this.getWeightForUser(user)) / this.getTotalWeight(expense);
+        let amount = (expense.value * this.getWeightForUser(user)) / this.getTotalWeight(expense);
+        fairShares[user.id] += amount;
       });
 
     });

@@ -12,6 +12,11 @@ export class UserListComponent implements OnInit {
   editMode: boolean;
   editingUser: User;
 
+  editingWeight: number;
+  weights: { user: User, weight: number }[];
+
+  evenSplit: boolean;
+
   constructor(private splitterService: SplitterService) {}
 
   ngOnInit() {
@@ -19,24 +24,41 @@ export class UserListComponent implements OnInit {
     this.splitterService.subscribeToUsers(users => {
       this.users = users;
     });
+
+    this.weights = this.splitterService.getWeights();
+    this.evenSplit = this.splitterService.isEvenSplit();
+    this.splitterService.subscribeToWeights(weights => {
+      this.weights = weights;
+      this.evenSplit = this.splitterService.isEvenSplit();
+    })
   }
 
   onRemoveUser(user: User) {
     this.splitterService.removeUser(user);
   }
 
-  onEditUsername(user: User) {
+  onEditUser(user: User) {
+    if(this.editingUser) {
+      return;
+    }
     this.editMode = !this.editMode;
     this.editingUser = user;
-    //console.log("renaming " + user.name);
+    this.editingWeight = this.getWeightForUser(this.editingUser);
   }
 
   isEditing(user: User) {
     return this.editingUser == user && this.editMode;
   }
 
-  onLeaveFocus(user: User) {
+  onSave(user: User) {
     this.splitterService.renameUser(user, user.name);
+    this.splitterService.setWeightForUser(user, this.editingWeight);
+    this.editingUser = null;
+    this.editingWeight = null;
     this.editMode = false;
+  }
+
+  getWeightForUser(user: User) {
+    return this.splitterService.getWeightForUser(user);
   }
 }
