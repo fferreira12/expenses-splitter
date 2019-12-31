@@ -56,6 +56,7 @@ export class WeightedCalculator implements PaymentCalculator {
     let allEqual = true;
     for (var id in balance) {
 
+      if (balance.hasOwnProperty(id)) {
         let diff = Math.abs(balance[id]);
 
         if (diff > 0.01) {
@@ -63,12 +64,13 @@ export class WeightedCalculator implements PaymentCalculator {
           allEqual = false;
           break; 
         }
+      }
     }
     return allEqual;
   }
 
   biggestNegative(balance: Object) {
-    let smallestValue = Infinity;
+    let smallestValue = 0;
     let smallestId: string;
     for (var id in balance) {
       if (balance.hasOwnProperty(id)) {
@@ -82,7 +84,7 @@ export class WeightedCalculator implements PaymentCalculator {
   }
 
   biggestPositive(balance: Object) {
-    let biggestValue = -Infinity;
+    let biggestValue = 0;
     let biggestId: string;
     for (var id in balance) {
       if (balance.hasOwnProperty(id)) {

@@ -27,6 +27,8 @@ export class BalanceComponent implements OnInit {
 
     this.users = this.splitterService.getUsers();
     this.calculator.setAllUsers(this.users);
+    this.fairShares = this.splitterService.getFairShares();
+    this.calculator.setFairShares(this.fairShares);
     this.expenses = this.splitterService.getExpenses();
 
     this.updateValuesSharesAndBalance();
@@ -47,11 +49,12 @@ export class BalanceComponent implements OnInit {
       this.updateValuesSharesAndBalance();
     });
 
-    this.calculator.setFairShares(this.splitterService.getFairShares());
     this.splitterService.subscribeToWeights(weights => {
       this.fairShares = this.splitterService.getFairShares();
       this.calculator.setFairShares(this.fairShares);
-    })
+      this.updateValuesSharesAndBalance();
+    });
+
   }
 
   updateValuesSharesAndBalance() {
