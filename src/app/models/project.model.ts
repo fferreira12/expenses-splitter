@@ -230,14 +230,22 @@ export class Project {
 
     this.weights = [];
 
+    let userWithUnsetWeights: string[] = [];
     this.users.forEach(user => {
       let weight = weights.find(weight => weight.user.id === user.id);
       if(weight) {
         this.weights.push(weight);
       } else {
         this.weights.push({user, weight:1});
+        userWithUnsetWeights.push(user.name);
       }
-    })
+    });
+
+    if(userWithUnsetWeights.length > 0) {
+      let s = userWithUnsetWeights.join(', ');
+      console.warn(`Users ${s.substring(0, s.length - 2)} did not have weights and will receive a weight value of 1`);
+
+    }
   }
 
   setEvenSplit() {
