@@ -198,12 +198,16 @@ export class SplitterService {
     return true;
   }
 
-  getData() {
+  getArchivedProjects() {
+    this.getData(true);
+  }
+
+  getData(getArchived: boolean = false) {
     if (!this.prepareStorage()) {
       return;
     }
     this.resetProjects();
-    this.storage.getProjectsOfUser().subscribe(data => {
+    this.storage.getProjectsOfUser(getArchived).subscribe(data => {
       // console.log("data");
       // console.log(data);
 

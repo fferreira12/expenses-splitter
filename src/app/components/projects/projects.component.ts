@@ -16,7 +16,18 @@ export class ProjectsComponent implements OnInit {
   allProjects: Project[];
   currentProject: Project;
 
-  showArchivedProjects: boolean = false;
+  _showArchivedProjects: boolean = false;
+
+  set showArchivedProjects(val: boolean) {
+    this._showArchivedProjects = val;
+    if(val) {
+      this.splitterService.getArchivedProjects();
+    }
+  }
+
+  get showArchivedProjects(): boolean {
+    return this._showArchivedProjects;
+  }
 
   constructor(private splitterService: SplitterService) {}
 

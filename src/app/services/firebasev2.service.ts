@@ -109,9 +109,14 @@ export class Firebasev2Service {
 
   // savePayment(payment: Payment) {}
 
-  getProjectsOfUser() {
+  getProjectsOfUser(getArchived: boolean = false) {
     //console.log('getting projects of user: ', this.afAuth.auth.currentUser)
-    return this.db.collection<Project>("projects2").valueChanges().pipe(map(projects => {
+
+    let collection = getArchived ? 
+      this.db.collection<Project>("projects2") : 
+      this.db.collection<Project>("projects2", ref => ref.where('archived', '==', getArchived));
+
+    return collection.valueChanges().pipe(map(projects => {
       return projects.filter(p => p.ownerId == this.userId);
     }));
       
