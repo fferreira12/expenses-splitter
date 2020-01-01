@@ -15,7 +15,9 @@
         <td>{{ payment.payer.name }}</td>
         <td>{{ payment.receiver.name }}</td>
         <td>{{ payment.value | currency:"R$ " }}</td>
-        <td><button class="btn btn-danger btn-sm" (click)="onRemovePayment(payment)">X</button></td>
+        <td><button class="btn btn-danger btn-sm" (click)="onRemovePayment(payment)">
+          <i class="fas fa-trash-alt"></i>
+        </button></td>
       </tr>
     </tbody>
   </table>

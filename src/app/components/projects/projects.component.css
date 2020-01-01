@@ -16,3 +16,7 @@
 .archived {
   background-color: #ccc;
 }
+
+.active-project {
+  background-color: #90e0b1;
+}

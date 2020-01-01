@@ -32,7 +32,9 @@
   <button class="btn btn-danger mt-2" type="button" (click)="onCancelEdit()" *ngIf="_editingExpense">
     {{ "Cancel" | translate}}
   </button>
-  <button class="btn btn-primary mt-2 ml-2" type="submit">
-    {{ getTitle() | translate}}
+  <button class="btn btn-primary mt-2 ml-2" type="submit" title="{{ getTitle() | translate}}">
+    <i class="fas fa-plus"></i>
+    <i class="fas fa-dollar-sign ml-1"></i>
+
   </button>
 </form>

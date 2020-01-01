@@ -42,7 +42,12 @@
           <td>{{ p.payer.name }}</td>
           <td>{{ p.amount | currency: "R$ "}}</td>
           <td>{{ p.receiver.name }}</td>
-          <td><button class="btn btn-success" (click)="onAddToPayments(p)">{{'AddToPayments' | translate}}</button></td>
+          <td>
+            <button class="btn btn-success" (click)="onAddToPayments(p)" title="{{'AddToPayments' | translate}}">
+              <i class="fas fa-plus mr-1"></i>
+              <i class="fas fa-file-invoice-dollar"></i>
+            </button>
+          </td>
         </tr>
       </tbody>
     </table>
