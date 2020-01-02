@@ -1,4 +1,4 @@
-![Status](https://github.com/fferreira12/expenses-splitter/workflows/Build/badge.svg)
+![Build](https://github.com/fferreira12/expenses-splitter/workflows/Build/badge.svg) ![Deploy](https://github.com/fferreira12/expenses-splitter/workflows/Build/badge.svg)
 
 # ExpenseSplitterFrontend
 
