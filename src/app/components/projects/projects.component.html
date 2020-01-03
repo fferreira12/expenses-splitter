@@ -29,7 +29,7 @@
         <tr *ngIf="showArchivedProjects || isCurrentProject(p) || !p.archived" [ngClass]="{'active-project':isCurrentProject(p), 'archived':p.archived}">
 
         <td class="align-middle" [ngClass]="{'self-project': selfProject(p), 'not-self-project': !selfProject(p)}">
-          {{ p.projectName }}</td>
+        {{ p.projectName }} <span *ngIf="p.total && p.total > 0">(R$ {{p.total}})</span></td>
         <td>
           <form class="form-inline">
           <button class="btn btn-primary mr-2" (click)="onActivateProject(p)" title="{{'Activate' | translate}}">

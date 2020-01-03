@@ -14,6 +14,8 @@ export class Project {
   expenses: Expense[];
   payments: Payment[];
 
+  total: number;
+
   archived: boolean;
 
   weights: {user: User, weight: number}[];

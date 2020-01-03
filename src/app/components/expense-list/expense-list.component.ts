@@ -2,6 +2,7 @@ import { Component, OnInit, Output, EventEmitter } from "@angular/core";
 import { SplitterService } from "src/app/services/splitter.service";
 import { Expense } from "src/app/models/expense.model";
 import { User } from "src/app/models/user.model";
+import { Project } from "src/app/models/project.model";
 
 @Component({
   selector: "app-expense-list",
@@ -11,13 +12,17 @@ import { User } from "src/app/models/user.model";
 export class ExpenseListComponent implements OnInit {
   expenses: Expense[];
 
+  currentProject: Project;
+
   @Output() editExpense = new EventEmitter<Expense>();
 
   constructor(private splitterService: SplitterService) {}
 
   ngOnInit() {
     this.expenses = this.splitterService.getExpenses();
+    this.currentProject = this.splitterService.currentProject;
     this.splitterService.subscribeToExpenses(expenses => {
+      this.currentProject = this.splitterService.currentProject;
       this.expenses = expenses;
     });
   }
@@ -31,11 +36,10 @@ export class ExpenseListComponent implements OnInit {
   }
 
   checkIsPayer(expense: Expense, user: User) {
-    return (Expense.createExpense(expense)).isPayer(user);
+    return Expense.createExpense(expense).isPayer(user);
   }
 
   getAmountPaid(expense: Expense, user: User) {
-    return (Expense.createExpense(expense)).getAmountPaid(user);
+    return Expense.createExpense(expense).getAmountPaid(user);
   }
-
 }

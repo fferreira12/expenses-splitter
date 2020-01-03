@@ -1,5 +1,6 @@
 <div *ngIf="expenses.length > 0">
   <h1>{{'Expenses' | translate}}</h1>
+<h2 *ngIf="currentProject && currentProject.total && currentProject.total > 0">{{'Total' | translate}}: R$ {{currentProject.total}}</h2>
 
   <table class="table">
     <thead class="thead-light">
