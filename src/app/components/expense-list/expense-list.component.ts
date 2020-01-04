@@ -42,4 +42,16 @@ export class ExpenseListComponent implements OnInit {
   getAmountPaid(expense: Expense, user: User) {
     return Expense.createExpense(expense).getAmountPaid(user);
   }
+
+  onFilesAdded(expense: Expense, event) {
+    console.log(expense, event.target.files[0]);
+    let file = event.target.files[0];
+    this.splitterService.addFileToExpense(file, expense);
+  }
+
+  onDeleteFile(expense: Expense) {
+    let url = expense.fileUrl;
+    this.splitterService.deleteFileFromExpense(expense);
+
+  }
 }

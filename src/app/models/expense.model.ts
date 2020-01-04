@@ -9,6 +9,8 @@ export class Expense {
   payers: PayersArray;
   value: number;
   //multiplePayers = false;
+  fileUrl: string;
+  filePath: string
 
   constructor(expenseName: string, value: number) {
     this.users = [];

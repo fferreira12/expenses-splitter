@@ -9,6 +9,7 @@ import { TranslateHttpLoader } from "@ngx-translate/http-loader";
 import { AngularFireModule } from '@angular/fire';
 import { AngularFirestoreModule } from '@angular/fire/firestore';
 import { AngularFireAuthModule } from '@angular/fire/auth';
+import { AngularFireStorageModule } from '@angular/fire/storage';
 import { environment } from '../environments/environment';
 
 import { AppRoutingModule } from "./app-routing.module";
@@ -104,6 +105,7 @@ const appRoutes: Routes = [
     AngularFireModule.initializeApp(environment.firebaseconfig), // imports firebase/app needed for everything
     AngularFirestoreModule, // imports firebase/firestore, only needed for database features
     AngularFireAuthModule, // imports firebase/auth, only needed for auth features,
+    AngularFireStorageModule
   ],
   providers: [],
   bootstrap: [AppComponent]
