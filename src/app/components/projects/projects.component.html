@@ -13,7 +13,7 @@
   <h1>{{'Projects' | translate}}</h1>
 
   <div>
-    <input type="checkbox" name="show-archived" [(ngModel)]="showArchivedProjects"> 
+    <input type="checkbox" name="show-archived" [(ngModel)]="showArchivedProjects">
     <label for="show-archived" class="ml-2">{{'ShowArchivedProjects' | translate}}</label>
   </div>
 
@@ -26,105 +26,113 @@
     </thead>
     <tbody>
       <ng-container *ngFor="let p of allProjects; let i = index">
-        <tr *ngIf="showArchivedProjects || isCurrentProject(p) || !p.archived" [ngClass]="{'active-project':isCurrentProject(p), 'archived':p.archived}">
+        <tr *ngIf="showArchivedProjects || isCurrentProject(p) || !p.archived"
+          [ngClass]="{'active-project':isCurrentProject(p), 'archived':p.archived}">
 
-        <td class="align-middle" [ngClass]="{'self-project': selfProject(p), 'not-self-project': !selfProject(p)}">
-        {{ p.projectName }} <span *ngIf="p.total && p.total > 0">(R$ {{p.total}})</span></td>
-        <td>
-          <form class="form-inline">
-          <button class="btn btn-primary mr-2" (click)="onActivateProject(p)" title="{{'Activate' | translate}}">
-            <i class="fas fa-check"></i>
-          </button>
-            <button class="btn btn-danger mr-2" data-toggle="modal"
-              [attr.data-target]="'#deleteModal'+i" title="{{'Delete' | translate}}">
-              <i class="far fa-trash-alt"></i>
-            </button>
-            <button class="btn btn-success mr-2" data-toggle="modal"
-              [attr.data-target]="'#renameModal'+i" title="{{'Rename' | translate}}">
-              <i class="fas fa-font"></i>
-            </button>
-            <button class="btn btn-secondary" *ngIf="!p.archived" (click)="onArchiveProject(p)" title="{{'Archive' | translate}}">
-              <i class="fas fa-archive"></i>
-            </button>
-            <button class="btn btn-success" *ngIf="p.archived" (click)="onUnarchiveProject(p)" title="{{'Unarchive' | translate}}">
-              <i class="fas fa-archive"></i>
-            </button>
+          <td class="align-middle" [ngClass]="{'self-project': selfProject(p), 'not-self-project': !selfProject(p)}">
+            {{ p.projectName }} <br/>
+            <span class="info" *ngIf="p.expensesCount && p.expensesCount > 0">{{p.expensesCount}} {{'Expense(s)' | translate}}</span> <br/>
+            <span class="info" *ngIf="p.total && p.total > 0">{{'Total' | translate}}: {{p.total | currency:"R$" }}</span> <br/>
+            <span class="info" *ngIf="p.expensesAverage && p.expensesAverage > 0">{{'Average' | translate}}: {{ p.expensesAverage | currency:"R$" }}</span> <br/>
+          </td>
+          <td>
+            <form class="form-inline">
+              <button class="btn btn-primary mr-2" (click)="onActivateProject(p)" title="{{'Activate' | translate}}">
+                <i class="fas fa-check"></i>
+              </button>
+              <button class="btn btn-danger mr-2" data-toggle="modal" [attr.data-target]="'#deleteModal'+i"
+                title="{{'Delete' | translate}}">
+                <i class="far fa-trash-alt"></i>
+              </button>
+              <button class="btn btn-success mr-2" data-toggle="modal" [attr.data-target]="'#renameModal'+i"
+                title="{{'Rename' | translate}}">
+                <i class="fas fa-font"></i>
+              </button>
+              <button class="btn btn-secondary" *ngIf="!p.archived" (click)="onArchiveProject(p)"
+                title="{{'Archive' | translate}}">
+                <i class="fas fa-archive"></i>
+              </button>
+              <button class="btn btn-success" *ngIf="p.archived" (click)="onUnarchiveProject(p)"
+                title="{{'Unarchive' | translate}}">
+                <i class="fas fa-archive"></i>
+              </button>
 
-            <button *ngIf="!addingUser" (click)="onToggleInviteUser()" class="btn btn-warning ml-2" title="{{'AddEditor' | translate}}">
-              <i class="fas fa-user-plus"></i>
-            </button>
+              <button *ngIf="!addingUser" (click)="onToggleInviteUser()" class="btn btn-warning ml-2"
+                title="{{'AddEditor' | translate}}">
+                <i class="fas fa-user-plus"></i>
+              </button>
 
-            <div *ngIf="addingUser">
-              <input class="form-control ml-2" type="email" placeholder="{{'Email' | translate}}" #inviteMail>
-              <button class="btn btn-warning ml-2"
-                (click)="onInviteUser(p, inviteMail.value)">{{'Invite' | translate}}</button>
-            </div>
-
-            <ul class="editors-list" *ngIf="p.editors.length > 0">
-              <li *ngIf="!selfProject(p)"><span class="badge badge-primary ml-2">Owner: {{p.ownerEmail}}</span></li>
-              <li *ngFor="let e of p.editors"><button type="button"
-                  class="btn btn-sm btn-outline-danger fas fa-trash-alt" (click)="onRemoveEditor(p, e)"></button> <span
-                  class="badge badge-primary ml-2">{{e}}</span></li>
-            </ul>
-          </form>
-
-        </td>
-
-        <!-- The Delete Modal -->
-        <div class="modal" [id]="'deleteModal'+i">
-          <div class="modal-dialog">
-            <div class="modal-content">
-
-              <!-- Modal Header -->
-              <div class="modal-header">
-                <h4 class="modal-title">{{'Delete' | translate}}</h4>
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
+              <div *ngIf="addingUser">
+                <input class="form-control ml-2" type="email" placeholder="{{'Email' | translate}}" #inviteMail>
+                <button class="btn btn-warning ml-2"
+                  (click)="onInviteUser(p, inviteMail.value)">{{'Invite' | translate}}</button>
               </div>
 
-              <!-- Modal body -->
-              <div class="modal-body">
-                <p>{{'DeleteProject?' | translate}} <strong>{{ p.projectName }}</strong>?</p>
-              </div>
+              <ul class="editors-list" *ngIf="p.editors.length > 0">
+                <li *ngIf="!selfProject(p)"><span class="badge badge-primary ml-2">Owner: {{p.ownerEmail}}</span></li>
+                <li *ngFor="let e of p.editors"><button type="button"
+                    class="btn btn-sm btn-outline-danger fas fa-trash-alt" (click)="onRemoveEditor(p, e)"></button>
+                  <span class="badge badge-primary ml-2">{{e}}</span></li>
+              </ul>
+            </form>
 
-              <!-- Modal footer -->
-              <div class="modal-footer">
-                <button type="button" class="btn btn-danger" data-dismiss="modal"
-                  (click)="onDeleteProject(p)">{{'Delete' | translate}}</button>
-              </div>
+          </td>
 
-            </div>
-          </div>
-        </div>
+          <!-- The Delete Modal -->
+          <div class="modal" [id]="'deleteModal'+i">
+            <div class="modal-dialog">
+              <div class="modal-content">
 
-        <!-- The Rename Modal -->
-        <div class="modal" [id]="'renameModal'+i">
-          <div class="modal-dialog">
-            <div class="modal-content">
+                <!-- Modal Header -->
+                <div class="modal-header">
+                  <h4 class="modal-title">{{'Delete' | translate}}</h4>
+                  <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
 
-              <!-- Modal Header -->
-              <div class="modal-header">
-                <h4 class="modal-title">{{'Rename' | translate}}</h4>
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-              </div>
-
-              <!-- Modal body -->
-              <form>
+                <!-- Modal body -->
                 <div class="modal-body">
-                  <p>{{'RenameProject?' | translate}} <strong>{{ p.projectName }}</strong> {{'To' | translate}}:</p>
-                  <input class="form-control" type="text" name="project-name" id="project-new-name"
-                    placeholder="{{'NewProjectName' | translate}}" [formControl]="projectNewName">
+                  <p>{{'DeleteProject?' | translate}} <strong>{{ p.projectName }}</strong>?</p>
                 </div>
 
                 <!-- Modal footer -->
                 <div class="modal-footer">
-                  <button type="button" class="btn btn-success" data-dismiss="modal"
-                    (click)="onRenameProject(p)">{{'Rename' | translate}}</button>
+                  <button type="button" class="btn btn-danger" data-dismiss="modal"
+                    (click)="onDeleteProject(p)">{{'Delete' | translate}}</button>
                 </div>
-              </form>
 
+              </div>
             </div>
           </div>
-        </div>
+
+          <!-- The Rename Modal -->
+          <div class="modal" [id]="'renameModal'+i">
+            <div class="modal-dialog">
+              <div class="modal-content">
+
+                <!-- Modal Header -->
+                <div class="modal-header">
+                  <h4 class="modal-title">{{'Rename' | translate}}</h4>
+                  <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+
+                <!-- Modal body -->
+                <form>
+                  <div class="modal-body">
+                    <p>{{'RenameProject?' | translate}} <strong>{{ p.projectName }}</strong> {{'To' | translate}}:</p>
+                    <input class="form-control" type="text" name="project-name" id="project-new-name"
+                      placeholder="{{'NewProjectName' | translate}}" [formControl]="projectNewName">
+                  </div>
+
+                  <!-- Modal footer -->
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-success" data-dismiss="modal"
+                      (click)="onRenameProject(p)">{{'Rename' | translate}}</button>
+                  </div>
+                </form>
+
+              </div>
+            </div>
+          </div>
 
 
 

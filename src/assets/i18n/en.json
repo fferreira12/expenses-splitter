@@ -7,6 +7,7 @@
   "UserDesc": "Defines the users that will participate in the expenses",
   "GoToUser": "Go to Users",
   "Expenses": "Expenses",
+  "Expense(s)": "Expense(s)",
   "ExpensesDesc": "Defines the expenses, the participants and who paid for it",
   "GoToExpenses": "Go to Expenses",
   "Payments": "Payments",
@@ -56,5 +57,6 @@
   "Archive": "Archive",
   "Unarchive": "Unarchive",
   "AddEditor": "Add Editor",
-  "Total": "Total"
+  "Total": "Total",
+  "Average": "Average"
 }

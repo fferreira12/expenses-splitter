@@ -16,6 +16,20 @@ export class Project {
 
   total: number;
 
+  get expensesCount(): number {
+    if(!this.expenses) {
+      return 0;
+    }
+    return this.expenses.length;
+  }
+
+  get expensesAverage(): number {
+    if(!this.expenses) {
+      return 0;
+    }
+    return this.expenses.map(exp => exp.value).reduce((a, b) => a + b, 0) / this.expenses.length;
+  }
+
   archived: boolean;
 
   weights: {user: User, weight: number}[];
