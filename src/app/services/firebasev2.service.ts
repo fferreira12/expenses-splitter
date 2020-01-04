@@ -11,6 +11,8 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { from } from 'rxjs';
 import { AuthService } from './auth.service';
+import { AngularFireStorage } from '@angular/fire/storage';
+import { uuid } from '../util/uuid';
 
 @Injectable({
   providedIn: "root"
@@ -22,7 +24,7 @@ export class Firebasev2Service {
   allProjectIds: string[] = [];
   projects$: Observable<Project[]>;
 
-  constructor(private db: AngularFirestore) {
+  constructor(private db: AngularFirestore, private storage: AngularFireStorage) {
     this.projects$ = this.db.collection<Project>("projects2").valueChanges();
     this.projects$.pipe(map(projects => {
       return projects.map(p => p.projectId);
@@ -141,7 +143,7 @@ export class Firebasev2Service {
   }
 
   getProjectsUserCanEdit(email: string) {
-    console.log("getting all projects that " + email + " can edit");
+    //console.log("getting all projects that " + email + " can edit");
     this.userEmail = email;
     if (!email) {
       return from<Project[]>([]);
@@ -319,6 +321,19 @@ export class Firebasev2Service {
        }
      });
   }
+
+  uploadFile(file: File, collection: string) {
+    let id = uuid();
+    let ref = this.storage.ref(`users/${this.userId}/${collection}/${id}.${file.name}`);
+    return ref.put(file);
+
+  }
+
+  deleteFile(fullPath: string) {
+    return this.storage.ref(fullPath).delete();
+  }
+
+  
 
   // getUsers(projectId: string) {}
 

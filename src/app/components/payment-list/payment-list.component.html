@@ -8,6 +8,7 @@
         <th>{{'Receiver' | translate}}</th>
         <th>{{'Value' | translate}}</th>
         <th>{{'Options' | translate}}</th>
+        <th>{{'File' | translate}}</th>
       </tr>
     </thead>
     <tbody *ngFor="let payment of payments">
@@ -15,9 +16,23 @@
         <td>{{ payment.payer.name }}</td>
         <td>{{ payment.receiver.name }}</td>
         <td>{{ payment.value | currency:"R$ " }}</td>
-        <td><button class="btn btn-danger btn-sm" (click)="onRemovePayment(payment)">
-          <i class="fas fa-trash-alt"></i>
-        </button></td>
+        <td>
+          <button class="btn btn-danger btn-sm" (click)="onRemovePayment(payment)">
+            <i class="fas fa-trash-alt"></i>
+          </button>
+        </td>
+        <td>
+          <input *ngIf="!payment.fileUrl" class="form-control" type="file" name="upload"
+            (change)="onFilesAdded(payment, $event)">
+          <a *ngIf="payment.fileUrl" href="{{payment.fileUrl}}">
+            <button class="btn btn-primary mt-2">
+              <i class="fas fa-download"></i>
+            </button>
+          </a>
+          <button *ngIf="payment.fileUrl" class="btn btn-danger mt-2 ml-2" (click)="onDeleteFile(payment)">
+            <i class="fas fa-times"></i>
+          </button>
+        </td>
       </tr>
     </tbody>
   </table>

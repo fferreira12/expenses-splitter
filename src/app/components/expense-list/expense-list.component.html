@@ -11,6 +11,7 @@
         <th>{{'Value' | translate}}</th>
         <th>{{'Users' | translate}}</th>
         <th>{{'Options' | translate}}</th>
+        <th>{{'File' | translate}}</th>
       </tr>
     </thead>
     <tbody>
@@ -28,6 +29,18 @@
           </button>
           <button class="btn btn-warning btn-sm ml-1" (click)="onEditExpense(expense)">
             <i class="fas fa-edit"></i>
+          </button>
+        </td>
+        <td>
+          <input *ngIf="!expense.fileUrl" class="form-control" type="file" name="upload"
+            (change)="onFilesAdded(expense, $event)">
+          <a *ngIf="expense.fileUrl" href="{{expense.fileUrl}}">
+            <button class="btn btn-primary mt-2">
+              <i class="fas fa-download"></i>
+            </button>
+          </a>
+          <button *ngIf="expense.fileUrl" class="btn btn-danger mt-2 ml-2" (click)="onDeleteFile(expense)">
+            <i class="fas fa-times"></i>
           </button>
         </td>
       </tr>
