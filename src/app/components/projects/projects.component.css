@@ -20,3 +20,8 @@
 .active-project {
   background-color: #90e0b1;
 }
+
+span.info {
+  font-size: 0.8rem;
+  font-weight: normal;
+}

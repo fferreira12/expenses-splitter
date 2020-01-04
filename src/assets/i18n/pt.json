@@ -7,6 +7,7 @@
   "UserDesc": "Defina os usuários que irão participar das despesas",
   "GoToUser": "Ir para usuários",
   "Expenses": "Despesas",
+  "Expense(s)": "Despesa(s)",
   "ExpensesDesc": "Defina as despesas, os participantes e quem pagou por elas",
   "GoToExpenses": "Ir para Despesas",
   "Payments": "Pagamentos",
@@ -57,5 +58,6 @@
   "Archive": "Arquivar",
   "Unarchive": "Desarquivar",
   "AddEditor": "Adicionar Editor",
-  "Total": "Total"
+  "Total": "Total",
+  "Average": "Média"
 }
