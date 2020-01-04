@@ -26,4 +26,14 @@ export class PaymentListComponent implements OnInit {
     this.splitterService.removePayment(payment);
   }
 
+  onFilesAdded(payment: Payment, event: any) {
+    console.log(payment, event.target.files[0]);
+    let file = event.target.files[0];
+    this.splitterService.addFileToPayment(file, payment);
+  }
+
+  onDeleteFile(payment: Payment) {
+    this.splitterService.deleteFileFromPayment(payment);
+  }
+
 }

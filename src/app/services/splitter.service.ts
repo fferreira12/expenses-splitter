@@ -448,7 +448,7 @@ export class SplitterService {
     }
     console.log('starting upload');
     
-    this.db.uploadFileToExpense(file).then(task => {
+    this.db.uploadFile(file, 'expenses').then(task => {
       task.ref.getDownloadURL().then(url => {
         expense.fileUrl = url;
         expense.filePath = task.ref.fullPath;
@@ -467,7 +467,7 @@ export class SplitterService {
       return;
     }
     console.log('starting delete');
-    this.db.deleteFileFromExpense(expense.filePath).subscribe(
+    this.db.deleteFile(expense.filePath).subscribe(
       
       () => {
         console.log('File deleted');
@@ -475,6 +475,52 @@ export class SplitterService {
         expense.fileUrl = "";
         this.saveProjectData(this.currentProject);
         this.expensesObservable.next(this.currentProject.expenses);
+      }, 
+      
+      () => {
+        console.error('Error deleting file');
+      })
+  }
+
+  addFileToPayment(file: File, payment: Payment) {
+    if(!this.currentProject.payments.includes(payment)) {
+      console.error("Can't upload because pyament does not belong to current project");
+      
+      return;
+    }
+    if(!(file.type.startsWith('image/') || file.type == "application/pdf") || file.size > 50 * 1024 * 1024) {
+      console.error("Can't upload because file is not supported or is bigger than 50MB");
+      return;
+    }
+    console.log('starting upload');
+    
+    this.db.uploadFile(file, 'payments').then(task => {
+      task.ref.getDownloadURL().then(url => {
+        payment.fileUrl = url;
+        payment.filePath = task.ref.fullPath;
+        this.saveProjectData(this.currentProject);
+        this.expensesObservable.next(this.currentProject.expenses);
+        console.log("File uploaded", payment);
+        
+      });
+    });
+  }
+
+  deleteFileFromPayment(payment: Payment) {
+    if(!this.currentProject.payments.includes(payment)) {
+      console.log("Can't upload because expense does not belong to current project");
+      
+      return;
+    }
+    console.log('starting delete');
+    this.db.deleteFile(payment.filePath).subscribe(
+      
+      () => {
+        console.log('File deleted');
+        payment.filePath = "";
+        payment.fileUrl = "";
+        this.saveProjectData(this.currentProject);
+        this.paymentsObservable.next(this.currentProject.payments);
       }, 
       
       () => {

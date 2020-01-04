@@ -322,16 +322,18 @@ export class Firebasev2Service {
      });
   }
 
-  uploadFileToExpense(file: File) {
+  uploadFile(file: File, collection: string) {
     let id = uuid();
-    let ref = this.storage.ref(`users/${this.userId}/expenses/${id}.${file.name}`);
+    let ref = this.storage.ref(`users/${this.userId}/${collection}/${id}.${file.name}`);
     return ref.put(file);
 
   }
 
-  deleteFileFromExpense(fullPath: string) {
+  deleteFile(fullPath: string) {
     return this.storage.ref(fullPath).delete();
   }
+
+  
 
   // getUsers(projectId: string) {}
 

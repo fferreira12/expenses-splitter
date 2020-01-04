@@ -52,6 +52,5 @@ export class ExpenseListComponent implements OnInit {
   onDeleteFile(expense: Expense) {
     let url = expense.fileUrl;
     this.splitterService.deleteFileFromExpense(expense);
-
   }
 }
