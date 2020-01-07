@@ -61,4 +61,8 @@ export class UserListComponent implements OnInit {
   getWeightForUser(user: User) {
     return this.splitterService.getWeightForUser(user);
   }
+
+  onResetWeights() {
+    this.splitterService.unSetWeights();
+  }
 }

@@ -226,7 +226,6 @@ export class SplitterService {
 
       //subscribe to realtime changes
       this.db.subscribeToProjectChanges(doc => {
-        console.log("new data from server");
 
         if(!doc.data) {
           return;
@@ -550,6 +549,13 @@ export class SplitterService {
 
   setWeights(weigths: { user: User, weight: number }[]) {
     this.currentProject.setUnevenSplit(weigths);
+    this.weightsObservable.next(this.getWeights());
+    this.saveProjectData(this.currentProject);
+    this.emitAllCurrentData();
+  }
+
+  unSetWeights() {
+    this.currentProject.setEvenSplit();
     this.weightsObservable.next(this.getWeights());
     this.saveProjectData(this.currentProject);
     this.emitAllCurrentData();

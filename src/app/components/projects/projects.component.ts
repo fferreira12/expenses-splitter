@@ -67,7 +67,6 @@ export class ProjectsComponent implements OnInit {
   }
 
   onInviteUser(project: Project, email: string) {
-    console.log("invited " + email + " to edit project " + project.projectName);
     this.splitterService.addEditor(project, email);
 
     this.addingUser = false;

@@ -308,7 +308,23 @@ export class Project {
     this.weights = [
       ...this.weights.filter(weight => weight.user.id !== user.id),
       { user, weight: parseFloat(weight) }
-    ]
+    ];
+
+    let allEqual = this.weights.length === this.users.length && this.weights.every(weight => weight.weight == this.weights[0].weight);
+    if(allEqual) {
+      this.setEvenSplit();
+    } else {
+      this.setWeightForRemainingUsers();
+    }
+
+  }
+
+  setWeightForRemainingUsers() {
+    this.users.forEach(user => {
+      if(!this.weights.some(weight => weight.user.id === user.id)) {
+        this.setWeightForUser(user, 1);
+      }
+    })
   }
 
   getFairShares(): { [uid: string]: number } {

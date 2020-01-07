@@ -60,5 +60,6 @@
   "AddEditor": "Adicionar Editor",
   "Total": "Total",
   "Average": "Média",
-  "File": "Arquivo"
+  "File": "Arquivo",
+  "ResetWeights": "Resetar Pesos"
 }

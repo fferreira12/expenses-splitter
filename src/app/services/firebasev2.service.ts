@@ -214,8 +214,6 @@ export class Firebasev2Service {
   }
 
   deleteProject(projectId: string) {
-    console.log("deleting " + projectId);
-
     return this.db
       .collection("projects2")
       .doc(projectId)

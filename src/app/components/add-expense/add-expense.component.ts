@@ -84,7 +84,6 @@ export class AddExpenseComponent implements OnInit {
       payer: onePayer ? this._editingExpense.payers[0].payer.id : null,
       payers: !onePayer ? amountsPayed : []
     });
-    console.log("updated form", this.expenseForm);
   }
 
   onAddExpense(event) {
