@@ -5,7 +5,6 @@ import { Expense } from './expense.model';
 fdescribe('Project Model', () => {
   it('should allow uneven splits', () => {
     let p = new Project();
-    console.log('shoul appear');
     
     let u1 = new User('u1', 'id1');
     let u2 = new User('u2', 'id2');

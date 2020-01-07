@@ -59,5 +59,6 @@
   "AddEditor": "Add Editor",
   "Total": "Total",
   "Average": "Average",
-  "File": "File"
+  "File": "File",
+  "ResetWeights": "Reset Weights"
 }

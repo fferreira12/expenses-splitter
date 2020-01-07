@@ -44,7 +44,6 @@ export class ExpenseListComponent implements OnInit {
   }
 
   onFilesAdded(expense: Expense, event) {
-    console.log(expense, event.target.files[0]);
     let file = event.target.files[0];
     this.splitterService.addFileToExpense(file, expense);
   }
