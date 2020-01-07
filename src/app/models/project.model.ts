@@ -198,6 +198,13 @@ export class Project {
     }
   }
 
+  setExpenseOrder(expense: Expense, order: number) {
+    if(!this.expenses.includes(expense)) {
+      return;
+    }
+    expense.order = order;
+  }
+
   addPayment(payment: Payment) {
     if (
       payment.payer == null ||

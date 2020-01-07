@@ -432,7 +432,13 @@ export class SplitterService {
   }
 
   getExpenses(): Expense[] {
-    return this.currentProject.expenses;
+    return this.currentProject.expenses.sort((a, b) => a.order - b.order);
+  }
+
+  setExpenseOrder(expense: Expense, order: number) {
+    this.currentProject.setExpenseOrder(expense, order);
+    this.saveProjectData(this.currentProject);
+    this.expensesObservable.next(this.currentProject.expenses);
   }
 
   addFileToExpense(file: File, expense: Expense) {

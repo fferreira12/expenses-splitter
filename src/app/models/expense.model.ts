@@ -11,6 +11,7 @@ export class Expense {
   //multiplePayers = false;
   fileUrl: string;
   filePath: string
+  order:number;
 
   constructor(expenseName: string, value: number) {
     this.users = [];
