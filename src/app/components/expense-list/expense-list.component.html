@@ -14,8 +14,8 @@
         <th>{{'File' | translate}}</th>
       </tr>
     </thead>
-    <tbody>
-      <tr *ngFor="let expense of expenses">
+    <tbody cdkDropList (cdkDropListDropped)="drop($event)">
+      <tr *ngFor="let expense of expenses" cdkDrag [cdkDragData]="expense">
         <td>{{ expense.name }}</td>
         <td>{{ expense.value | currency: "R$ " }}</td>
         <td>

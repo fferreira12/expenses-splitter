@@ -3,6 +3,7 @@ import { SplitterService } from "src/app/services/splitter.service";
 import { Expense } from "src/app/models/expense.model";
 import { User } from "src/app/models/user.model";
 import { Project } from "src/app/models/project.model";
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: "app-expense-list",
@@ -51,5 +52,10 @@ export class ExpenseListComponent implements OnInit {
   onDeleteFile(expense: Expense) {
     let url = expense.fileUrl;
     this.splitterService.deleteFileFromExpense(expense);
+  }
+
+  drop(event: CdkDragDrop<string[]>) {
+    moveItemInArray(this.expenses, event.previousIndex, event.currentIndex);
+    this.splitterService.setExpenseOrder(event.item.data as Expense, event.currentIndex)
   }
 }

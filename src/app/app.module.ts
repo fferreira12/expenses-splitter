@@ -10,6 +10,7 @@ import { AngularFireModule } from '@angular/fire';
 import { AngularFirestoreModule } from '@angular/fire/firestore';
 import { AngularFireAuthModule } from '@angular/fire/auth';
 import { AngularFireStorageModule } from '@angular/fire/storage';
+import { DragDropModule } from '@angular/cdk/drag-drop'
 import { environment } from '../environments/environment';
 
 import { AppRoutingModule } from "./app-routing.module";
@@ -33,6 +34,7 @@ import { ProjectListComponent } from "./components/project-list/project-list.com
 import { ProjectsComponent } from "./components/projects/projects.component";
 import { LoadingComponent } from "./components/loading/loading.component";
 import { LanguageListComponent } from "./components/language-list/language-list.component";
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http);
@@ -105,7 +107,9 @@ const appRoutes: Routes = [
     AngularFireModule.initializeApp(environment.firebaseconfig), // imports firebase/app needed for everything
     AngularFirestoreModule, // imports firebase/firestore, only needed for database features
     AngularFireAuthModule, // imports firebase/auth, only needed for auth features,
-    AngularFireStorageModule
+    AngularFireStorageModule, 
+    NoopAnimationsModule,
+    DragDropModule
   ],
   providers: [],
   bootstrap: [AppComponent]
