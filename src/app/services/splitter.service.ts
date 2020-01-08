@@ -425,7 +425,11 @@ export class SplitterService {
   }
 
   removeExpense(expense: Expense) {
+    let filePath = expense.filePath;
     if (this.currentProject.removeExpense(expense)) {
+      if (filePath) {
+        this.db.deleteFile(filePath);
+      }
       this.saveProjectData(this.currentProject);
       this.expensesObservable.next(this.currentProject.expenses);
     }
@@ -595,7 +599,11 @@ export class SplitterService {
   }
 
   removePayment(payment: Payment) {
+    let filePath = payment.filePath;
     if (this.currentProject.removePayment(payment)) {
+      if (filePath) {
+        this.db.deleteFile(filePath);
+      }
       this.saveProjectData(this.currentProject);
       this.paymentsObservable.next(this.currentProject.payments);
     }
