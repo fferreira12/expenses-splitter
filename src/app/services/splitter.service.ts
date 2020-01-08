@@ -457,7 +457,7 @@ export class SplitterService {
     }
     console.log('starting upload');
     
-    this.db.uploadFile(file, 'expenses').then(task => {
+    this.db.uploadFile(file, this.currentProject, 'expenses').then(task => {
       task.ref.getDownloadURL().then(url => {
         expense.fileUrl = url;
         expense.filePath = task.ref.fullPath;
@@ -503,7 +503,7 @@ export class SplitterService {
     }
     console.log('starting upload');
     
-    this.db.uploadFile(file, 'payments').then(task => {
+    this.db.uploadFile(file, this.currentProject, 'payments').then(task => {
       task.ref.getDownloadURL().then(url => {
         payment.fileUrl = url;
         payment.filePath = task.ref.fullPath;
