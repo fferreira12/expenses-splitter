@@ -320,9 +320,9 @@ export class Firebasev2Service {
      });
   }
 
-  uploadFile(file: File, collection: string) {
+  uploadFile(file: File, project: Project, collection: string) {
     let id = uuid();
-    let ref = this.storage.ref(`users/${this.userId}/${collection}/${id}.${file.name}`);
+    let ref = this.storage.ref(`users/${this.userId}/projects/${project.projectId}/${collection}/${id}.${file.name}`);
     return ref.put(file);
 
   }
