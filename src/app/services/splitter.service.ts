@@ -10,7 +10,7 @@ import { Payment } from "../models/payment.model";
 import { AuthService } from "./auth.service";
 import { Project } from "../models/project.model";
 import { Firebasev2Service } from "./firebasev2.service";
-import { TranslateService } from '@ngx-translate/core';
+import { TranslateService } from "@ngx-translate/core";
 
 @Injectable({
   providedIn: "root"
@@ -34,7 +34,7 @@ export class SplitterService {
   allProjectsObservable: Subject<Project[]>;
   loadingObservable: Subject<boolean>;
 
-  weightsObservable: Subject<{ user: User, weight: number }[]>
+  weightsObservable: Subject<{ user: User; weight: number }[]>;
 
   constructor(
     private db: Firebasev2Service,
@@ -46,37 +46,29 @@ export class SplitterService {
     try {
       this.userId = this.authService.getUserId();
       //this.userEmail = this.authService.currentUser?.email;
-      this.authService.subscribeToUserId(userId => {
-        if (userId == "") {
+
+      this.authService.subscribeToUser((user: firebase.User) => {
+        if (!user) {
           this.currentProject.setData();
+          return;
         } else {
           this.resetProjects();
-          this.userId = userId;
-          //this.userEmail = this.authService.currentUser.email;
-          this.db.setUserId(userId);
+          this.userId = user.uid;
+          this.userEmail = user.email;
+          this.db.setUserId(this.userId);
           this.getData();
         }
-      });
-      this.authService.subscribeToUserEmail(email => {
-        if (email) {
-          this.userEmail = email;
-          this.resetProjects();
-          this.getData();
 
-          let sub = this.translate.onLangChange.subscribe(d => {
-            //console.log('language has changed');
-            //console.log(d);
-            this.saveLanguagePreference(d.lang);
-          });
+        let sub = this.translate.onLangChange.subscribe(d => {
+          this.saveLanguagePreference(d.lang);
+        });
 
-          this.authService.registerSubscription(sub);
-          
-          this.getLanguagePreference().subscribe(doc => {
-            let data = doc.data();
-            //console.log('got language, ', data);
-            this.translate.use(data.language);
-          });
-        }
+        this.authService.registerSubscription(sub);
+
+        this.getLanguagePreference().subscribe(doc => {
+          let data = doc.data();
+          this.translate.use(data.language);
+        });
       });
     } catch (e) {
       console.log(e);
@@ -208,11 +200,6 @@ export class SplitterService {
     }
     this.resetProjects();
     this.db.getProjectsOfUser(getArchived).subscribe(data => {
-      // console.log("data");
-      // console.log(data);
-
-      // let parsedData = data.data();
-      //console.log('parsing this', data);
       
       this.tryParseData(data);
       this.emitAllCurrentData();
@@ -226,8 +213,7 @@ export class SplitterService {
 
       //subscribe to realtime changes
       this.db.subscribeToProjectChanges(doc => {
-
-        if(!doc.data) {
+        if (!doc.data) {
           return;
         }
 
@@ -253,20 +239,28 @@ export class SplitterService {
       } else {
         //this.currentProject = this.allSelfProjects[0];
         //console.log('before getting last project');
-        
+
         this.db.getLastProject().subscribe(doc => {
-          //console.log('got last project', doc);
-          
+
           let data = doc.data();
 
-          //console.log('last project data', data);
           let p = this.getAllProjects().find(p => {
             return p.projectId === data.projectId;
           });
-          if(p){
+          if (p) {
             this.setCurrentProject(p);
           } else {
-            this.currentProject = this.allSelfProjects[0];
+            //try to download project by id, in the case it is an archived project
+            this.db.getProject(data.projectId).subscribe(docSnap => {
+              if (!docSnap.exists) {
+                this.currentProject = this.allSelfProjects[0];
+              }
+
+              let data = docSnap.data();
+              let p = this.parseOne({ id: data.projectId, ...docSnap.data() });
+              this.currentProject = p;
+              this.emitAllCurrentData();
+            });
           }
         });
       }
@@ -290,25 +284,27 @@ export class SplitterService {
     let project = new Project(pro.id, pro.projectName);
     Object.assign(project, pro);
 
-    let shouldAddToSelf = !this.allSelfProjects.some(prj => {
-      return prj.projectId == project.projectId;
-    });
-    let shouldAddToOthers = ![
+    let shouldAddToSelf = project.ownerId === this.userId;
+    let shouldAddToOthers =
+      !shouldAddToSelf &&
+      project.editors.some(editorEmail => editorEmail === this.userEmail);
+    let alreadyAdded = [
       ...this.allSelfProjects,
       ...this.allProjectsCanEdit
-    ].some(prj => {
-      return prj.projectId == project.projectId;
-    });
+    ].some(p => p.projectId === project.projectId);
+    if (alreadyAdded) {
+      return project;
+    }
     if (self && shouldAddToSelf) {
+
       this.allSelfProjects.push(project);
     } else if (!self && shouldAddToOthers) {
       this.allProjectsCanEdit.push(project);
     } else {
       this.updateProject(project);
     }
-   
-    return project;
 
+    return project;
   }
 
   updateProject(project: Project) {
@@ -335,7 +331,7 @@ export class SplitterService {
     this.currentProjectObservable.next(this.currentProject);
     this.isLoading = false;
     this.loadingObservable.next(this.isLoading);
-    this.weightsObservable.next(this.getWeights())
+    this.weightsObservable.next(this.getWeights());
   }
 
   saveProjectData(project: Project) {
@@ -355,8 +351,6 @@ export class SplitterService {
     this.isLoading = false;
     this.loadingObservable.next(this.isLoading);
   }
-
-
 
   addUser(user: User) {
     if (this.currentProject.addUser(user)) {
@@ -415,7 +409,7 @@ export class SplitterService {
   }
 
   editExpense(oldExpense: Expense, newExpense: Expense) {
-    if(this.currentProject.updateExpense(oldExpense, newExpense)) {
+    if (this.currentProject.updateExpense(oldExpense, newExpense)) {
       this.saveProjectData(this.currentProject);
       this.expensesObservable.next(this.currentProject.expenses);
       return true;
@@ -446,95 +440,111 @@ export class SplitterService {
   }
 
   addFileToExpense(file: File, expense: Expense) {
-    if(!this.currentProject.expenses.includes(expense)) {
-      console.error("Can't upload because expense does not belong to current project");
-      
+    if (!this.currentProject.expenses.includes(expense)) {
+      console.error(
+        "Can't upload because expense does not belong to current project"
+      );
+
       return;
     }
-    if(!(file.type.startsWith('image/') || file.type == "application/pdf") || file.size > 50 * 1024 * 1024) {
-      console.error("Can't upload because file is not supported or is bigger than 50MB");
+    if (
+      !(file.type.startsWith("image/") || file.type == "application/pdf") ||
+      file.size > 50 * 1024 * 1024
+    ) {
+      console.error(
+        "Can't upload because file is not supported or is bigger than 50MB"
+      );
       return;
     }
-    console.log('starting upload');
-    
-    this.db.uploadFile(file, this.currentProject, 'expenses').then(task => {
+    console.log("starting upload");
+
+    this.db.uploadFile(file, this.currentProject, "expenses").then(task => {
       task.ref.getDownloadURL().then(url => {
         expense.fileUrl = url;
         expense.filePath = task.ref.fullPath;
         this.saveProjectData(this.currentProject);
         this.expensesObservable.next(this.currentProject.expenses);
         console.log("File uploaded", expense);
-        
       });
     });
   }
 
   deleteFileFromExpense(expense: Expense) {
-    if(!this.currentProject.expenses.includes(expense)) {
-      console.log("Can't upload because expense does not belong to current project");
-      
+    if (!this.currentProject.expenses.includes(expense)) {
+      console.log(
+        "Can't upload because expense does not belong to current project"
+      );
+
       return;
     }
-    console.log('starting delete');
+    console.log("starting delete");
     this.db.deleteFile(expense.filePath).subscribe(
-      
       () => {
-        console.log('File deleted');
+        console.log("File deleted");
         expense.filePath = "";
         expense.fileUrl = "";
         this.saveProjectData(this.currentProject);
         this.expensesObservable.next(this.currentProject.expenses);
-      }, 
-      
+      },
+
       () => {
-        console.error('Error deleting file');
-      })
+        console.error("Error deleting file");
+      }
+    );
   }
 
   addFileToPayment(file: File, payment: Payment) {
-    if(!this.currentProject.payments.includes(payment)) {
-      console.error("Can't upload because pyament does not belong to current project");
-      
+    if (!this.currentProject.payments.includes(payment)) {
+      console.error(
+        "Can't upload because pyament does not belong to current project"
+      );
+
       return;
     }
-    if(!(file.type.startsWith('image/') || file.type == "application/pdf") || file.size > 50 * 1024 * 1024) {
-      console.error("Can't upload because file is not supported or is bigger than 50MB");
+    if (
+      !(file.type.startsWith("image/") || file.type == "application/pdf") ||
+      file.size > 50 * 1024 * 1024
+    ) {
+      console.error(
+        "Can't upload because file is not supported or is bigger than 50MB"
+      );
       return;
     }
-    console.log('starting upload');
-    
-    this.db.uploadFile(file, this.currentProject, 'payments').then(task => {
+    console.log("starting upload");
+
+    this.db.uploadFile(file, this.currentProject, "payments").then(task => {
       task.ref.getDownloadURL().then(url => {
         payment.fileUrl = url;
         payment.filePath = task.ref.fullPath;
         this.saveProjectData(this.currentProject);
         this.expensesObservable.next(this.currentProject.expenses);
         console.log("File uploaded", payment);
-        
       });
     });
   }
 
   deleteFileFromPayment(payment: Payment) {
-    if(!this.currentProject.payments.includes(payment)) {
-      console.log("Can't upload because expense does not belong to current project");
-      
+    if (!this.currentProject.payments.includes(payment)) {
+      console.log(
+        "Can't upload because expense does not belong to current project"
+      );
+
       return;
     }
-    console.log('starting delete');
+    console.log("starting delete");
     this.db.deleteFile(payment.filePath).subscribe(
-      
       () => {
-        console.log('File deleted');
+        console.log("File deleted");
         payment.filePath = "";
         payment.fileUrl = "";
         this.saveProjectData(this.currentProject);
         this.paymentsObservable.next(this.currentProject.payments);
-      }, 
-      
+      },
+
       () => {
-        console.error('Error deleting file');
-      })
+        console.error("Error deleting file");
+      }
+    );
   }
 
   subscribeToExpenses(observer) {
@@ -557,7 +567,7 @@ export class SplitterService {
     this.emitAllCurrentData();
   }
 
-  setWeights(weigths: { user: User, weight: number }[]) {
+  setWeights(weigths: { user: User; weight: number }[]) {
     this.currentProject.setUnevenSplit(weigths);
     this.weightsObservable.next(this.getWeights());
     this.saveProjectData(this.currentProject);
@@ -632,10 +642,9 @@ export class SplitterService {
 
   saveLanguagePreference(lang: string) {
     //console.log('saving lang ' + lang);
-    if(!lang) {
+    if (!lang) {
       return;
     }
     this.db.saveLanguagePreference(lang);
   }
-
 }
