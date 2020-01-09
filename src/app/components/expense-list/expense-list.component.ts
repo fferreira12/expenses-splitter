@@ -3,7 +3,8 @@ import { SplitterService } from "src/app/services/splitter.service";
 import { Expense } from "src/app/models/expense.model";
 import { User } from "src/app/models/user.model";
 import { Project } from "src/app/models/project.model";
-import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { CdkDragDrop, moveItemInArray } from "@angular/cdk/drag-drop";
+import * as firebase from "firebase";
 
 @Component({
   selector: "app-expense-list",
@@ -14,6 +15,9 @@ export class ExpenseListComponent implements OnInit {
   expenses: Expense[];
 
   currentProject: Project;
+
+  percentUploaded: number = 0.0;
+  expenseUploading: Expense;
 
   @Output() editExpense = new EventEmitter<Expense>();
 
@@ -45,8 +49,29 @@ export class ExpenseListComponent implements OnInit {
   }
 
   onFilesAdded(expense: Expense, event) {
+    this.expenseUploading = expense;
+
     let file = event.target.files[0];
-    this.splitterService.addFileToExpense(file, expense);
+    let promise = this.splitterService.addFileToExpense(file, expense);
+
+    promise.snapshotChanges().subscribe(task => {
+      console.log("got task", task);
+      this.percentUploaded = Math.floor((100 * task.bytesTransferred) / task.totalBytes);
+    });
+
+    promise.then(task => {
+      if (task.state === firebase.storage.TaskState.SUCCESS) {
+        task.ref.getDownloadURL().then(url => {
+          let newExpense = new Expense(expense.name, expense.value);
+          Object.assign(newExpense, expense);
+          newExpense.fileUrl = url;
+          newExpense.filePath = task.ref.fullPath;
+          newExpense.order = expense.order;
+          console.log("saving expense",  expense);
+          this.splitterService.editExpense(expense, newExpense);
+        });
+      }
+    });
   }
 
   onDeleteFile(expense: Expense) {
@@ -56,6 +81,9 @@ export class ExpenseListComponent implements OnInit {
 
   drop(event: CdkDragDrop<string[]>) {
     moveItemInArray(this.expenses, event.previousIndex, event.currentIndex);
-    this.splitterService.setExpenseOrder(event.item.data as Expense, event.currentIndex)
+    this.expenses.forEach((exp, i) => {
+      this.splitterService.setExpenseOrder(exp, i);
+    });
+    
   }
 }

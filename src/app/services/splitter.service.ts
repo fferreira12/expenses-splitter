@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { User } from "../models/user.model";
 
-import { Observable, Subject } from "rxjs";
+import { Subject } from "rxjs";
 import { Expense } from "../models/expense.model";
 import { Payment } from "../models/payment.model";
 //import { LocalstorageService } from "./localstorage.service";
@@ -297,7 +297,6 @@ export class SplitterService {
       return project;
     }
     if (self && shouldAddToSelf) {
-
       this.allSelfProjects.push(project);
     } else if (!self && shouldAddToOthers) {
       this.allProjectsCanEdit.push(project);
@@ -323,7 +322,7 @@ export class SplitterService {
     this.isLoading = true;
     this.loadingObservable.next(this.isLoading);
     this.usersObservable.next(this.currentProject.users);
-    this.expensesObservable.next(this.currentProject.expenses);
+    this.expensesObservable.next(this.getExpenses());
     this.paymentsObservable.next(this.currentProject.payments);
     this.allProjectsObservable.next(this.getAllProjects());
     this.currentProjectObservable.next(this.currentProject);
@@ -402,14 +401,14 @@ export class SplitterService {
   addExpense(expense: Expense) {
     if (this.currentProject.addExpense(expense)) {
       this.saveProjectData(this.currentProject);
-      this.expensesObservable.next(this.currentProject.expenses);
+      this.expensesObservable.next(this.getExpenses());
     }
   }
 
   editExpense(oldExpense: Expense, newExpense: Expense) {
     if (this.currentProject.updateExpense(oldExpense, newExpense)) {
       this.saveProjectData(this.currentProject);
-      this.expensesObservable.next(this.currentProject.expenses);
+      this.expensesObservable.next(this.getExpenses());
       return true;
     } else {
       return false;
@@ -423,7 +422,7 @@ export class SplitterService {
         this.db.deleteFile(filePath);
       }
       this.saveProjectData(this.currentProject);
-      this.expensesObservable.next(this.currentProject.expenses);
+      this.expensesObservable.next(this.getExpenses());
     }
   }
 
@@ -472,15 +471,9 @@ export class SplitterService {
     }
     console.log("starting upload");
 
-    this.db.uploadFile(file, this.currentProject, "expenses").then(task => {
-      task.ref.getDownloadURL().then(url => {
-        expense.fileUrl = url;
-        expense.filePath = task.ref.fullPath;
-        this.saveProjectData(this.currentProject);
-        this.expensesObservable.next(this.currentProject.expenses);
-        console.log("File uploaded", expense);
-      });
-    });
+    let promise = this.db.uploadFile(file, this.currentProject, "expenses");
+
+    return promise;
   }
 
   deleteFileFromExpense(expense: Expense) {
@@ -498,7 +491,7 @@ export class SplitterService {
         expense.filePath = "";
         expense.fileUrl = "";
         this.saveProjectData(this.currentProject);
-        this.expensesObservable.next(this.currentProject.expenses);
+        this.expensesObservable.next(this.getExpenses());
       },
 
       () => {
@@ -531,7 +524,7 @@ export class SplitterService {
         payment.fileUrl = url;
         payment.filePath = task.ref.fullPath;
         this.saveProjectData(this.currentProject);
-        this.expensesObservable.next(this.currentProject.expenses);
+        this.expensesObservable.next(this.getExpenses());
         console.log("File uploaded", payment);
       });
     });
