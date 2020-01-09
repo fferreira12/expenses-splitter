@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+
 import { SplitterService } from 'src/app/services/splitter.service';
 import { Payment } from 'src/app/models/payment.model';
 
@@ -34,6 +36,11 @@ export class PaymentListComponent implements OnInit {
 
   onDeleteFile(payment: Payment) {
     this.splitterService.deleteFileFromPayment(payment);
+  }
+
+  drop(event: CdkDragDrop<Payment[]>) {
+    moveItemInArray(this.payments, event.previousIndex, event.currentIndex);
+    this.splitterService.setPaymentOrder(event.item.data as Payment, event.currentIndex)
   }
 
 }

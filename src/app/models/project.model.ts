@@ -14,6 +14,8 @@ export class Project {
   expenses: Expense[];
   payments: Payment[];
 
+  order: number;
+
   total: number;
 
   get expensesCount(): number {
@@ -198,11 +200,11 @@ export class Project {
     }
   }
 
-  setExpenseOrder(expense: Expense, order: number) {
-    if(!this.expenses.includes(expense)) {
-      return;
-    }
-    expense.order = order;
+  setOrder(orderable: { order: number }, order: number) {
+    // if(!this.expenses.includes(expense)) {
+    //   return;
+    // }
+    orderable.order = order;
   }
 
   addPayment(payment: Payment) {

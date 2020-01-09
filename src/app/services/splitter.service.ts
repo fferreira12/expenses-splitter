@@ -98,11 +98,13 @@ export class SplitterService {
   }
 
   getAllProjects(includeOthers: boolean = false) {
+    let p: Project[];
     if (includeOthers) {
-      return [...this.allSelfProjects, ...this.allProjectsCanEdit];
+      p = [...this.allSelfProjects, ...this.allProjectsCanEdit];
     } else {
-      return this.allSelfProjects;
+      p = this.allSelfProjects;
     }
+    return p.sort((a, b) => a.order - b.order);
   }
 
   getCurrentProject() {
@@ -237,7 +239,6 @@ export class SplitterService {
         this.allSelfProjects.push(this.currentProject);
         this.saveProjectData(this.currentProject);
       } else {
-        //this.currentProject = this.allSelfProjects[0];
         //console.log('before getting last project');
 
         this.db.getLastProject().subscribe(doc => {
@@ -254,12 +255,12 @@ export class SplitterService {
             this.db.getProject(data.projectId).subscribe(docSnap => {
               if (!docSnap.exists) {
                 this.currentProject = this.allSelfProjects[0];
+                return;
               }
 
               let data = docSnap.data();
               let p = this.parseOne({ id: data.projectId, ...docSnap.data() });
-              this.currentProject = p;
-              this.emitAllCurrentData();
+              this.setCurrentProject(p);
             });
           }
         });
@@ -324,17 +325,14 @@ export class SplitterService {
     this.usersObservable.next(this.currentProject.users);
     this.expensesObservable.next(this.currentProject.expenses);
     this.paymentsObservable.next(this.currentProject.payments);
-    this.allProjectsObservable.next([
-      ...this.allSelfProjects,
-      ...this.allProjectsCanEdit
-    ]);
+    this.allProjectsObservable.next(this.getAllProjects());
     this.currentProjectObservable.next(this.currentProject);
     this.isLoading = false;
     this.loadingObservable.next(this.isLoading);
     this.weightsObservable.next(this.getWeights());
   }
 
-  saveProjectData(project: Project) {
+  saveProjectData(project: Project, saveLastProject: boolean = false) {
     this.isLoading = true;
     if (!this.prepareStorage()) {
       this.isLoading = false;
@@ -347,7 +345,7 @@ export class SplitterService {
     if (!project.ownerId) {
       project.setOwner(this.userId, this.userEmail);
     }
-    this.db.saveProject(project.ownerId, project);
+    this.db.saveProject(project.ownerId, project, saveLastProject);
     this.isLoading = false;
     this.loadingObservable.next(this.isLoading);
   }
@@ -434,9 +432,25 @@ export class SplitterService {
   }
 
   setExpenseOrder(expense: Expense, order: number) {
-    this.currentProject.setExpenseOrder(expense, order);
+    this.currentProject.setOrder(expense, order);
     this.saveProjectData(this.currentProject);
     this.expensesObservable.next(this.currentProject.expenses);
+  }
+
+  setPaymentOrder(payment: Payment, order: number) {
+    this.currentProject.setOrder(payment, order);
+    this.saveProjectData(this.currentProject);
+    this.paymentsObservable.next(this.currentProject.payments);
+  }
+
+  setProjectsOrder(projects: Project[]) {
+    for (let i = 0; i < projects.length; i++) {
+      const project = projects[i];
+      project.order = i;
+      this.saveProjectData(project, false);
+    }
+    this.allProjectsObservable.next(this.getAllProjects());
+    
   }
 
   addFileToExpense(file: File, expense: Expense) {

@@ -1,4 +1,6 @@
 import { Component, OnInit } from "@angular/core";
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+
 import { SplitterService } from "src/app/services/splitter.service";
 import { Project } from "src/app/models/project.model";
 import { FormControl } from "@angular/forms";
@@ -96,4 +98,10 @@ export class ProjectsComponent implements OnInit {
   onUnarchiveProject(project: Project) {
     this.splitterService.unArchiveProject(project);
   }
+
+  drop(event: CdkDragDrop<string[]>) {
+    moveItemInArray(this.allProjects, event.previousIndex, event.currentIndex);
+    this.splitterService.setProjectsOrder(this.allProjects);
+  }
+
 }
