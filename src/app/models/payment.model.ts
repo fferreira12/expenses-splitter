@@ -7,7 +7,9 @@ export class Payment {
   value: number;
 
   fileUrl: string;
-  filePath: string
+  filePath: string;
+
+  order: number;
 
   constructor(payer: User, receiver: User, value:number){
     this.payer = payer;

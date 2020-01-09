@@ -324,10 +324,7 @@ export class SplitterService {
     this.usersObservable.next(this.currentProject.users);
     this.expensesObservable.next(this.currentProject.expenses);
     this.paymentsObservable.next(this.currentProject.payments);
-    this.allProjectsObservable.next([
-      ...this.allSelfProjects,
-      ...this.allProjectsCanEdit
-    ]);
+    this.allProjectsObservable.next(this.getAllProjects());
     this.currentProjectObservable.next(this.currentProject);
     this.isLoading = false;
     this.loadingObservable.next(this.isLoading);
@@ -434,9 +431,15 @@ export class SplitterService {
   }
 
   setExpenseOrder(expense: Expense, order: number) {
-    this.currentProject.setExpenseOrder(expense, order);
+    this.currentProject.setOrder(expense, order);
     this.saveProjectData(this.currentProject);
     this.expensesObservable.next(this.currentProject.expenses);
+  }
+
+  setPaymentOrder(payment: Payment, order: number) {
+    this.currentProject.setOrder(payment, order);
+    this.saveProjectData(this.currentProject);
+    this.paymentsObservable.next(this.currentProject.payments);
   }
 
   addFileToExpense(file: File, expense: Expense) {
