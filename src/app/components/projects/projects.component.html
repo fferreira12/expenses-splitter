@@ -24,10 +24,11 @@
         <th>{{'Options' | translate}}</th>
       </tr>
     </thead>
-    <tbody>
+    <tbody cdkDropList (cdkDropListDropped)="drop($event)">
       <ng-container *ngFor="let p of allProjects; let i = index">
         <tr *ngIf="showArchivedProjects || isCurrentProject(p) || !p.archived"
-          [ngClass]="{'active-project':isCurrentProject(p), 'archived':p.archived}">
+          [ngClass]="{'active-project':isCurrentProject(p), 'archived':p.archived}"
+          cdkDrag [cdkDragData]="p">
 
           <td class="align-middle" [ngClass]="{'self-project': selfProject(p), 'not-self-project': !selfProject(p)}">
             {{ p.projectName }} <br/>
