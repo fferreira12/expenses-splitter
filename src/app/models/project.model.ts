@@ -166,7 +166,7 @@ export class Project {
     }
   }
 
-  addExpense(expense: Expense) {
+  addExpense(expense: Expense, updating: boolean = false) {
     if (
       !expense.allPayersAreParticipating(expense.payers) ||
       expense.value == null ||
@@ -175,7 +175,7 @@ export class Project {
       return false;
     }
 
-    if(!expense.order || expense.order == 0) {
+    if(!updating && (!expense.order || expense.order == 0)) {
       expense.order = this.expenses.length;
     }
 
@@ -197,7 +197,7 @@ export class Project {
   updateExpense(oldExpense: Expense, newExpense: Expense) {
     let removed = this.removeExpense(oldExpense);
     if(removed) {
-      this.addExpense(newExpense);
+      this.addExpense(newExpense, true);
       return true;
     } else {
       return false;
@@ -211,7 +211,7 @@ export class Project {
     orderable.order = order;
   }
 
-  addPayment(payment: Payment) {
+  addPayment(payment: Payment, updating: boolean = false) {
     if (
       payment.payer == null ||
       payment.receiver == null ||
@@ -222,7 +222,7 @@ export class Project {
       //console.log("invalid payment");
       return false;
     }
-    if(!payment.order || payment.order == 0) {
+    if(!updating && (!payment.order || payment.order == 0)) {
       payment.order = this.payments.length;
     }
 
@@ -242,7 +242,7 @@ export class Project {
   updatePayment(oldPayment: Payment, newPayment: Payment) {
     let removed = this.removePayment(oldPayment);
     if(removed) {
-      this.addPayment(newPayment);
+      this.addPayment(newPayment, true);
       return true;
     } else {
       return false;
