@@ -62,8 +62,8 @@ export class Expense {
       ps = this.payers;
     }
 
-    return ps.every(p => {
-      return this.users.includes(p.payer);
+    return ps.every(payer => {
+      return this.users.some(p => p.id === payer.payer.id);
     });
   }
 

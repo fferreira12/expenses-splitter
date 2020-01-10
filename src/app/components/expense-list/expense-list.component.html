@@ -34,6 +34,9 @@
         <td>
           <input *ngIf="!expense.fileUrl" class="form-control" type="file" name="upload"
             (change)="onFilesAdded(expense, $event)">
+            <div class="progress" *ngIf="percentUploaded > 0 && expenseUploading === expense">
+              <div class="progress-bar" role="progressbar" [ngStyle]="{'width': percentUploaded+'%'}" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
           <a *ngIf="expense.fileUrl" href="{{expense.fileUrl}}">
             <button class="btn btn-primary mt-2">
               <i class="fas fa-download"></i>

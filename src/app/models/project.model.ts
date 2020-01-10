@@ -175,6 +175,10 @@ export class Project {
       return false;
     }
 
+    if(!expense.order || expense.order == 0) {
+      expense.order = this.expenses.length;
+    }
+
     this.expenses.push(expense);
     return true;
     //this.saveProjectData(this.currentProject);
@@ -218,6 +222,9 @@ export class Project {
       //console.log("invalid payment");
       return false;
     }
+    if(!payment.order || payment.order == 0) {
+      payment.order = this.payments.length;
+    }
 
     this.payments.push(payment);
     return true;
@@ -228,6 +235,16 @@ export class Project {
       this.payments.splice(this.payments.indexOf(payment), 1);
       return true;
     } catch {
+      return false;
+    }
+  }
+
+  updatePayment(oldPayment: Payment, newPayment: Payment) {
+    let removed = this.removePayment(oldPayment);
+    if(removed) {
+      this.addPayment(newPayment);
+      return true;
+    } else {
       return false;
     }
   }
