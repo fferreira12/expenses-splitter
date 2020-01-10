@@ -323,7 +323,7 @@ export class SplitterService {
     this.loadingObservable.next(this.isLoading);
     this.usersObservable.next(this.currentProject.users);
     this.expensesObservable.next(this.getExpenses());
-    this.paymentsObservable.next(this.currentProject.payments);
+    this.paymentsObservable.next(this.getPayments());
     this.allProjectsObservable.next(this.getAllProjects());
     this.currentProjectObservable.next(this.currentProject);
     this.isLoading = false;
@@ -519,6 +519,7 @@ export class SplitterService {
     }
     console.log("starting upload");
 
+    /*
     this.db.uploadFile(file, this.currentProject, "payments").then(task => {
       task.ref.getDownloadURL().then(url => {
         payment.fileUrl = url;
@@ -528,6 +529,11 @@ export class SplitterService {
         console.log("File uploaded", payment);
       });
     });
+    */
+
+    let promise = this.db.uploadFile(file, this.currentProject, "payments");
+
+    return promise;
   }
 
   deleteFileFromPayment(payment: Payment) {
@@ -545,7 +551,7 @@ export class SplitterService {
         payment.filePath = "";
         payment.fileUrl = "";
         this.saveProjectData(this.currentProject);
-        this.paymentsObservable.next(this.currentProject.payments);
+        this.paymentsObservable.next(this.getPayments());
       },
 
       () => {
@@ -611,7 +617,7 @@ export class SplitterService {
   addPayment(payment: Payment) {
     if (this.currentProject.addPayment(payment)) {
       this.saveProjectData(this.currentProject);
-      this.paymentsObservable.next(this.currentProject.payments);
+      this.paymentsObservable.next(this.getPayments());
     }
   }
 
@@ -622,12 +628,22 @@ export class SplitterService {
         this.db.deleteFile(filePath);
       }
       this.saveProjectData(this.currentProject);
-      this.paymentsObservable.next(this.currentProject.payments);
+      this.paymentsObservable.next(this.getPayments());
+    }
+  }
+
+  editPayment(oldPayment: Payment, newPayment: Payment) {
+    if (this.currentProject.updatePayment(oldPayment, newPayment)) {
+      this.saveProjectData(this.currentProject);
+      this.paymentsObservable.next(this.getPayments());
+      return true;
+    } else {
+      return false;
     }
   }
 
   getPayments(): Payment[] {
-    return this.currentProject.payments;
+    return this.currentProject.payments.sort((a, b) => a.order - b.order);;
   }
 
   subscribeToPayments(observer) {
