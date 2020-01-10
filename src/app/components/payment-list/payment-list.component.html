@@ -12,7 +12,7 @@
       </tr>
     </thead>
     <tbody cdkDropList (cdkDropListDropped)="drop($event)">
-      <tr *ngFor="let payment of payments" cdkDrag [cdkDragData]="payment">
+      <tr *ngFor="let payment of payments; let i = index" cdkDrag [cdkDragData]="payment">
         <td>{{ payment.payer.name }}</td>
         <td>{{ payment.receiver.name }}</td>
         <td>{{ payment.value | currency:"R$ " }}</td>
@@ -22,13 +22,16 @@
           </button>
         </td>
         <td>
-          <input *ngIf="!payment.fileUrl" class="form-control" type="file" name="upload"
+          <label [for]="'upload-'+i" *ngIf="!payment.fileUrl" class="btn btn-primary mt-2">
+            <i class="fas fa-file-upload"></i>
+          </label>
+          <input *ngIf="!payment.fileUrl" class="form-control" type="file" name="upload" [id]="'upload-'+i"
             (change)="onFilesAdded(payment, $event)">
             <div class="progress" *ngIf="percentUploaded > 0 && paymentUploading === payment">
               <div class="progress-bar" role="progressbar" [ngStyle]="{'width': percentUploaded+'%'}" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
             </div>
           <a *ngIf="payment.fileUrl" href="{{payment.fileUrl}}">
-            <button class="btn btn-primary mt-2">
+            <button class="btn btn-success mt-2">
               <i class="fas fa-download"></i>
             </button>
           </a>
