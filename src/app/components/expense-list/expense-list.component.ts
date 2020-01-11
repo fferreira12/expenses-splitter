@@ -4,6 +4,7 @@ import { Expense } from "src/app/models/expense.model";
 import { User } from "src/app/models/user.model";
 import { Project } from "src/app/models/project.model";
 import { CdkDragDrop, moveItemInArray } from "@angular/cdk/drag-drop";
+import { MatSnackBar } from '@angular/material/snack-bar';
 import * as firebase from "firebase";
 
 @Component({
@@ -21,7 +22,7 @@ export class ExpenseListComponent implements OnInit {
 
   @Output() editExpense = new EventEmitter<Expense>();
 
-  constructor(private splitterService: SplitterService) {}
+  constructor(private splitterService: SplitterService, private _snackBar: MatSnackBar) {}
 
   ngOnInit() {
     this.expenses = this.splitterService.getExpenses();
@@ -68,7 +69,10 @@ export class ExpenseListComponent implements OnInit {
           newExpense.filePath = task.ref.fullPath;
           newExpense.order = expense.order;
           console.log("saving expense",  expense);
-          this.splitterService.editExpense(expense, newExpense);
+          let success = this.splitterService.editExpense(expense, newExpense);
+          if(success) {
+            this.openSnackBar('Upload Complete');
+          }
         });
       }
     });
@@ -77,6 +81,7 @@ export class ExpenseListComponent implements OnInit {
   onDeleteFile(expense: Expense) {
     let url = expense.fileUrl;
     this.splitterService.deleteFileFromExpense(expense);
+    this.openSnackBar('File Deleted');
   }
 
   drop(event: CdkDragDrop<string[]>) {
@@ -85,5 +90,11 @@ export class ExpenseListComponent implements OnInit {
       this.splitterService.setExpenseOrder(exp, i);
     });
     
+  }
+
+  openSnackBar(message: string) {
+    this._snackBar.open(message, 'Close', {
+      duration: 4000,
+    });
   }
 }
