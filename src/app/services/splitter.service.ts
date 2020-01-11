@@ -356,6 +356,14 @@ export class SplitterService {
     }
   }
 
+  setUsersOrder(users: User[]) {
+    users.forEach((user, index) => {
+      user.order = index;
+    });
+    this.saveProjectData(this.currentProject, false);
+    this.usersObservable.next(this.getUsers());
+  }
+
   addEditor(project: Project, email: string) {
     this.db.addEditorToProject(project.projectId, email);
     project.addEditor(email);
@@ -390,7 +398,7 @@ export class SplitterService {
   }
 
   getUsers(): User[] {
-    return this.currentProject.users;
+    return this.currentProject.users.sort((a, b) => a.order - b.order);
   }
 
   subscribeToUsers(observer) {
