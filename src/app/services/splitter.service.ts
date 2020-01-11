@@ -321,7 +321,7 @@ export class SplitterService {
   private emitAllCurrentData() {
     this.isLoading = true;
     this.loadingObservable.next(this.isLoading);
-    this.usersObservable.next(this.currentProject.users);
+    this.usersObservable.next(this.getUsers());
     this.expensesObservable.next(this.getExpenses());
     this.paymentsObservable.next(this.getPayments());
     this.allProjectsObservable.next(this.getAllProjects());
@@ -352,7 +352,7 @@ export class SplitterService {
   addUser(user: User) {
     if (this.currentProject.addUser(user)) {
       this.saveProjectData(this.currentProject);
-      this.usersObservable.next(this.currentProject.users);
+      this.usersObservable.next(this.getUsers());
     }
   }
 
@@ -389,7 +389,7 @@ export class SplitterService {
     if (this.currentProject.removeUser(user)) {
       this.removeExpensesAndPaymentsWithNoAssociatedUser();
       this.saveProjectData(this.currentProject);
-      this.usersObservable.next(this.currentProject.users);
+      this.usersObservable.next(this.getUsers());
     }
   }
 

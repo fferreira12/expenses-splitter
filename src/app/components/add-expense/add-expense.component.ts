@@ -36,6 +36,15 @@ export class AddExpenseComponent implements OnInit {
 
   ngOnInit() {
     this.users = this.splitterService.getUsers();
+    this.startForm();
+    this.splitterService.subscribeToUsers(users => {
+      this.users = users;
+
+      this.startForm();
+    });
+  }
+
+  startForm() {
     this.expenseForm = new FormGroup({
       expenseName: new FormControl(null),
       users: new FormArray([]),
@@ -44,13 +53,6 @@ export class AddExpenseComponent implements OnInit {
       payers: new FormArray([])
     });
     this.addCheckboxes();
-    this.splitterService.subscribeToUsers(users => {
-      this.users = users;
-
-      this.expenseForm.controls.users = this.formBuilder.array([]);
-
-      this.addCheckboxes();
-    });
   }
 
   getTitle() {
@@ -73,10 +75,12 @@ export class AddExpenseComponent implements OnInit {
   }
 
   updateForm() {
+    //debugger;
     if(!this._editingExpense) return;
     let onePayer = this._editingExpense.payers.length == 1;
     this.singlePayer = onePayer;
     let amountsPayed = this._editingExpense.payers.map(payer => payer.amount);
+    this.expenseForm.reset();
     this.expenseForm.patchValue({
       expenseName: this._editingExpense.name,
       users: this._editingExpense.users,
@@ -84,6 +88,7 @@ export class AddExpenseComponent implements OnInit {
       payer: onePayer ? this._editingExpense.payers[0].payer.id : null,
       payers: !onePayer ? amountsPayed : []
     });
+    this.updateCheckboxes();
   }
 
   onAddExpense(event) {
@@ -98,7 +103,9 @@ export class AddExpenseComponent implements OnInit {
   }
 
   editExpense() {
-    let edited = this.splitterService.editExpense(this.oldExpense, this.getNewExpenseFromForm());
+    let newExpense = this.getNewExpenseFromForm();
+    
+    let edited = this.splitterService.editExpense(this.oldExpense, newExpense);
     if(edited) {
       this.onCancelEdit();
     }
@@ -119,6 +126,10 @@ export class AddExpenseComponent implements OnInit {
     let value = this.expenseForm.controls.value.value;
 
     let expense = new Expense(expenseName, value);
+
+    if(this._editingExpense) {
+      expense.order = this._editingExpense.order;
+    }
 
     let filteredUsers = this.users.filter(user => {
       let isIn = usersIds.includes(user.id);
@@ -156,19 +167,23 @@ export class AddExpenseComponent implements OnInit {
 
   addCheckboxes() {
     this.users.map((o, i) => {
-      const control = new FormControl(true);
+      const control = new FormControl(this.userIsParticipating(o));
       const valueControl = new FormControl(0);
       (this.expenseForm.controls.users as FormArray).push(control);
       (this.expenseForm.controls.payers as FormArray).push(valueControl);
     });
   }
 
+  updateCheckboxes() {
+    (this.expenseForm.controls.users as FormArray).reset();
+    (this.expenseForm.controls.users as FormArray).controls.forEach((control, i) => {
+      control.setValue(this.userIsParticipating(this.users[i]));
+    });
+  }
+
   checkCheckBoxvalue(event) {
-    if (event.target.checked) {
-      //event.target.value = event.target.name;
-    }
-    //console.log(this.expenseForm.controls.users)
-    // console.log(event);
+    //this.updateCheckboxes();
+    
   }
 
   onSinglePlayerCheck(event) {
@@ -179,7 +194,16 @@ export class AddExpenseComponent implements OnInit {
 
   onCancelEdit() {
     this._editingExpense = null;
+    this.oldExpense = null;
     this.singlePayer = true;
+    this.editing = false;
+    this.startForm();
+  }
+
+  resetForm() {
     this.expenseForm.reset();
+    (this.expenseForm.controls.users as FormArray).controls.forEach(control => {
+      control.setValue(true);
+    });
   }
 }

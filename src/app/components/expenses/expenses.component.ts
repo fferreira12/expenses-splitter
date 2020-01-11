@@ -16,6 +16,7 @@ export class ExpensesComponent implements OnInit {
   }
 
   onEditExpense(expense: Expense) {
+    this.editingExpense = null;
     this.editingExpense = expense;
   }
 
