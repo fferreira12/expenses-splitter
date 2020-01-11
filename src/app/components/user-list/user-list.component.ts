@@ -1,4 +1,6 @@
 import { Component, OnInit } from "@angular/core";
+import { CdkDragDrop, moveItemInArray } from "@angular/cdk/drag-drop";
+
 import { SplitterService } from "src/app/services/splitter.service";
 import { User } from "src/app/models/user.model";
 
@@ -64,5 +66,10 @@ export class UserListComponent implements OnInit {
 
   onResetWeights() {
     this.splitterService.unSetWeights();
+  }
+
+  drop(event: CdkDragDrop<string[]>) {
+    moveItemInArray(this.users, event.previousIndex, event.currentIndex);
+    this.splitterService.setUsersOrder(this.users);
   }
 }

@@ -16,7 +16,18 @@ export class Project {
 
   order: number;
 
-  total: number;
+  _total: number;
+  get total(): number {
+    if(!this.expenses) {
+      return 0;
+    }
+    this._total = this.expenses.reduce((previous, current) => previous + current.value, 0);
+    return this._total;
+  }
+
+  set total(value: number) {
+    this._total = value;
+  }
 
   get expensesCount(): number {
     if(!this.expenses) {

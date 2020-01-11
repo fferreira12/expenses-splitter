@@ -1,7 +1,7 @@
 <div *ngIf="users.length > 0">
   <h1>{{'People' | translate}}</h1>
-  <ul class="list-group">
-    <li *ngFor="let user of users" class="list-group-item">
+  <ul class="list-group" cdkDropList (cdkDropListDropped)="drop($event)"> 
+    <li *ngFor="let user of users" class="list-group-item" cdkDrag [cdkDragData]="user">
       <button class="btn btn-danger btn-sm" (click)="onRemoveUser(user)">
         <i class="far fa-trash-alt"></i>
       </button>

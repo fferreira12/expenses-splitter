@@ -11,6 +11,7 @@ import { AngularFirestoreModule } from '@angular/fire/firestore';
 import { AngularFireAuthModule } from '@angular/fire/auth';
 import { AngularFireStorageModule } from '@angular/fire/storage';
 import { DragDropModule } from '@angular/cdk/drag-drop'
+import { MatSnackBarModule } from '@angular/material';
 import { environment } from '../environments/environment';
 
 import { AppRoutingModule } from "./app-routing.module";
@@ -109,7 +110,8 @@ const appRoutes: Routes = [
     AngularFireAuthModule, // imports firebase/auth, only needed for auth features,
     AngularFireStorageModule, 
     NoopAnimationsModule,
-    DragDropModule
+    DragDropModule,
+    MatSnackBarModule
   ],
   providers: [],
   bootstrap: [AppComponent]

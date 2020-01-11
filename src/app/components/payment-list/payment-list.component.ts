@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { SplitterService } from 'src/app/services/splitter.service';
 import { Payment } from 'src/app/models/payment.model';
@@ -17,9 +18,7 @@ export class PaymentListComponent implements OnInit {
   percentUploaded: number = 0.0;
   paymentUploading: Payment;
 
-  constructor(
-    private splitterService: SplitterService
-  ) { }
+  constructor(private splitterService: SplitterService, private _snackBar: MatSnackBar) { }
 
   ngOnInit() {
     this.payments = this.splitterService.getPayments();
@@ -59,7 +58,10 @@ export class PaymentListComponent implements OnInit {
           newPayment.filePath = task.ref.fullPath;
           newPayment.order = payment.order;
           console.log("saving payment",  newPayment);
-          this.splitterService.editPayment(payment, newPayment);
+          let success = this.splitterService.editPayment(payment, newPayment);
+          if(success) {
+            this.openSnackBar('Upload Complete');
+          }
         });
       }
     });
@@ -67,6 +69,7 @@ export class PaymentListComponent implements OnInit {
 
   onDeleteFile(payment: Payment) {
     this.splitterService.deleteFileFromPayment(payment);
+    this.openSnackBar('File Deleted');
   }
 
   drop(event: CdkDragDrop<Payment[]>) {
@@ -74,6 +77,12 @@ export class PaymentListComponent implements OnInit {
     this.splitterService.setPaymentOrder(event.item.data as Payment, event.currentIndex);
     this.payments.forEach((pay, i) => {
       this.splitterService.setPaymentOrder(pay, i);
+    });
+  }
+
+  openSnackBar(message: string) {
+    this._snackBar.open(message, 'Close', {
+      duration: 4000,
     });
   }
 
