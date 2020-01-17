@@ -6,6 +6,7 @@ import * as firebase from "firebase";
 import { SplitterService } from "src/app/services/splitter.service";
 import { User } from "src/app/models/user.model";
 import { Expense } from "src/app/models/expense.model";
+import { OcrService } from 'src/app/services/ocr.service';
 
 @Component({
   selector: "app-add-expense",
@@ -38,6 +39,7 @@ export class AddExpenseComponent implements OnInit {
   constructor(
     private splitterService: SplitterService,
     private formBuilder: FormBuilder,
+    private ocr: OcrService,
     private _snackBar: MatSnackBar
   ) {}
 
@@ -245,7 +247,25 @@ export class AddExpenseComponent implements OnInit {
 
   onFilesAdded(event) {
     this.expenseFile = event.target.files[0];
-    console.log(this.expenseFile);
+    this.ocr.recognizeText(this.expenseFile).subscribe(text => {
+      let valuePattern = /R? ?\$ ?([\d]+[.,][\d]+)\w+/
+      let valueMatches = text.match(valuePattern);
+      let lastValueMatch = parseFloat(valueMatches[valueMatches.length-1].replace(',', '.'));
+      
+      let actualValue = this.expenseForm.controls['value'].value;
+      let actualName = this.expenseForm.controls['expenseName'].value;
+      
+      if(lastValueMatch && !this.editingExpense && !actualValue) {
+        this.expenseForm.controls['value'].setValue(lastValueMatch);
+      }
+      
+      if(!this.editingExpense && !actualName) {
+        let firstLine = text.split('\n')[0];
+        this.expenseForm.controls['expenseName'].setValue(firstLine);
+      }
+
+      console.log(lastValueMatch);
+    });
   }
 
   onRemoveFile() {
