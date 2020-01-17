@@ -3,6 +3,7 @@ import * as Teseract from "tesseract.js";
 import { createWorker } from 'tesseract.js';
 import { from, Observable } from "rxjs";
 import { map } from "rxjs/operators";
+import { SplitterService } from './splitter.service';
 
 @Injectable({
   providedIn: "root"
@@ -12,7 +13,7 @@ export class OcrService {
   private worker: Teseract.Worker;
   private workerReady = false;
 
-  constructor() {
+  constructor(private splitterService: SplitterService) {
     this.worker = createWorker({
       logger: m => console.log(m)
     });
@@ -27,11 +28,16 @@ export class OcrService {
   }
 
   recognizeText(image: Teseract.ImageLike) {
+    this.splitterService.startLoading();
     if(!this.workerReady) {
+      this.splitterService.finishLoading();
       return;
     }
     let promise = this.worker.recognize(image);
     this.result$ = from(promise);
-    return this.result$.pipe(map(result => result.data.text));
+    return this.result$.pipe(map(result => {
+      this.splitterService.finishLoading();
+      return result.data.text
+    }));
   }
 }
