@@ -410,6 +410,9 @@ export class SplitterService {
     if (this.currentProject.addExpense(expense)) {
       this.saveProjectData(this.currentProject);
       this.expensesObservable.next(this.getExpenses());
+      return true;
+    } else {
+      return false;
     }
   }
 

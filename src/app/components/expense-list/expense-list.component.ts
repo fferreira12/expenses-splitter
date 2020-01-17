@@ -60,6 +60,7 @@ export class ExpenseListComponent implements OnInit {
       this.percentUploaded = Math.floor((100 * task.bytesTransferred) / task.totalBytes);
     });
 
+    //TODO: refactor: add expense has same code
     promise.then(task => {
       if (task.state === firebase.storage.TaskState.SUCCESS) {
         task.ref.getDownloadURL().then(url => {

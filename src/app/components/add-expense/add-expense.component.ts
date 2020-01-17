@@ -1,6 +1,9 @@
 import { Component, OnInit, Input } from "@angular/core";
-import { SplitterService } from "src/app/services/splitter.service";
 import { FormGroup, FormControl, FormBuilder, FormArray } from "@angular/forms";
+import { MatSnackBar } from '@angular/material/snack-bar';
+import * as firebase from "firebase";
+
+import { SplitterService } from "src/app/services/splitter.service";
 import { User } from "src/app/models/user.model";
 import { Expense } from "src/app/models/expense.model";
 
@@ -18,6 +21,9 @@ export class AddExpenseComponent implements OnInit {
   _editingExpense: Expense = null;
   oldExpense: Expense = null;
 
+  expenseFile: File = null;
+  percentUploaded: number = 0.0;
+
   @Input() set editingExpense(expense: Expense) {
     if(!expense) {
       return;
@@ -31,7 +37,8 @@ export class AddExpenseComponent implements OnInit {
 
   constructor(
     private splitterService: SplitterService,
-    private formBuilder: FormBuilder
+    private formBuilder: FormBuilder,
+    private _snackBar: MatSnackBar
   ) {}
 
   ngOnInit() {
@@ -98,7 +105,36 @@ export class AddExpenseComponent implements OnInit {
     if(this._editingExpense) {
       this.editExpense();
     } else {
-      this.splitterService.addExpense(e);
+      let success = this.splitterService.addExpense(e);
+
+      if(success && this.expenseFile) {
+        let task = this.splitterService.addFileToExpense(this.expenseFile, e);
+      
+        task.snapshotChanges().subscribe(task => {
+          console.log("got task", task);
+          this.percentUploaded = Math.floor((100 * task.bytesTransferred) / task.totalBytes);
+        });
+
+        //TODO: refactor: expense list has same code
+        task.then(task => {
+          if (task.state === firebase.storage.TaskState.SUCCESS) {
+            task.ref.getDownloadURL().then(url => {
+              let newExpense = new Expense(e.name, e.value);
+              Object.assign(newExpense, e);
+              newExpense.fileUrl = url;
+              newExpense.filePath = task.ref.fullPath;
+              newExpense.order = e.order;
+              console.log("saving expense",  e);
+              let success = this.splitterService.editExpense(e, newExpense);
+              if(success) {
+                this.openSnackBar('Upload Complete');
+              }
+              this.percentUploaded = 0;
+              this.expenseFile = null;
+            });
+          }
+        });
+      }
     }
   }
 
@@ -204,6 +240,21 @@ export class AddExpenseComponent implements OnInit {
     this.expenseForm.reset();
     (this.expenseForm.controls.users as FormArray).controls.forEach(control => {
       control.setValue(true);
+    });
+  }
+
+  onFilesAdded(event) {
+    this.expenseFile = event.target.files[0];
+    console.log(this.expenseFile);
+  }
+
+  onRemoveFile() {
+    this.expenseFile = null;
+  }
+
+  openSnackBar(message: string) {
+    this._snackBar.open(message, 'Close', {
+      duration: 4000,
     });
   }
 }
