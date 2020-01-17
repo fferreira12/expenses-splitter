@@ -85,7 +85,7 @@ export class SplitterService {
     this.weightsObservable = new Subject();
 
     this.emitAllCurrentData();
-    this.isLoading = false;
+    this.finishLoading();
   }
 
   subscribeToLoading(subscriber) {
@@ -95,6 +95,16 @@ export class SplitterService {
 
   getLoadingStatus() {
     return this.isLoading;
+  }
+
+  startLoading() {
+    this.isLoading = true;
+    this.loadingObservable.next(this.isLoading);
+  }
+
+  finishLoading() {
+    this.isLoading = false;
+    this.loadingObservable.next(this.isLoading);
   }
 
   getAllProjects(includeOthers: boolean = false) {
@@ -319,25 +329,22 @@ export class SplitterService {
   }
 
   private emitAllCurrentData() {
-    this.isLoading = true;
-    this.loadingObservable.next(this.isLoading);
+    this.startLoading();
     this.usersObservable.next(this.getUsers());
     this.expensesObservable.next(this.getExpenses());
     this.paymentsObservable.next(this.getPayments());
     this.allProjectsObservable.next(this.getAllProjects());
     this.currentProjectObservable.next(this.currentProject);
-    this.isLoading = false;
-    this.loadingObservable.next(this.isLoading);
     this.weightsObservable.next(this.getWeights());
+    this.finishLoading();
   }
 
   saveProjectData(project: Project, saveLastProject: boolean = false) {
-    this.isLoading = true;
+    this.startLoading();
     if (!this.prepareStorage()) {
-      this.isLoading = false;
+      this.finishLoading();
       return;
     }
-    this.loadingObservable.next(this.isLoading);
     if (this.db.userId == null) {
       this.db.setUserId(this.userId);
     }
@@ -345,8 +352,7 @@ export class SplitterService {
       project.setOwner(this.userId, this.userEmail);
     }
     this.db.saveProject(project.ownerId, project, saveLastProject);
-    this.isLoading = false;
-    this.loadingObservable.next(this.isLoading);
+    this.finishLoading();
   }
 
   addUser(user: User) {
@@ -464,6 +470,7 @@ export class SplitterService {
   }
 
   addFileToExpense(file: File, expense: Expense) {
+    this.startLoading();
     if (!this.currentProject.expenses.includes(expense)) {
       console.error(
         "Can't upload because expense does not belong to current project"

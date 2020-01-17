@@ -133,6 +133,7 @@ export class AddExpenseComponent implements OnInit {
               }
               this.percentUploaded = 0;
               this.expenseFile = null;
+              this.splitterService.finishLoading();
             });
           }
         });
