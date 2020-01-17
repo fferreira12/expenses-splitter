@@ -2,6 +2,7 @@
   <h1>{{'People' | translate}}</h1>
   <ul class="list-group" cdkDropList (cdkDropListDropped)="drop($event)"> 
     <li *ngFor="let user of users" class="list-group-item" cdkDrag [cdkDragData]="user">
+      <i class="fas fa-arrows-alt mr-2" cdkDragHandle></i>
       <button class="btn btn-danger btn-sm" (click)="onRemoveUser(user)">
         <i class="far fa-trash-alt"></i>
       </button>

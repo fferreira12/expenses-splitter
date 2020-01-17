@@ -20,6 +20,7 @@
   <table class="table">
     <thead class="thead-light">
       <tr>
+        <th></th>
         <th>{{'Name' | translate}}</th>
         <th>{{'Options' | translate}}</th>
       </tr>
@@ -29,7 +30,9 @@
         <tr *ngIf="showArchivedProjects || isCurrentProject(p) || !p.archived"
           [ngClass]="{'active-project':isCurrentProject(p), 'archived':p.archived}"
           cdkDrag [cdkDragData]="p">
-
+          <td cdkDragHandle>
+            <i class="fas fa-arrows-alt"></i>
+          </td>
           <td class="align-middle" [ngClass]="{'self-project': selfProject(p), 'not-self-project': !selfProject(p)}">
             {{ p.projectName }} <br/>
             <span class="info" *ngIf="p.expensesCount && p.expensesCount > 0">{{p.expensesCount}} {{'Expense(s)' | translate}}</span> <br/>
@@ -78,6 +81,7 @@
             </form>
 
           </td>
+
 
           <!-- The Delete Modal -->
           <div class="modal" [id]="'deleteModal'+i">

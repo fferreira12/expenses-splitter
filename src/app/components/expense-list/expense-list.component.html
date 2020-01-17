@@ -7,6 +7,7 @@
   <table class="table">
     <thead class="thead-light">
       <tr>
+        <th></th>
         <th>{{'Expense' | translate}}</th>
         <th>{{'Value' | translate}}</th>
         <th>{{'Users' | translate}}</th>
@@ -16,6 +17,7 @@
     </thead>
     <tbody cdkDropList (cdkDropListDropped)="drop($event)">
       <tr *ngFor="let expense of expenses, let i = index" cdkDrag [cdkDragData]="expense">
+        <td cdkDragHandle><i class="fas fa-arrows-alt"></i></td>
         <td>{{ expense.name }}</td>
         <td>{{ expense.value | currency: "R$ " }}</td>
         <td>
