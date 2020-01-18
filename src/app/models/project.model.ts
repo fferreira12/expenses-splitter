@@ -348,7 +348,8 @@ export class Project {
     ];
 
     let allEqual = this.weights.length === this.users.length && this.weights.every(weight => weight.weight == this.weights[0].weight);
-    if(allEqual) {
+    let allOnes = this.weights.every(weight => weight.weight == 1);
+    if(allEqual || allOnes) {
       this.setEvenSplit();
     } else {
       this.setWeightForRemainingUsers();
@@ -357,6 +358,9 @@ export class Project {
   }
 
   setWeightForRemainingUsers() {
+    if(!this.weights) {
+      return;
+    }
     this.users.forEach(user => {
       if(!this.weights.some(weight => weight.user.id === user.id)) {
         this.setWeightForUser(user, 1);
