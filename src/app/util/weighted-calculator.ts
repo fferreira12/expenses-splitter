@@ -18,6 +18,9 @@ export class WeightedCalculator implements PaymentCalculator {
     this.payments = [];
     while (!this.isDone(this.balance)) {
       let payment = this.nextPayment(this.balance);
+      if(!payment || !payment.payer || !payment.receiver) {
+        return;
+      }
       this.payments.push(payment);
       this.balance[payment.payer.id] += payment.amount;
       this.balance[payment.receiver.id] -= payment.amount;

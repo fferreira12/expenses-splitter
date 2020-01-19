@@ -5,6 +5,7 @@ import { User } from "src/app/models/user.model";
 import { SimpleCalculator } from "src/app/util/payment-calculator";
 import { Payment } from 'src/app/models/payment.model';
 import { WeightedCalculator } from 'src/app/util/weighted-calculator';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: "app-balance",
@@ -12,8 +13,10 @@ import { WeightedCalculator } from 'src/app/util/weighted-calculator';
   styleUrls: ["./balance.component.css"]
 })
 export class BalanceComponent implements OnInit {
-  users: User[];
+  users: User[] = [];
+  users$: Observable<User[]>;
   expenses: Expense[];
+  expenses$: Observable<Expense[]>;
   paidValues: any;
   fairShares: any;
   balances: any = {};
@@ -25,31 +28,30 @@ export class BalanceComponent implements OnInit {
   ngOnInit() {
     this.calculator = new WeightedCalculator();
 
-    this.users = this.splitterService.getUsers();
     this.calculator.setAllUsers(this.users);
     this.fairShares = this.splitterService.getFairShares();
     this.calculator.setFairShares(this.fairShares);
-    this.expenses = this.splitterService.getExpenses();
-
-    this.updateValuesSharesAndBalance();
-
-    this.splitterService.subscribeToExpenses(expenses => {
+    
+    //this.updateValuesSharesAndBalance();
+    
+    this.expenses$ = this.splitterService.getExpenses$();
+    this.expenses$.subscribe(expenses => {
       this.expenses = expenses;
-
       this.updateValuesSharesAndBalance();
     });
 
-    this.splitterService.subscribeToPayments(payments => {
+    this.splitterService.getPayments$().subscribe(payments => {
       this.updateValuesSharesAndBalance();
     });
 
-    this.splitterService.subscribeToUsers(users => {
+    this.users$ = this.splitterService.getUsers$()
+    this.users$.subscribe(users => {
       this.users = users;
       this.calculator.setAllUsers(this.users);
       this.updateValuesSharesAndBalance();
     });
 
-    this.splitterService.subscribeToWeights(weights => {
+    this.splitterService.getWeights$().subscribe(weights => {
       this.fairShares = this.splitterService.getFairShares();
       this.calculator.setFairShares(this.fairShares);
       this.updateValuesSharesAndBalance();
@@ -61,8 +63,10 @@ export class BalanceComponent implements OnInit {
     this.paidValues = this.splitterService.getPaidValues();
     this.fairShares = this.splitterService.getFairShares();
     this.balances = this.splitterService.getBalances();
-    this.calculator.setFairShares(this.fairShares);
-    this.suggestedPayments = this.calculator.calculate(this.balances);
+    if(this.balances) {
+      this.calculator.setFairShares(this.fairShares);
+      this.suggestedPayments = this.calculator.calculate(this.balances);
+    }
     //console.log(this.suggestedPayments);
   }
 
