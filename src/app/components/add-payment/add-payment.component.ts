@@ -3,6 +3,7 @@ import { FormGroup, FormBuilder, FormControl, FormArray } from "@angular/forms";
 import { SplitterService } from "src/app/services/splitter.service";
 import { User } from "src/app/models/user.model";
 import { Payment } from "src/app/models/payment.model";
+import { Observable } from 'rxjs';
 
 @Component({
   selector: "app-add-payment",
@@ -10,7 +11,8 @@ import { Payment } from "src/app/models/payment.model";
   styleUrls: ["./add-payment.component.css"]
 })
 export class AddPaymentComponent implements OnInit {
-  users: User[];
+  users: User[] = [];
+  users$: Observable<User[]>;
   paymentForm: FormGroup;
 
   constructor(
@@ -19,13 +21,13 @@ export class AddPaymentComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.users = this.splitterService.getUsers();
     this.paymentForm = new FormGroup({
       payer: new FormControl(null),
       receiver: new FormControl(null),
       value: new FormControl(null)
     });
-    this.splitterService.subscribeToUsers(users => {
+    this.users$ = this.splitterService.getUsers$();
+    this.users$.subscribe(users => {
       this.users = users;
     });
   }

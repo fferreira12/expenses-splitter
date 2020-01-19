@@ -3,6 +3,7 @@ import { CdkDragDrop, moveItemInArray } from "@angular/cdk/drag-drop";
 
 import { SplitterService } from "src/app/services/splitter.service";
 import { User } from "src/app/models/user.model";
+import { Observable } from 'rxjs';
 
 @Component({
   selector: "app-user-list",
@@ -11,6 +12,7 @@ import { User } from "src/app/models/user.model";
 })
 export class UserListComponent implements OnInit {
   users: User[];
+  users$: Observable<User[]>
   editMode: boolean;
   editingUser: User;
 
@@ -22,8 +24,8 @@ export class UserListComponent implements OnInit {
   constructor(private splitterService: SplitterService) {}
 
   ngOnInit() {
-    this.users = this.splitterService.getUsers();
-    this.splitterService.subscribeToUsers(users => {
+    this.users$ = this.splitterService.getUsers$();
+    this.users$.subscribe(users => {
       this.users = users;
     });
 

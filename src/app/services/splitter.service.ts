@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { User } from "../models/user.model";
 
-import { Subject } from "rxjs";
+import { Subject, Observable, BehaviorSubject } from "rxjs";
 import { Expense } from "../models/expense.model";
 import { Payment } from "../models/payment.model";
 //import { LocalstorageService } from "./localstorage.service";
@@ -27,7 +27,7 @@ export class SplitterService {
   // expenses: Expense[] = [];
   // payments: Payment[] = [];
 
-  usersObservable: Subject<User[]>;
+  usersObservable: BehaviorSubject<User[]>;
   expensesObservable: Subject<Expense[]>;
   paymentsObservable: Subject<Payment[]>;
   currentProjectObservable: Subject<Project>;
@@ -76,7 +76,7 @@ export class SplitterService {
 
     //this.getData();
 
-    this.usersObservable = new Subject();
+    this.usersObservable = new BehaviorSubject([]);
     this.expensesObservable = new Subject();
     this.paymentsObservable = new Subject();
     this.currentProjectObservable = new Subject();
@@ -405,6 +405,10 @@ export class SplitterService {
 
   getUsers(): User[] {
     return this.currentProject.users.sort((a, b) => a.order - b.order);
+  }
+
+  getUsers$(): Observable<User[]> {
+    return this.usersObservable;
   }
 
   subscribeToUsers(observer) {
