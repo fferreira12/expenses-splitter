@@ -16,6 +16,7 @@ export class BalanceComponent implements OnInit {
   users: User[] = [];
   users$: Observable<User[]>;
   expenses: Expense[];
+  expenses$: Observable<Expense[]>;
   paidValues: any;
   fairShares: any;
   balances: any = {};
@@ -30,17 +31,16 @@ export class BalanceComponent implements OnInit {
     this.calculator.setAllUsers(this.users);
     this.fairShares = this.splitterService.getFairShares();
     this.calculator.setFairShares(this.fairShares);
-    this.expenses = this.splitterService.getExpenses();
-
+    
     //this.updateValuesSharesAndBalance();
-
-    this.splitterService.subscribeToExpenses(expenses => {
+    
+    this.expenses$ = this.splitterService.getExpenses$();
+    this.expenses$.subscribe(expenses => {
       this.expenses = expenses;
-
       this.updateValuesSharesAndBalance();
     });
 
-    this.splitterService.subscribeToPayments(payments => {
+    this.splitterService.getPayments$().subscribe(payments => {
       this.updateValuesSharesAndBalance();
     });
 
@@ -51,7 +51,7 @@ export class BalanceComponent implements OnInit {
       this.updateValuesSharesAndBalance();
     });
 
-    this.splitterService.subscribeToWeights(weights => {
+    this.splitterService.getWeights$().subscribe(weights => {
       this.fairShares = this.splitterService.getFairShares();
       this.calculator.setFairShares(this.fairShares);
       this.updateValuesSharesAndBalance();

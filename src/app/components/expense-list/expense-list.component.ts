@@ -6,6 +6,7 @@ import { Project } from "src/app/models/project.model";
 import { CdkDragDrop, moveItemInArray } from "@angular/cdk/drag-drop";
 import { MatSnackBar } from '@angular/material/snack-bar';
 import * as firebase from "firebase";
+import { Observable } from 'rxjs';
 
 @Component({
   selector: "app-expense-list",
@@ -14,6 +15,7 @@ import * as firebase from "firebase";
 })
 export class ExpenseListComponent implements OnInit {
   expenses: Expense[];
+  expenses$: Observable<Expense[]>;
 
   currentProject: Project;
 
@@ -25,9 +27,9 @@ export class ExpenseListComponent implements OnInit {
   constructor(private splitterService: SplitterService, private _snackBar: MatSnackBar) {}
 
   ngOnInit() {
-    this.expenses = this.splitterService.getExpenses();
+    this.expenses$ = this.splitterService.getExpenses$();
     this.currentProject = this.splitterService.currentProject;
-    this.splitterService.subscribeToExpenses(expenses => {
+    this.expenses$.subscribe(expenses => {
       this.currentProject = this.splitterService.currentProject;
       this.expenses = expenses;
     });

@@ -18,6 +18,7 @@ export class UserListComponent implements OnInit {
 
   editingWeight: number;
   weights: { user: User, weight: number }[];
+  weights$: Observable<{ user: User, weight: number }[]>;
 
   evenSplit: boolean;
 
@@ -29,9 +30,9 @@ export class UserListComponent implements OnInit {
       this.users = users;
     });
 
-    this.weights = this.splitterService.getWeights();
+    this.weights$ = this.splitterService.getWeights$();
     this.evenSplit = this.splitterService.isEvenSplit();
-    this.splitterService.subscribeToWeights(weights => {
+    this.weights$.subscribe(weights => {
       this.weights = weights;
       this.evenSplit = this.splitterService.isEvenSplit();
     })
