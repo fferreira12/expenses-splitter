@@ -11,6 +11,8 @@ import { AuthService } from "./auth.service";
 import { Project } from "../models/project.model";
 import { Firebasev2Service } from "./firebasev2.service";
 import { TranslateService } from "@ngx-translate/core";
+import { tap } from 'rxjs/operators';
+import * as firebase from 'firebase';
 
 @Injectable({
   providedIn: "root"
@@ -487,6 +489,16 @@ export class SplitterService {
     console.log("starting upload");
 
     let promise = this.db.uploadFile(file, this.currentProject, "expenses");
+
+    promise.snapshotChanges()
+    .pipe(
+      tap(snapshot => {
+          if(snapshot.state === firebase.storage.TaskState.SUCCESS) {
+            this.finishLoading();
+          }
+        }
+      )
+    )
 
     return promise;
   }

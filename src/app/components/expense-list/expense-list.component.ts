@@ -76,7 +76,6 @@ export class ExpenseListComponent implements OnInit {
           if(success) {
             this.openSnackBar('Upload Complete');
           }
-          this.splitterService.finishLoading();
         });
       }
     });

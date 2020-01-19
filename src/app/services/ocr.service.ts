@@ -14,9 +14,7 @@ export class OcrService {
   private workerReady = false;
 
   constructor(private splitterService: SplitterService) {
-    this.worker = createWorker({
-      logger: m => console.log(m)
-    });
+    this.worker = createWorker({});
     this.prepareWorker();
   }
 
@@ -37,7 +35,7 @@ export class OcrService {
     this.result$ = from(promise);
     return this.result$.pipe(map(result => {
       this.splitterService.finishLoading();
-      return result.data.text
+      return result;
     }));
   }
 }

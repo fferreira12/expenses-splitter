@@ -136,7 +136,6 @@ export class AddExpenseComponent implements OnInit {
               }
               this.percentUploaded = 0;
               this.expenseFile = null;
-              this.splitterService.finishLoading();
             });
           }
         });
@@ -251,7 +250,9 @@ export class AddExpenseComponent implements OnInit {
 
   onFilesAdded(event) {
     this.expenseFile = event.target.files[0];
-    this.ocr.recognizeText(this.expenseFile).subscribe(text => {
+    this.ocr.recognizeText(this.expenseFile).subscribe(result => {
+      let text = result.data.text;
+
       let valuePattern = /R? ?\$ ?([\d]+[.,][\d]+)\w+/;
       let valueMatches = text.match(valuePattern);
       let lastValueMatch = parseFloat(
