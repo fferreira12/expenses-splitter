@@ -91,7 +91,7 @@ export class SplitterService {
   }
 
   getLoadingStatus$(): Observable<boolean> {
-    return this.loadingObservable;
+    return this.loadingObservable.asObservable();
   }
 
   startLoading() {
@@ -115,7 +115,7 @@ export class SplitterService {
   }
 
   getAllProjects$(): Observable<Project[]> {
-    return this.allProjectsObservable;
+    return this.allProjectsObservable.asObservable();
   }
 
   //deprecated
@@ -124,7 +124,7 @@ export class SplitterService {
   }
 
   getCurrentProject$(): Observable<Project> {
-    return this.currentProjectObservable;
+    return this.currentProjectObservable.asObservable();
   }
 
   setCurrentProject(project: Project) {
@@ -404,7 +404,7 @@ export class SplitterService {
   }
 
   getUsers$(): Observable<User[]> {
-    return this.usersObservable;
+    return this.usersObservable.asObservable();
   }
 
   addExpense(expense: Expense) {
@@ -443,7 +443,7 @@ export class SplitterService {
   }
 
   getExpenses$(): Observable<Expense[]> {
-    return this.expensesObservable;
+    return this.expensesObservable.asObservable();
   }
 
   setExpenseOrder(expense: Expense, order: number) {
@@ -669,7 +669,7 @@ export class SplitterService {
   }
 
   getPayments$(): Observable<Payment[]> {
-    return this.paymentsObservable;
+    return this.paymentsObservable.asObservable();
   }
 
   getPaymentsMade(user: User) {
