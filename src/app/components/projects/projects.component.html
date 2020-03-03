@@ -26,7 +26,7 @@
       </tr>
     </thead>
     <tbody cdkDropList (cdkDropListDropped)="drop($event)">
-      <ng-container *ngFor="let p of allProjects; let i = index">
+      <ng-container *ngFor="let p of allProjects$ | async; let i = index">
         <tr *ngIf="showArchivedProjects || isCurrentProject(p) || !p.archived"
           [ngClass]="{'active-project':isCurrentProject(p), 'archived':p.archived}"
           cdkDrag [cdkDragData]="p">

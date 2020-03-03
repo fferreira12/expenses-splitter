@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { SplitterService } from 'src/app/services/splitter.service';
 import { Project } from 'src/app/models/project.model';
 import { FormControl } from '@angular/forms';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-project-list',
@@ -10,8 +11,10 @@ import { FormControl } from '@angular/forms';
 })
 export class ProjectListComponent implements OnInit {
 
-  allProjects: Project[] = []
+  allProjects: Project[] = [];
+  allProjects$: Observable<Project[]>;
   currentProject: Project;
+  currentProject$: Observable<Project>;
   name = new FormControl('');
 
   get unarchivedProjects(): Project[] {
@@ -23,13 +26,13 @@ export class ProjectListComponent implements OnInit {
   constructor(private splitterService: SplitterService) { }
 
   ngOnInit() {
-    this.allProjects = this.splitterService.getAllProjects();
-    this.currentProject = this.splitterService.getCurrentProject();
-    this.splitterService.subscribeToCurrentProject(currentproject => {
-      this.currentProject = currentproject;
-    });
-    this.splitterService.subscribeToAllProjects(allProjects => {
+    this.allProjects$ = this.splitterService.getAllProjects$();
+    this.allProjects$.subscribe(allProjects => {
       this.allProjects = allProjects;
+    });
+    this.currentProject$ = this.splitterService.getCurrentProject$();
+    this.currentProject$.subscribe(currentproject => {
+      this.currentProject = currentproject;
     });
   }
 

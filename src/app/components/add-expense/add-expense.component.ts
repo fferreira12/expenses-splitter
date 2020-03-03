@@ -1,12 +1,13 @@
 import { Component, OnInit, Input } from "@angular/core";
 import { FormGroup, FormControl, FormBuilder, FormArray } from "@angular/forms";
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatSnackBar } from "@angular/material/snack-bar";
 import * as firebase from "firebase";
 
 import { SplitterService } from "src/app/services/splitter.service";
 import { User } from "src/app/models/user.model";
 import { Expense } from "src/app/models/expense.model";
-import { OcrService } from 'src/app/services/ocr.service';
+import { OcrService } from "src/app/services/ocr.service";
+import { Observable } from 'rxjs';
 
 @Component({
   selector: "app-add-expense",
@@ -15,7 +16,8 @@ import { OcrService } from 'src/app/services/ocr.service';
 })
 export class AddExpenseComponent implements OnInit {
   expenseForm: FormGroup;
-  users: User[];
+  users: User[] = [];
+  users$: Observable<User[]>;
   singlePayer: boolean = true;
 
   editing: boolean = false;
@@ -26,14 +28,14 @@ export class AddExpenseComponent implements OnInit {
   percentUploaded: number = 0.0;
 
   @Input() set editingExpense(expense: Expense) {
-    if(!expense) {
+    if (!expense) {
       return;
     }
     this.editing = true;
     this.oldExpense = Object.freeze(expense);
     this._editingExpense = expense;
     this.updateForm();
-    window.scroll(0,0);
+    window.scroll(0, 0);
   }
 
   constructor(
@@ -44,11 +46,10 @@ export class AddExpenseComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.users = this.splitterService.getUsers();
     this.startForm();
-    this.splitterService.subscribeToUsers(users => {
+    this.users$ = this.splitterService.getUsers$()
+    this.users$.subscribe(users => {
       this.users = users;
-
       this.startForm();
     });
   }
@@ -85,7 +86,7 @@ export class AddExpenseComponent implements OnInit {
 
   updateForm() {
     //debugger;
-    if(!this._editingExpense) return;
+    if (!this._editingExpense) return;
     let onePayer = this._editingExpense.payers.length == 1;
     this.singlePayer = onePayer;
     let amountsPayed = this._editingExpense.payers.map(payer => payer.amount);
@@ -104,17 +105,19 @@ export class AddExpenseComponent implements OnInit {
     event.preventDefault();
     let e = this.getNewExpenseFromForm();
     //console.log("expense created", e);
-    if(this._editingExpense) {
+    if (this._editingExpense) {
       this.editExpense();
     } else {
       let success = this.splitterService.addExpense(e);
 
-      if(success && this.expenseFile) {
+      if (success && this.expenseFile) {
         let task = this.splitterService.addFileToExpense(this.expenseFile, e);
-      
+
         task.snapshotChanges().subscribe(task => {
           console.log("got task", task);
-          this.percentUploaded = Math.floor((100 * task.bytesTransferred) / task.totalBytes);
+          this.percentUploaded = Math.floor(
+            (100 * task.bytesTransferred) / task.totalBytes
+          );
         });
 
         //TODO: refactor: expense list has same code
@@ -126,14 +129,13 @@ export class AddExpenseComponent implements OnInit {
               newExpense.fileUrl = url;
               newExpense.filePath = task.ref.fullPath;
               newExpense.order = e.order;
-              console.log("saving expense",  e);
+              console.log("saving expense", e);
               let success = this.splitterService.editExpense(e, newExpense);
-              if(success) {
-                this.openSnackBar('Upload Complete');
+              if (success) {
+                this.openSnackBar("Upload Complete");
               }
               this.percentUploaded = 0;
               this.expenseFile = null;
-              this.splitterService.finishLoading();
             });
           }
         });
@@ -143,9 +145,9 @@ export class AddExpenseComponent implements OnInit {
 
   editExpense() {
     let newExpense = this.getNewExpenseFromForm();
-    
+
     let edited = this.splitterService.editExpense(this.oldExpense, newExpense);
-    if(edited) {
+    if (edited) {
       this.onCancelEdit();
     }
   }
@@ -166,7 +168,7 @@ export class AddExpenseComponent implements OnInit {
 
     let expense = new Expense(expenseName, value);
 
-    if(this._editingExpense) {
+    if (this._editingExpense) {
       expense.order = this._editingExpense.order;
     }
 
@@ -198,7 +200,6 @@ export class AddExpenseComponent implements OnInit {
       });
       expense.value = total;
       expense.setPayers(payers);
-
     }
 
     return expense;
@@ -215,14 +216,15 @@ export class AddExpenseComponent implements OnInit {
 
   updateCheckboxes() {
     (this.expenseForm.controls.users as FormArray).reset();
-    (this.expenseForm.controls.users as FormArray).controls.forEach((control, i) => {
-      control.setValue(this.userIsParticipating(this.users[i]));
-    });
+    (this.expenseForm.controls.users as FormArray).controls.forEach(
+      (control, i) => {
+        control.setValue(this.userIsParticipating(this.users[i]));
+      }
+    );
   }
 
   checkCheckBoxvalue(event) {
     //this.updateCheckboxes();
-    
   }
 
   onSinglePlayerCheck(event) {
@@ -248,21 +250,25 @@ export class AddExpenseComponent implements OnInit {
 
   onFilesAdded(event) {
     this.expenseFile = event.target.files[0];
-    this.ocr.recognizeText(this.expenseFile).subscribe(text => {
-      let valuePattern = /R? ?\$ ?([\d]+[.,][\d]+)\w+/
+    this.ocr.recognizeText(this.expenseFile).subscribe(result => {
+      let text = result.data.text;
+
+      let valuePattern = /R? ?\$ ?([\d]+[.,][\d]+)\w+/;
       let valueMatches = text.match(valuePattern);
-      let lastValueMatch = parseFloat(valueMatches[valueMatches.length-1].replace(',', '.'));
-      
-      let actualValue = this.expenseForm.controls['value'].value;
-      let actualName = this.expenseForm.controls['expenseName'].value;
-      
-      if(lastValueMatch && !this.editingExpense && !actualValue) {
-        this.expenseForm.controls['value'].setValue(lastValueMatch);
+      let lastValueMatch = parseFloat(
+        valueMatches[valueMatches.length - 1].replace(",", ".")
+      );
+
+      let actualValue = this.expenseForm.controls["value"].value;
+      let actualName = this.expenseForm.controls["expenseName"].value;
+
+      if (lastValueMatch && !this.editingExpense && !actualValue) {
+        this.expenseForm.controls["value"].setValue(lastValueMatch);
       }
-      
-      if(!this.editingExpense && !actualName) {
-        let firstLine = text.split('\n')[0];
-        this.expenseForm.controls['expenseName'].setValue(firstLine);
+
+      if (!this.editingExpense && !actualName) {
+        let firstLine = text.split("\n")[0];
+        this.expenseForm.controls["expenseName"].setValue(firstLine);
       }
 
       console.log(lastValueMatch);
@@ -274,8 +280,8 @@ export class AddExpenseComponent implements OnInit {
   }
 
   openSnackBar(message: string) {
-    this._snackBar.open(message, 'Close', {
-      duration: 4000,
+    this._snackBar.open(message, "Close", {
+      duration: 4000
     });
   }
 }

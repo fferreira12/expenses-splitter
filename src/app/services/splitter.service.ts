@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { User } from "../models/user.model";
 
-import { Subject } from "rxjs";
+import { Subject, Observable, BehaviorSubject } from "rxjs";
 import { Expense } from "../models/expense.model";
 import { Payment } from "../models/payment.model";
 //import { LocalstorageService } from "./localstorage.service";
@@ -11,6 +11,8 @@ import { AuthService } from "./auth.service";
 import { Project } from "../models/project.model";
 import { Firebasev2Service } from "./firebasev2.service";
 import { TranslateService } from "@ngx-translate/core";
+import { tap } from 'rxjs/operators';
+import * as firebase from 'firebase';
 
 @Injectable({
   providedIn: "root"
@@ -27,14 +29,14 @@ export class SplitterService {
   // expenses: Expense[] = [];
   // payments: Payment[] = [];
 
-  usersObservable: Subject<User[]>;
-  expensesObservable: Subject<Expense[]>;
-  paymentsObservable: Subject<Payment[]>;
-  currentProjectObservable: Subject<Project>;
-  allProjectsObservable: Subject<Project[]>;
-  loadingObservable: Subject<boolean>;
+  usersObservable: BehaviorSubject<User[]>;
+  expensesObservable: BehaviorSubject<Expense[]>;
+  paymentsObservable: BehaviorSubject<Payment[]>;
+  currentProjectObservable: BehaviorSubject<Project>;
+  allProjectsObservable: BehaviorSubject<Project[]>;
+  loadingObservable: BehaviorSubject<boolean>;
 
-  weightsObservable: Subject<{ user: User; weight: number }[]>;
+  weightsObservable: BehaviorSubject<{ user: User; weight: number }[]>;
 
   constructor(
     private db: Firebasev2Service,
@@ -76,25 +78,20 @@ export class SplitterService {
 
     //this.getData();
 
-    this.usersObservable = new Subject();
-    this.expensesObservable = new Subject();
-    this.paymentsObservable = new Subject();
-    this.currentProjectObservable = new Subject();
-    this.allProjectsObservable = new Subject();
-    this.loadingObservable = new Subject();
-    this.weightsObservable = new Subject();
+    this.usersObservable = new BehaviorSubject([]);
+    this.expensesObservable = new BehaviorSubject([]);
+    this.paymentsObservable = new BehaviorSubject([]);
+    this.currentProjectObservable = new BehaviorSubject(null);
+    this.allProjectsObservable = new BehaviorSubject([]);
+    this.loadingObservable = new BehaviorSubject(true);
+    this.weightsObservable = new BehaviorSubject(null);
 
     this.emitAllCurrentData();
     this.finishLoading();
   }
 
-  subscribeToLoading(subscriber) {
-    let sub = this.loadingObservable.subscribe(subscriber);
-    this.authService.registerSubscription(sub);
-  }
-
-  getLoadingStatus() {
-    return this.isLoading;
+  getLoadingStatus$(): Observable<boolean> {
+    return this.loadingObservable.asObservable();
   }
 
   startLoading() {
@@ -107,7 +104,7 @@ export class SplitterService {
     this.loadingObservable.next(this.isLoading);
   }
 
-  getAllProjects(includeOthers: boolean = false) {
+  getAllProjects(includeOthers: boolean = true) {
     let p: Project[];
     if (includeOthers) {
       p = [...this.allSelfProjects, ...this.allProjectsCanEdit];
@@ -117,8 +114,17 @@ export class SplitterService {
     return p.sort((a, b) => a.order - b.order);
   }
 
+  getAllProjects$(): Observable<Project[]> {
+    return this.allProjectsObservable.asObservable();
+  }
+
+  //deprecated
   getCurrentProject() {
     return this.currentProject;
+  }
+
+  getCurrentProject$(): Observable<Project> {
+    return this.currentProjectObservable.asObservable();
   }
 
   setCurrentProject(project: Project) {
@@ -179,16 +185,6 @@ export class SplitterService {
   resetProjects() {
     this.allSelfProjects = [];
     this.allProjectsCanEdit = [];
-  }
-
-  subscribeToCurrentProject(subscriber) {
-    let sub = this.currentProjectObservable.subscribe(subscriber);
-    this.authService.registerSubscription(sub);
-  }
-
-  subscribeToAllProjects(subscriber) {
-    let sub = this.allProjectsObservable.subscribe(subscriber);
-    this.authService.registerSubscription(sub);
   }
 
   prepareStorage() {
@@ -403,13 +399,12 @@ export class SplitterService {
     this.currentProject.removeExpensesAndPaymentsWithNoAssociatedUser();
   }
 
-  getUsers(): User[] {
+  private getUsers(): User[] {
     return this.currentProject.users.sort((a, b) => a.order - b.order);
   }
 
-  subscribeToUsers(observer) {
-    let sub = this.usersObservable.subscribe(observer);
-    this.authService.registerSubscription(sub);
+  getUsers$(): Observable<User[]> {
+    return this.usersObservable.asObservable();
   }
 
   addExpense(expense: Expense) {
@@ -443,8 +438,12 @@ export class SplitterService {
     }
   }
 
-  getExpenses(): Expense[] {
+  private getExpenses(): Expense[] {
     return this.currentProject.expenses.sort((a, b) => a.order - b.order);
+  }
+
+  getExpenses$(): Observable<Expense[]> {
+    return this.expensesObservable.asObservable();
   }
 
   setExpenseOrder(expense: Expense, order: number) {
@@ -490,6 +489,16 @@ export class SplitterService {
     console.log("starting upload");
 
     let promise = this.db.uploadFile(file, this.currentProject, "expenses");
+
+    promise.snapshotChanges()
+    .pipe(
+      tap(snapshot => {
+          if(snapshot.state === firebase.storage.TaskState.SUCCESS) {
+            this.finishLoading();
+          }
+        }
+      )
+    )
 
     return promise;
   }
@@ -578,13 +587,12 @@ export class SplitterService {
     );
   }
 
-  subscribeToExpenses(observer) {
-    let sub = this.expensesObservable.subscribe(observer);
-    this.authService.registerSubscription(sub);
-  }
-
   getWeights() {
     return this.currentProject.weights;
+  }
+
+  getWeights$(): Observable<{ user: User; weight: number }[]> {
+    return this.weightsObservable;
   }
 
   getWeightForUser(user: User) {
@@ -614,10 +622,6 @@ export class SplitterService {
 
   isEvenSplit() {
     return this.currentProject.isEvenSplit();
-  }
-
-  subscribeToWeights(observer) {
-    this.weightsObservable.subscribe(observer);
   }
 
   getPaidValues() {
@@ -660,13 +664,12 @@ export class SplitterService {
     }
   }
 
-  getPayments(): Payment[] {
+  private getPayments(): Payment[] {
     return this.currentProject.payments.sort((a, b) => a.order - b.order);;
   }
 
-  subscribeToPayments(observer) {
-    let sub = this.paymentsObservable.subscribe(observer);
-    this.authService.registerSubscription(sub);
+  getPayments$(): Observable<Payment[]> {
+    return this.paymentsObservable.asObservable();
   }
 
   getPaymentsMade(user: User) {

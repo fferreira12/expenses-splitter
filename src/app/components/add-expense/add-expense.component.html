@@ -3,7 +3,7 @@
   <input class="form-control" type="text" name="expense-name" placeholder="{{'Expense' | translate}}"
     formControlName="expenseName" />
   {{'Participants' | translate}}: <br />
-  <label formArrayName="users" *ngFor="let user of users; let i = index" class="form-check form-check-inline">
+  <label formArrayName="users" *ngFor="let user of users$ | async; let i = index" class="form-check form-check-inline">
     <input type="checkbox" [formControlName]="i" [value]="user.id" (change)="checkCheckBoxvalue($event)" [checked]="userIsParticipating(user)" />
     {{ user.name }}
   </label>
@@ -13,13 +13,13 @@
   {{'ManyPayers' | translate}}
   <br />
   <ng-template [ngIf]="singlePayer">
-    <div class="radio" *ngFor="let user of users" class="form-check form-check-inline">
+    <div class="radio" *ngFor="let user of users$ | async" class="form-check form-check-inline">
       <input type="radio" [value]="user.id" formControlName="payer" />
       {{ user.name }}
     </div>
   </ng-template>
   <ng-template [ngIf]="!singlePayer">
-    <div class="radio" formArrayName="payers" *ngFor="let user of users; let i = index"
+    <div class="radio" formArrayName="payers" *ngFor="let user of users$ | async; let i = index"
       class="form-check form-check-inline">
       <!-- <input type="checkbox" [formControlName]="'p'+i" [value]="user.id" (change)="checkCheckBoxvalue($event)" /> -->
       {{ user.name }}
@@ -45,7 +45,7 @@
     <i class="fas fa-dollar-sign ml-1"></i>
 
   </button>
-  <div class="progress" *ngIf="percentUploaded > 0">
+  <div class="progress mt-2" *ngIf="percentUploaded > 0">
     <div class="progress-bar" role="progressbar" [ngStyle]="{'width': percentUploaded+'%'}" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
   </div>
 </form>

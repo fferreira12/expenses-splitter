@@ -5,6 +5,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { SplitterService } from 'src/app/services/splitter.service';
 import { Payment } from 'src/app/models/payment.model';
 import * as firebase from 'firebase';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-payment-list',
@@ -14,15 +15,16 @@ import * as firebase from 'firebase';
 export class PaymentListComponent implements OnInit {
 
   payments: Payment[];
-
+  payments$: Observable<Payment[]>;
+  
   percentUploaded: number = 0.0;
   paymentUploading: Payment;
 
   constructor(private splitterService: SplitterService, private _snackBar: MatSnackBar) { }
 
   ngOnInit() {
-    this.payments = this.splitterService.getPayments();
-    this.splitterService.subscribeToPayments(payments => {
+    this.payments$ = this.splitterService.getPayments$();
+    this.payments$.subscribe(payments => {
       this.payments = payments;
     });
   }

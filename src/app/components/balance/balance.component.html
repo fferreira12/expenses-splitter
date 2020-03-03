@@ -12,7 +12,7 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let user of users"
+      <tr *ngFor="let user of users$ | async"
         [ngClass]="{'text-success': balances[user.id] > 0.01, 'text-danger': balances[user.id] < -0.01}">
         <td>{{ user.name }}</td>
         <td>{{ fairShares[user.id] | currency: "R$ " }}</td>
@@ -26,7 +26,7 @@
     </tbody>
   </table>
 
-  <div *ngIf="suggestedPayments.length > 0">
+  <div *ngIf="suggestedPayments?.length > 0">
     <h1>{{'SuggestedPayments' | translate}}</h1>
     <table class="table col-md-8">
       <thead class="thead-light">

@@ -4,6 +4,7 @@ import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { SplitterService } from "src/app/services/splitter.service";
 import { Project } from "src/app/models/project.model";
 import { FormControl } from "@angular/forms";
+import { Observable } from 'rxjs';
 
 @Component({
   selector: "app-projects",
@@ -16,7 +17,9 @@ export class ProjectsComponent implements OnInit {
   addingUser: boolean = false;
 
   allProjects: Project[];
+  allProjects$: Observable<Project[]>;
   currentProject: Project;
+  currentProject$: Observable<Project>;
 
   _showArchivedProjects: boolean = false;
 
@@ -34,13 +37,13 @@ export class ProjectsComponent implements OnInit {
   constructor(private splitterService: SplitterService) {}
 
   ngOnInit() {
-    this.allProjects = this.splitterService.getAllProjects(true);
-    this.currentProject = this.splitterService.getCurrentProject();
-
-    this.splitterService.subscribeToAllProjects(allProjects => {
+    this.allProjects$ = this.splitterService.getAllProjects$();
+    this.allProjects$.subscribe(allProjects => {
       this.allProjects = allProjects;
     });
-    this.splitterService.subscribeToCurrentProject(currProject => {
+    
+    this.currentProject$ = this.splitterService.getCurrentProject$();
+    this.currentProject$.subscribe(currProject => {
       this.currentProject = currProject;
     });
   }
@@ -86,8 +89,7 @@ export class ProjectsComponent implements OnInit {
     if(!project) {
       return false;
     }
-    let current = this.splitterService.getCurrentProject();
-    return project.projectName == current.projectName;
+    return project.projectName == this.currentProject.projectName;
   }
 
   onArchiveProject(project: Project) {
