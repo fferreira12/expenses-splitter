@@ -208,7 +208,7 @@ export class SplitterService {
     }
     this.resetProjects();
     this.db.getProjectsOfUser(getArchived).subscribe(data => {
-      
+
       this.tryParseData(data);
       this.emitAllCurrentData();
     });
@@ -465,7 +465,7 @@ export class SplitterService {
       this.saveProjectData(project, false);
     }
     this.allProjectsObservable.next(this.getAllProjects());
-    
+
   }
 
   addFileToExpense(file: File, expense: Expense) {
