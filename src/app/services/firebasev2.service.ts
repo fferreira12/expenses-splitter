@@ -47,7 +47,7 @@ export class Firebasev2Service {
   saveProject(ownerId: string, project: Project, isCurrentProject: boolean = true) {
     this.verifyUserId();
     //let name = project.projectName;
-    
+
     /* OLD
     this.db
       .collection("projects")
@@ -114,16 +114,16 @@ export class Firebasev2Service {
   getProjectsOfUser(getArchived: boolean = false) {
     //console.log('getting projects of user: ', this.afAuth.auth.currentUser)
 
-    let collection = getArchived ? 
-      this.db.collection<Project>("projects2") : 
+    let collection = getArchived ?
+      this.db.collection<Project>("projects2") :
       this.db.collection<Project>("projects2", ref => ref.where('archived', '==', getArchived));
 
     return collection.valueChanges().pipe(map(projects => {
       return projects.filter(p => p.ownerId == this.userId);
     }));
-      
-    
-    
+
+
+
     /*
     .where("userId", "==", this.userId)
       .get()
@@ -142,11 +142,11 @@ export class Firebasev2Service {
     */
   }
 
-  getProjectsUserCanEdit(email: string) {
+  getProjectsUserCanEdit(email: string): Observable<Project[]> {
     //console.log("getting all projects that " + email + " can edit");
     this.userEmail = email;
     if (!email) {
-      return from<Project[]>([]);
+      return from([]);
     }
 
     /*
@@ -244,7 +244,7 @@ export class Firebasev2Service {
         })
       }
     });
-    
+
     /*
     this.db
       .collection("projects")
@@ -276,7 +276,7 @@ export class Firebasev2Service {
   }
 
   removeEditorFromProject(projectId: string, editorEmail: string) {
-    
+
     /*
     this.db
       .collection("projects")
@@ -308,10 +308,10 @@ export class Firebasev2Service {
 
      let project: Observable<Project>;
      project = this.db.doc<Project>('projects2/'+projectId).valueChanges();
- 
+
      project.subscribe(p => {
        if(p.editors.includes(editorEmail)) {
-         
+
         let editors = p.editors.filter(editor => editor !== editorEmail);
          return this.db.doc<Project>('projects2/'+projectId).update({
            editors
@@ -331,7 +331,7 @@ export class Firebasev2Service {
     return this.storage.ref(fullPath).delete();
   }
 
-  
+
 
   // getUsers(projectId: string) {}
 
