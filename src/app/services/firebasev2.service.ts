@@ -7,7 +7,7 @@ import { User } from "../models/user.model";
 import { Expense } from "../models/expense.model";
 import { Payment } from "../models/payment.model";
 import { AngularFirestore, AngularFirestoreDocument } from '@angular/fire/firestore';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { from } from 'rxjs';
 import { AuthService } from './auth.service';
@@ -60,6 +60,8 @@ export class Firebasev2Service {
     */
 
     // NEW
+    if (project.isEmptyProject()) return;
+
     project.ownerId = ownerId;
     let plainJSProject = JSON.parse(JSON.stringify(project));
     this.db.collection('projects2').doc<Project>(project.projectId).set(plainJSProject);
@@ -111,18 +113,26 @@ export class Firebasev2Service {
 
   // savePayment(payment: Payment) {}
 
-  getProjectsOfUser(getArchived: boolean = false) {
+  getProjectsOfUser(getArchived: boolean = false, email = undefined) {
     //console.log('getting projects of user: ', this.afAuth.auth.currentUser)
 
-    let collection = getArchived ?
-      this.db.collection<Project>("projects2") :
-      this.db.collection<Project>("projects2", ref => ref.where('archived', '==', getArchived));
+    // let collection = getArchived ?
+    //   this.db.collection<Project>("projects2") :
+    //   this.db.collection<Project>("projects2", ref => ref.where('archived', '==', getArchived));
 
-    return collection.valueChanges().pipe(map(projects => {
-      return projects.filter(p => p.ownerId == this.userId);
+    if (!(this.userEmail || email)) return of([]);
+
+
+    let collection = this.db.collection<Project>("projects2", ref => ref.where('ownerEmail', '==', email || this.userEmail));
+
+    let result = collection.valueChanges().pipe(map(projects => {
+      let ps = projects.filter(p => getArchived || !p.archived);
+      console.log('got result from db', ps);
+      return ps;
     }));
 
 
+    return result;
 
     /*
     .where("userId", "==", this.userId)

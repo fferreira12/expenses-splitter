@@ -1,7 +1,12 @@
-import { Project } from '../models/project.model';
+import { ProjectState } from './project.state';
 
 export type AppState = {
-  selfProjects: Project[];
-  otherProjects: Project[];
-  currentProject: Project;
+  isLoading: boolean;
+
+  userId: string;
+  userEmail: string;
+
+  selfProjects: ProjectState[];
+  otherProjects: ProjectState[];
+  currentProject: ProjectState;
 }

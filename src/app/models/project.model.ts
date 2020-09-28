@@ -2,6 +2,8 @@ import { User } from "./user.model";
 import { Expense } from "./expense.model";
 import { Payment } from "./payment.model";
 import { uuid } from "../util/uuid";
+import { ProjectState } from '../state/project.state';
+import copy from 'fast-copy';
 
 export class Project {
   editors: string[] = [];
@@ -16,7 +18,7 @@ export class Project {
 
   order: number;
 
-  _total: number;
+  _total: number = 0;
   get total(): number {
     if(!this.expenses) {
       return 0;
@@ -57,6 +59,53 @@ export class Project {
     this.projectId = projectId || uuid();
     this.projectName = projectName || "Default";
     this.setData(users, expenses, payments);
+  }
+
+  isEmptyProject() {
+    return this.projectName == "Default" && this.users.length == 0 && this.expenses.length == 0 && this.payments.length == 0 && this.editors.length == 0;
+  }
+
+  public static fromState(projectState: ProjectState): Project {
+    let p = new Project();
+    p.setState(projectState);
+    return p;
+  }
+
+  public static batchFromState(projectStates: ProjectState[]): Project[] {
+    let clone = copy(projectStates);
+    return clone.map(state => Project.fromState(state));
+  }
+
+  getState(): ProjectState {
+    let clone: Project = copy(this);
+    let state: ProjectState = {
+      editors: clone.editors,
+      ownerId: clone.ownerId,
+      ownerEmail: clone.ownerEmail,
+      projectId: clone.projectId,
+      projectName: clone.projectName,
+      users: clone.users,
+      expenses: clone.expenses,
+      payments: clone.payments,
+      order: clone.order,
+      _total: clone._total,
+      archived: clone.archived,
+      weights: clone.weights,
+    }
+    return state;
+  }
+
+  setState(state: ProjectState) {
+    this.editors = state.editors;
+    this.ownerId = state.ownerId;
+    this.ownerEmail = state.ownerEmail;
+    this.projectId = state.projectId;
+    this.projectName = state.projectName;
+    this.setData(state.users, state.expenses, state.payments);
+    this.order = state.order;
+    this._total = state._total;
+    this.archived = state.archived;
+    this.weights = state.weights;
   }
 
   setData(users?: User[], expenses?: Expense[], payments?: Payment[]) {
@@ -121,7 +170,7 @@ export class Project {
   updateUsernameInExpensesMade(user: User, newName: string) {
     //update expense
     this.expenses.forEach((expense, expenseIndex) => {
-      
+
       //updates users
       expense.users.forEach((u, userIndex) => {
         if(u.id === user.id) {
@@ -341,7 +390,7 @@ export class Project {
     if(!this.weights) {
       this.weights = [];
     }
-    
+
     this.weights = [
       ...this.weights.filter(weight => weight.user.id !== user.id),
       { user, weight: parseFloat(weight) }
@@ -377,7 +426,7 @@ export class Project {
     let evenSplit = !this.weights;
 
     this.expenses.forEach(expense => {
-      
+
       expense.users.forEach(user => {
         let amount = (expense.value * this.getWeightForUser(user)) / this.getTotalWeight(expense);
         fairShares[user.id] += amount;

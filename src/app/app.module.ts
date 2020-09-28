@@ -36,6 +36,10 @@ import { ProjectsComponent } from "./components/projects/projects.component";
 import { LoadingComponent } from "./components/loading/loading.component";
 import { LanguageListComponent } from "./components/language-list/language-list.component";
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { StoreModule } from '@ngrx/store';
+import { projectReducer } from './state/project.reducer';
+import { EffectsModule } from '@ngrx/effects';
+import { AppEffects } from './state/app.effects';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http);
@@ -108,10 +112,17 @@ const appRoutes: Routes = [
     AngularFireModule.initializeApp(environment.firebaseconfig), // imports firebase/app needed for everything
     AngularFirestoreModule, // imports firebase/firestore, only needed for database features
     AngularFireAuthModule, // imports firebase/auth, only needed for auth features,
-    AngularFireStorageModule, 
+    AngularFireStorageModule,
     NoopAnimationsModule,
     DragDropModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    StoreModule.forRoot({ app: projectReducer }, {
+      runtimeChecks: {
+        strictActionImmutability: false,
+        strictStateImmutability: true
+      }
+    }),
+    EffectsModule.forRoot([AppEffects])
   ],
   providers: [],
   bootstrap: [AppComponent]

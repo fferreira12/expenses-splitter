@@ -5,6 +5,9 @@ import { SplitterService } from "src/app/services/splitter.service";
 import { Project } from "src/app/models/project.model";
 import { FormControl } from "@angular/forms";
 import { Observable } from 'rxjs';
+import { Store } from '@ngrx/store';
+import { AppState } from 'src/app/state/app.state';
+import { createProject } from 'src/app/state/app.actions';
 
 @Component({
   selector: "app-projects",
@@ -34,18 +37,23 @@ export class ProjectsComponent implements OnInit {
     return this._showArchivedProjects;
   }
 
-  constructor(private splitterService: SplitterService) {}
+  constructor(private splitterService: SplitterService, private store: Store<{ app: AppState }>) {}
 
   ngOnInit() {
-    this.allProjects$ = this.splitterService.getAllProjects$();
+    // this.allProjects$ = this.splitterService.getAllProjects$();
+    this.allProjects$ = this.store.select(state => Project.batchFromState(state.app.selfProjects));
     this.allProjects$.subscribe(allProjects => {
       this.allProjects = allProjects;
+      this.currentProject = this.allProjects[0];
+      console.log(this.currentProject);
+
     });
-    
-    this.currentProject$ = this.splitterService.getCurrentProject$();
-    this.currentProject$.subscribe(currProject => {
-      this.currentProject = currProject;
-    });
+
+    // this.currentProject$ = this.splitterService.getCurrentProject$();
+    // this.currentProject$.subscribe(currProject => {
+    //   this.currentProject = currProject;
+    // });
+
   }
 
   onActivateProject(project: Project) {
@@ -59,7 +67,8 @@ export class ProjectsComponent implements OnInit {
   }
 
   onAddProject() {
-    this.splitterService.createNewProject(this.projectName.value);
+    //this.splitterService.createNewProject(this.projectName.value);
+    this.store.dispatch(createProject(this.projectName.value));
   }
 
   onRenameProject(project: Project) {

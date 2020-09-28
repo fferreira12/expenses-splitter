@@ -19,7 +19,7 @@ export class AuthService {
   currentUser: firebase.User;
   userEmail: string = null;
   userEmailObservable: BehaviorSubject<string> = new BehaviorSubject(null);
-  
+
   subscriptionsToCancelOnLogout: Subscription[] = [];
   snapshotsToCancelOnLogout: (()=>void)[] = [];
 
@@ -59,6 +59,10 @@ export class AuthService {
         //console.log("not signed in");
       }
     });
+  }
+
+  getUser$() {
+    return this.userObservable.asObservable();
   }
 
   subscribeToUser(subscriber) {
@@ -129,7 +133,7 @@ export class AuthService {
     this.afAuth.auth.signOut().then(() => {
       this.router.navigate(['signin']);
     });
-    
+
   }
 
   getToken() {
@@ -163,7 +167,7 @@ export class AuthService {
   }
 
   cancelAllSubscriptionsAndSnapshots() {
-    
+
     this.subscriptionsToCancelOnLogout.forEach(sub => {
       sub.unsubscribe();
     });
