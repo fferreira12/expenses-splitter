@@ -40,7 +40,7 @@ export class Firebasev2Service {
 
   verifyUserId() {
     if (!this.userId) {
-      throw new Error("Must set the user id before using Firebase Service V2");
+      console.warn("Must set the user id before using Firebase Service V2");
     }
   }
 
@@ -67,17 +67,19 @@ export class Firebasev2Service {
     this.db.collection('projects2').doc<Project>(project.projectId).set(plainJSProject);
 
     if(isCurrentProject) {
-      this.saveLastProject(project);
+      this.saveLastProject(project.projectId);
     }
   }
 
-  saveLastProject(project: Project) {
-    this.db
+  saveLastProject(projectId: string) {
+    if (!projectId) return;
+
+    return this.db
     .collection("last-projects")
     .doc(this.userId)
     .set({
-      projectId: project.projectId,
-      projectName: project.projectName,
+      projectId: projectId,
+      //projectName: project.projectName,
       userId: this.userId
     });
   }
@@ -95,9 +97,12 @@ export class Firebasev2Service {
     return doc.get();
   }
 
-  getLastProject() {
-    this.verifyUserId();
-    return this.db.collection('last-projects').doc(this.userId).get();
+  getLastProject(userId: string = undefined) {
+    if (!(userId || this.userId)) {
+      this.verifyUserId();
+      return of(null);
+    }
+    return this.db.collection('last-projects').doc(userId || this.userId).get();
   }
 
   // saveUser(projectId: string, user: User) {
@@ -113,21 +118,20 @@ export class Firebasev2Service {
 
   // savePayment(payment: Payment) {}
 
-  getProjectsOfUser(getArchived: boolean = false, email = undefined) {
+  getProjectsOfUser(getArchived: boolean = false, userId = undefined) {
     //console.log('getting projects of user: ', this.afAuth.auth.currentUser)
 
     // let collection = getArchived ?
     //   this.db.collection<Project>("projects2") :
     //   this.db.collection<Project>("projects2", ref => ref.where('archived', '==', getArchived));
 
-    if (!(this.userEmail || email)) return of([]);
+    if (!(this.userId || userId)) return of([]);
 
 
-    let collection = this.db.collection<Project>("projects2", ref => ref.where('ownerEmail', '==', email || this.userEmail));
+    let collection = this.db.collection<Project>("projects2", ref => ref.where('ownerId', '==', userId || this.userId));
 
     let result = collection.valueChanges().pipe(map(projects => {
       let ps = projects.filter(p => getArchived || !p.archived);
-      console.log('got result from db', ps);
       return ps;
     }));
 

@@ -7,7 +7,8 @@ import { FormControl } from "@angular/forms";
 import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { AppState } from 'src/app/state/app.state';
-import { createProject } from 'src/app/state/app.actions';
+import { createProject, renameProject, setCurrentProject } from 'src/app/state/app.actions';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: "app-projects",
@@ -41,24 +42,27 @@ export class ProjectsComponent implements OnInit {
 
   ngOnInit() {
     // this.allProjects$ = this.splitterService.getAllProjects$();
-    this.allProjects$ = this.store.select(state => Project.batchFromState(state.app.selfProjects));
+    this.allProjects$ = this.store.select(state => Project.batchFromState(state.app.selfProjects)).pipe(
+      map(projectArray => projectArray.sort((a, b) => a.order - b.order))
+    );
     this.allProjects$.subscribe(allProjects => {
       this.allProjects = allProjects;
-      this.currentProject = this.allProjects[0];
-      console.log(this.currentProject);
-
+      // this.currentProject = this.allProjects[0];
     });
 
+    this.currentProject$ = this.store.select(state => Project.fromState(state.app.currentProject));
     // this.currentProject$ = this.splitterService.getCurrentProject$();
-    // this.currentProject$.subscribe(currProject => {
-    //   this.currentProject = currProject;
-    // });
+
+    this.currentProject$.subscribe(currProject => {
+      this.currentProject = currProject;
+    });
 
   }
 
   onActivateProject(project: Project) {
     //console.log('project to activate: ' + project.projectName);
-    this.splitterService.setCurrentProject(project);
+    //this.splitterService.setCurrentProject(project);
+    this.store.dispatch(setCurrentProject({ projectId: project.projectId }));
   }
 
   onDeleteProject(project: Project) {
@@ -73,7 +77,8 @@ export class ProjectsComponent implements OnInit {
 
   onRenameProject(project: Project) {
     //console.log('project to rename: ' + project.projectName);
-    this.splitterService.renameProject(project, this.projectNewName.value);
+    //this.splitterService.renameProject(project, this.projectNewName.value);
+    this.store.dispatch(renameProject({ projectId: project.projectId, newName: this.projectNewName.value }));
   }
 
   onToggleInviteUser() {
@@ -95,10 +100,10 @@ export class ProjectsComponent implements OnInit {
   }
 
   isCurrentProject(project: Project) {
-    if(!project) {
+    if(!project || !this.currentProject) {
       return false;
     }
-    return project.projectName == this.currentProject.projectName;
+    return project.projectId == this.currentProject.projectId;
   }
 
   onArchiveProject(project: Project) {

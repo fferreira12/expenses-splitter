@@ -129,7 +129,7 @@ export class SplitterService {
 
   setCurrentProject(project: Project) {
     this.currentProject = project;
-    this.db.saveLastProject(project);
+    this.db.saveLastProject(project.projectId);
     this.emitAllCurrentData();
   }
 

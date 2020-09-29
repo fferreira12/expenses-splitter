@@ -1,6 +1,8 @@
 import { createAction, props } from '@ngrx/store';
 import { ProjectState } from './project.state';
 
+export const noOp = createAction('[App] No Operation');
+
 export const appStartup = createAction('[App] Startup');
 export const setUser = createAction('[App] Set User', props<{userId: string, userEmail: string}>());
 
@@ -9,18 +11,20 @@ export const loadProjects = createAction('[Project] Load', props<{projects: Proj
 
 export const getAllProjects = createAction('[Project] Get All');
 export const getCurrentProject = createAction('[Project] Get Current');
-export const setCurrentProject = createAction('[Project] Set Current');
-export const renameProject = createAction('[Project] Rename');
-export const archiveProject = createAction('[Project] Archive');
-export const unarchiveProject = createAction('[Project] Unarchive');
-export const deleteProject = createAction('[Project] Delete');
-export const updateProject = createAction('[Project] Update');
-export const resetProjects = createAction('[Project] Reset All');
-export const addEditor = createAction('[Project] Add Editor');
-export const removeEditor = createAction('[Project] Remove Editor');
+export const setCurrentProject = createAction('[Project] Set Current', props<{ projectId: string }>());
+export const renameProject = createAction('[Project] Rename', props<{ projectId: string, newName: string }>());
+export const archiveProject = createAction('[Project] Archive', props<{ projectId: string }>());
+export const unarchiveProject = createAction('[Project] Unarchive', props<{ projectId: string }>());
+export const deleteProject = createAction('[Project] Delete', props<{ projectId: string }>());
+export const addEditor = createAction('[Project] Add Editor', props<{ projectId: string, editorEmail: string }>());
+export const removeEditor = createAction('[Project] Remove Editor', props<{ projectId: string, editorEmail: string }>());
+
+
 export const orderProjects = createAction('[Project] Order');
 export const setWeights = createAction('[Project] Set Weights');
 export const unsetWeights = createAction('[Project] Unset Weights');
+export const updateProject = createAction('[Project] Update');
+export const resetProjects = createAction('[Project] Reset All');
 
 export const addUser = createAction('[User] Add');
 export const removeUser = createAction('[User] Remove');

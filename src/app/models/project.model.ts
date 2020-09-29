@@ -96,6 +96,7 @@ export class Project {
   }
 
   setState(state: ProjectState) {
+    if (!state) return;
     this.editors = state.editors;
     this.ownerId = state.ownerId;
     this.ownerEmail = state.ownerEmail;
