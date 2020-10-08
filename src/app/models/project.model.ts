@@ -155,6 +155,16 @@ export class Project {
     return true;
   }
 
+  removeUserById(userId: string) {
+    let index = this.users.findIndex(user => user.id === userId);
+    if (index == -1) {
+      return false;
+    } else {
+      this.users.splice(index, 1);
+      return true;
+    }
+  }
+
   renameUser(user: User, newName: string): boolean {
     if (!this.users.includes(user)) {
       return false;

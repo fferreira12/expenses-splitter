@@ -161,7 +161,23 @@ const _projectReducer = createReducer<AppState>(
     let st = copy(state);
     let cps = [...st.selfProjects, ...st.otherProjects].find(p => p.projectId == state.currentProject);
 
-    cps.users = [...cps.users].filter(user => user.id !== props.userId);
+    let project = Project.fromState(cps);
+
+    if (project.removeUserById(props.userId)) {
+      project.removeExpensesAndPaymentsWithNoAssociatedUser();
+    } else {
+      return st;
+    }
+
+    let projectState = project.getState();
+
+    if (state.userId === projectState.ownerId) {
+      let index = state.selfProjects.findIndex(p => p.projectId === projectState.projectId);
+      st.selfProjects[index] = projectState;
+    } else {
+      let index = state.otherProjects.findIndex(p => p.projectId === projectState.projectId);
+      st.otherProjects[index] = projectState;
+    }
 
     return st;
   })

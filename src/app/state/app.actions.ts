@@ -21,11 +21,11 @@ export const removeEditor = createAction('[Project] Remove Editor', props<{ proj
 export const orderProjects = createAction('[Project] Order', props<{ projects: ProjectState[] }>());
 
 export const addUser = createAction('[User] Add', props<{ userName: string }>());
-
-// 🔽 TO IMPLEMENT 🔽
 export const removeUser = createAction('[User] Remove', props<{ userId: string }>());
 
+// 🔽 TO IMPLEMENT 🔽
 export const renameUser = createAction('[User] Rename');
+
 export const orderUsers = createAction('[User] Order');
 export const getUsers = createAction('[User] Get All');
 export const setWeights = createAction('[User] Set Weights');
