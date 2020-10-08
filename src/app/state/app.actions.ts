@@ -18,19 +18,17 @@ export const unarchiveProject = createAction('[Project] Unarchive', props<{ proj
 export const deleteProject = createAction('[Project] Delete', props<{ projectId: string }>());
 export const addEditor = createAction('[Project] Add Editor', props<{ projectId: string, editorEmail: string }>());
 export const removeEditor = createAction('[Project] Remove Editor', props<{ projectId: string, editorEmail: string }>());
+export const orderProjects = createAction('[Project] Order', props<{ projects: ProjectState[] }>());
 
-
-export const orderProjects = createAction('[Project] Order');
-export const setWeights = createAction('[Project] Set Weights');
-export const unsetWeights = createAction('[Project] Unset Weights');
-export const updateProject = createAction('[Project] Update');
-export const resetProjects = createAction('[Project] Reset All');
+// 🔽 TO IMPLEMENT 🔽
 
 export const addUser = createAction('[User] Add');
 export const removeUser = createAction('[User] Remove');
 export const renameUser = createAction('[User] Rename');
 export const orderUsers = createAction('[User] Order');
 export const getUsers = createAction('[User] Get All');
+export const setWeights = createAction('[User] Set Weights');
+export const unsetWeights = createAction('[User] Unset Weights');
 
 export const addExpense = createAction('[Expense] Add');
 export const editExpense = createAction('[Expense] Edit');
@@ -46,3 +44,6 @@ export const removePayment = createAction('[Payment] Remove');
 export const orderPayments = createAction('[Payments] Order');
 export const addFileToPayment = createAction('[Payment] Add File');
 export const removeFileFromPayment = createAction('[Payment] Remove File');
+
+export const updateProject = createAction('[Project] Update');
+export const resetProjects = createAction('[Project] Reset All');

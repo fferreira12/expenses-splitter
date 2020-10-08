@@ -11,7 +11,7 @@ import {
   archiveProject,
   setCurrentProject,
   unarchiveProject,
-  loadProjects, setUser, addEditor, removeEditor
+  loadProjects, setUser, addEditor, removeEditor, orderProjects
 } from "./app.actions";
 import { AppState } from './app.state';
 import { ProjectState } from './project.state';
@@ -128,7 +128,30 @@ const _projectReducer = createReducer<AppState>(
     return {
       ...st
     }
-  })
+  }),
+
+  on(orderProjects, (state, props) => {
+    let st: AppState = copy(state);
+    let orders: { [key: string]: number } = {};
+    props.projects.forEach((project, index) => {
+      orders[project.projectId] = index;
+    });
+    return {
+      ...st,
+      selfProjects: st.selfProjects.map(p => {
+        return {
+          ...p,
+          order: orders[p.projectId]
+        }
+      }),
+      otherProjects: st.otherProjects.map(p => {
+        return {
+          ...p,
+          order: orders[p.projectId]
+        }
+      })
+    }
+  }),
 
 
 );

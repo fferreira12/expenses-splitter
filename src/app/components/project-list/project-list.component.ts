@@ -5,8 +5,9 @@ import { FormControl } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { AppState } from 'src/app/state/app.state';
-import { createProject } from 'src/app/state/app.actions';
+import { createProject, setCurrentProject } from 'src/app/state/app.actions';
 import { map } from 'rxjs/operators';
+import { selectCurrentProject, selectOrderedProjects } from 'src/app/state/app.selectors';
 
 @Component({
   selector: 'app-project-list',
@@ -29,7 +30,7 @@ export class ProjectListComponent implements OnInit {
 
   constructor(
     private splitterService: SplitterService,
-    private store: Store<{ app: AppState }>
+    private store: Store<{app: AppState}>
   ) { }
 
   ngOnInit() {
@@ -41,12 +42,16 @@ export class ProjectListComponent implements OnInit {
     // this.currentProject$.subscribe(currentproject => {
     //   this.currentProject = currentproject;
     // });
-    this.allProjects$ = this.store
-      .select(state => state.app.selfProjects).pipe(
-        map(pStates => {
-          return pStates.map(state => Project.fromState(state));
-        })
-      );
+    this.allProjects$ = this.store.select(selectOrderedProjects);
+    this.allProjects$.subscribe(projects => this.allProjects = projects);
+
+    this.currentProject$ = this.store.select(selectCurrentProject);
+    this.currentProject$.subscribe(project => {
+      console.log('got current project', project)
+      this.currentProject = project
+    });
+
+
   }
 
   onAddNewProject() {
@@ -56,7 +61,8 @@ export class ProjectListComponent implements OnInit {
   }
 
   onChangeProject(project: Project) {
-    this.splitterService.setCurrentProject(project);
+    //this.splitterService.setCurrentProject(project);
+    this.store.dispatch(setCurrentProject(project));
   }
 
 }
