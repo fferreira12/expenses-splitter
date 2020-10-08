@@ -56,3 +56,4 @@ src/util/service-key.json
 # firebase caches and logs
 firebase-debug.log
 .firebase/*.cache
+util/service-key.json
