@@ -9,6 +9,7 @@ import { Store } from '@ngrx/store';
 import { AppState } from 'src/app/state/app.state';
 import { createProject, renameProject, setCurrentProject } from 'src/app/state/app.actions';
 import { map } from 'rxjs/operators';
+import { selectCurrentProject } from 'src/app/state/app.selectors';
 
 @Component({
   selector: "app-projects",
@@ -38,11 +39,11 @@ export class ProjectsComponent implements OnInit {
     return this._showArchivedProjects;
   }
 
-  constructor(private splitterService: SplitterService, private store: Store<{ app: AppState }>) {}
+  constructor(private splitterService: SplitterService, private store: Store<{ projects: AppState }>) {}
 
   ngOnInit() {
     // this.allProjects$ = this.splitterService.getAllProjects$();
-    this.allProjects$ = this.store.select(state => Project.batchFromState(state.app.selfProjects)).pipe(
+    this.allProjects$ = this.store.select(state => Project.batchFromState(state.projects.selfProjects)).pipe(
       map(projectArray => projectArray.sort((a, b) => a.order - b.order))
     );
     this.allProjects$.subscribe(allProjects => {
@@ -50,7 +51,7 @@ export class ProjectsComponent implements OnInit {
       // this.currentProject = this.allProjects[0];
     });
 
-    this.currentProject$ = this.store.select(state => Project.fromState(state.app.currentProject));
+    this.currentProject$ = this.store.select(selectCurrentProject).pipe(map(curr => Project.fromState(curr)));
     // this.currentProject$ = this.splitterService.getCurrentProject$();
 
     this.currentProject$.subscribe(currProject => {

@@ -4,6 +4,10 @@ import { CdkDragDrop, moveItemInArray } from "@angular/cdk/drag-drop";
 import { SplitterService } from "src/app/services/splitter.service";
 import { User } from "src/app/models/user.model";
 import { Observable } from 'rxjs';
+import { Store } from '@ngrx/store';
+import { AppState } from 'src/app/state/app.state';
+import { selectCurrentProject } from 'src/app/state/app.selectors';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: "app-user-list",
@@ -22,10 +26,11 @@ export class UserListComponent implements OnInit {
 
   evenSplit: boolean;
 
-  constructor(private splitterService: SplitterService) {}
+  constructor(private splitterService: SplitterService, private store: Store<{projects: AppState}>) {}
 
   ngOnInit() {
-    this.users$ = this.splitterService.getUsers$();
+    //this.users$ = this.splitterService.getUsers$();
+    this.users$ = this.store.select(selectCurrentProject).pipe(map(curr => curr?.users));
     this.users$.subscribe(users => {
       this.users = users;
     });

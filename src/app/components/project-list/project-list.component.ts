@@ -23,14 +23,14 @@ export class ProjectListComponent implements OnInit {
   name = new FormControl('');
 
   get unarchivedProjects(): Project[] {
-    return this.allProjects.filter(p => {
+    return this.allProjects?.filter(p => {
       return this.currentProject.projectId == p.projectId || !p.archived;
     });
   }
 
   constructor(
     private splitterService: SplitterService,
-    private store: Store<{app: AppState}>
+    private store: Store<{projects: AppState}>
   ) { }
 
   ngOnInit() {
@@ -45,7 +45,7 @@ export class ProjectListComponent implements OnInit {
     this.allProjects$ = this.store.select(selectOrderedProjects);
     this.allProjects$.subscribe(projects => this.allProjects = projects);
 
-    this.currentProject$ = this.store.select(selectCurrentProject);
+    this.currentProject$ = this.store.select(selectCurrentProject).pipe(map(ps => Project.fromState(ps)));
     this.currentProject$.subscribe(project => {
       console.log('got current project', project)
       this.currentProject = project

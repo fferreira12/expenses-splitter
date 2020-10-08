@@ -8,7 +8,7 @@ import { Project } from '../models/project.model';
 import { AuthService } from "../services/auth.service";
 
 import { Firebasev2Service } from "../services/firebasev2.service";
-import { addEditor, appStartup, archiveProject, deleteProject, loadProjects, noOp, orderProjects, removeEditor, renameProject, setCurrentProject, setUser, unarchiveProject } from "./app.actions";
+import { addEditor, addUser, appStartup, archiveProject, deleteProject, loadProjects, noOp, orderProjects, removeEditor, renameProject, setCurrentProject, setUser, unarchiveProject } from "./app.actions";
 import { AppState } from './app.state';
 
 @Injectable()
@@ -74,7 +74,7 @@ export class AppEffects {
     ofType(renameProject, archiveProject, unarchiveProject, addEditor, removeEditor),
     withLatestFrom(this.store),
     tap(([action, appState]) => {
-      let st: AppState = copy(appState).app;
+      let st: AppState = copy(appState).projects;
       let p = [...st.selfProjects, ...st.otherProjects].find(p => p.projectId == action.projectId);
       this.db.saveProject(p.ownerId, Project.fromState(p));
     })
@@ -93,17 +93,31 @@ export class AppEffects {
     ofType(orderProjects),
     withLatestFrom(this.store),
     tap(([action, appState]) => {
-      let st: AppState = copy(appState).app;
-      [...appState.app.selfProjects, ...appState.app.otherProjects].forEach(p => {
+      let st: AppState = copy(appState).projects;
+      [...appState.projects.selfProjects, ...appState.projects.otherProjects].forEach(p => {
         this.db.saveProject(p.ownerId, Project.fromState(p));
       });
     })
   );
 
+  @Effect({ dispatch: false })
+  saveCurrentProject$ = this.actions$.pipe(
+    ofType(addUser),
+    withLatestFrom(this.store),
+    tap(([action, appState]) => {
+      let st: AppState = copy(appState).projects;
+      let p = [...st.selfProjects, ...st.otherProjects].find(p => p.projectId == appState.projects.currentProject);
+      console.log('saving user to db', action.userName);
+      // debugger;
+      this.db.saveProject(p.ownerId, Project.fromState(p));
+    })
+  );
+
+
   constructor(
     private actions$: Actions,
     private db: Firebasev2Service,
     private authService: AuthService,
-    private store: Store<{app: AppState}>
+    private store: Store<{projects: AppState}>
   ) {}
 }

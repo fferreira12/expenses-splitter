@@ -2,6 +2,7 @@ import { state } from '@angular/animations';
 import { createReducer, on, props } from "@ngrx/store";
 import copy from "fast-copy";
 import { Project } from '../models/project.model';
+import { User } from '../models/user.model';
 import {
   createProject,
   getAllProjects,
@@ -11,21 +12,11 @@ import {
   archiveProject,
   setCurrentProject,
   unarchiveProject,
-  loadProjects, setUser, addEditor, removeEditor, orderProjects
+  loadProjects, setUser, addEditor, removeEditor, orderProjects, addUser
 } from "./app.actions";
 import { AppState } from './app.state';
+import { initialState } from './initial.state';
 import { ProjectState } from './project.state';
-
-export const initialState: AppState = {
-  isLoading: false,
-  userId: null,
-  userEmail: null,
-  selfProjects: [
-    new ProjectState()
-  ],
-  otherProjects: [],
-  currentProject: null
-};
 
 const _projectReducer = createReducer<AppState>(
   initialState,
@@ -38,7 +29,7 @@ const _projectReducer = createReducer<AppState>(
     return {
       ...copy(state),
       selfProjects: [...state.selfProjects, p],
-      currentProject: p
+      currentProject: p.projectId
     }
   }),
 
@@ -63,13 +54,13 @@ const _projectReducer = createReducer<AppState>(
 
   on(setCurrentProject, (state, props) => {
     let st: AppState = copy(state);
-    let cps = [...st.selfProjects, ...st.otherProjects].find(p => p.projectId == props.projectId);
+    //let cps = [...st.selfProjects, ...st.otherProjects].find(p => p.projectId == props.projectId);
     // debugger;
     console.log('inside action reducer');
 
     return {
       ...st,
-      currentProject: cps
+      currentProject: props.projectId
     }
   }),
 
@@ -152,6 +143,19 @@ const _projectReducer = createReducer<AppState>(
       })
     }
   }),
+
+
+  on(addUser, (state, props) => {
+    let st = copy(state);
+    let cps = [...st.selfProjects, ...st.otherProjects].find(p => p.projectId == state.currentProject);
+    console.log('got user ', props.userName);
+
+    cps.users = [...cps.users, new User(props.userName)];
+
+    debugger;
+
+    return st;
+  })
 
 
 );

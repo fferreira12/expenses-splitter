@@ -22,7 +22,7 @@ export const orderProjects = createAction('[Project] Order', props<{ projects: P
 
 // 🔽 TO IMPLEMENT 🔽
 
-export const addUser = createAction('[User] Add');
+export const addUser = createAction('[User] Add', props<{ userName: string }>());
 export const removeUser = createAction('[User] Remove');
 export const renameUser = createAction('[User] Rename');
 export const orderUsers = createAction('[User] Order');

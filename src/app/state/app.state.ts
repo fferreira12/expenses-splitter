@@ -8,5 +8,5 @@ export type AppState = {
 
   selfProjects: ProjectState[];
   otherProjects: ProjectState[];
-  currentProject: ProjectState;
+  currentProject: string;
 }

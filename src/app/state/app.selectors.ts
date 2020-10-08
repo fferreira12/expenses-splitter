@@ -7,19 +7,22 @@ export const orderProjects = (projects: ProjectState[]) => projects.sort((a, b) 
 export const projectStatesToProjects = (projects: ProjectState[]) => projects.map(p => Project.fromState(p));
 
 export const selectOrderedProjects = createSelector(
-  (state: {app: AppState}) => {
-    return [...state.app.selfProjects, ...state.app.otherProjects]
+  (state: { projects: AppState }) => {
+    if (!state || !state.projects) return;
+    return [...state.projects?.selfProjects, ...state.projects?.otherProjects]
   },
   (projectStates: ProjectState[]) => {
+    if (!projectStates) return;
     return projectStatesToProjects(orderProjects(projectStates));
   }
 );
 
 export const selectCurrentProject = createSelector(
-  (state: {app: AppState}) => {
-    return state.app.currentProject
+  (state: {projects: AppState}) => {
+    return state.projects
   },
-  (projectState: ProjectState) => {
-    return Project.fromState(projectState);
+  (state: AppState) => {
+    let p = [...state.selfProjects, ...state.otherProjects].find(p => p.projectId == state.currentProject);
+    return p;
   }
 );

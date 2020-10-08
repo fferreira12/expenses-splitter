@@ -8,6 +8,10 @@ import { User } from "src/app/models/user.model";
 import { Expense } from "src/app/models/expense.model";
 import { OcrService } from "src/app/services/ocr.service";
 import { Observable } from 'rxjs';
+import { Store } from '@ngrx/store';
+import { AppState } from 'src/app/state/app.state';
+import { selectCurrentProject } from 'src/app/state/app.selectors';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: "app-add-expense",
@@ -42,12 +46,14 @@ export class AddExpenseComponent implements OnInit {
     private splitterService: SplitterService,
     private formBuilder: FormBuilder,
     private ocr: OcrService,
-    private _snackBar: MatSnackBar
+    private _snackBar: MatSnackBar,
+    private store: Store<{projects: AppState}>
   ) {}
 
   ngOnInit() {
     this.startForm();
-    this.users$ = this.splitterService.getUsers$()
+    //this.users$ = this.splitterService.getUsers$()
+    this.users$ = this.store.select(selectCurrentProject).pipe(map(curr => curr.users));
     this.users$.subscribe(users => {
       this.users = users;
       this.startForm();

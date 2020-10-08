@@ -6,6 +6,10 @@ import { SimpleCalculator } from "src/app/util/payment-calculator";
 import { Payment } from 'src/app/models/payment.model';
 import { WeightedCalculator } from 'src/app/util/weighted-calculator';
 import { Observable } from 'rxjs';
+import { AppState } from 'src/app/state/app.state';
+import { Store } from '@ngrx/store';
+import { selectCurrentProject } from 'src/app/state/app.selectors';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: "app-balance",
@@ -23,7 +27,7 @@ export class BalanceComponent implements OnInit {
   calculator: WeightedCalculator;
   suggestedPayments: { payer: User; receiver: User; amount: number }[];
 
-  constructor(private splitterService: SplitterService) {}
+  constructor(private splitterService: SplitterService, private store: Store<{projects: AppState}>) {}
 
   ngOnInit() {
     this.calculator = new WeightedCalculator();
@@ -31,9 +35,9 @@ export class BalanceComponent implements OnInit {
     this.calculator.setAllUsers(this.users);
     this.fairShares = this.splitterService.getFairShares();
     this.calculator.setFairShares(this.fairShares);
-    
+
     //this.updateValuesSharesAndBalance();
-    
+
     this.expenses$ = this.splitterService.getExpenses$();
     this.expenses$.subscribe(expenses => {
       this.expenses = expenses;
@@ -44,7 +48,8 @@ export class BalanceComponent implements OnInit {
       this.updateValuesSharesAndBalance();
     });
 
-    this.users$ = this.splitterService.getUsers$()
+    //this.users$ = this.splitterService.getUsers$()
+    this.users$ = this.store.select(selectCurrentProject).pipe(map(curr => curr.users));
     this.users$.subscribe(users => {
       this.users = users;
       this.calculator.setAllUsers(this.users);
