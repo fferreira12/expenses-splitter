@@ -8,7 +8,7 @@ import { Project } from '../models/project.model';
 import { AuthService } from "../services/auth.service";
 
 import { Firebasev2Service } from "../services/firebasev2.service";
-import { addEditor, addUser, appStartup, archiveProject, deleteProject, loadProjects, noOp, orderProjects, removeEditor, removeUser, renameProject, renameUser, setCurrentProject, setUser, unarchiveProject } from "./app.actions";
+import { addEditor, addUser, appStartup, archiveProject, deleteProject, loadProjects, noOp, orderProjects, orderUsers, removeEditor, removeUser, renameProject, renameUser, setCurrentProject, setUser, unarchiveProject } from "./app.actions";
 import { AppState } from './app.state';
 
 @Injectable()
@@ -102,7 +102,7 @@ export class AppEffects {
 
   @Effect({ dispatch: false })
   saveCurrentProject$ = this.actions$.pipe(
-    ofType(addUser, removeUser, renameUser),
+    ofType(addUser, removeUser, renameUser, orderUsers),
     withLatestFrom(this.store),
     tap(([action, appState]) => {
       let st: AppState = copy(appState).projects;

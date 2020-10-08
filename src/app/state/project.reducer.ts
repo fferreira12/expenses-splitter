@@ -12,7 +12,7 @@ import {
   archiveProject,
   setCurrentProject,
   unarchiveProject,
-  loadProjects, setUser, addEditor, removeEditor, orderProjects, addUser, removeUser, renameUser
+  loadProjects, setUser, addEditor, removeEditor, orderProjects, addUser, removeUser, renameUser, orderUsers
 } from "./app.actions";
 import { AppState } from './app.state';
 import { initialState } from './initial.state';
@@ -199,6 +199,26 @@ const _projectReducer = createReducer<AppState>(
     }
     return st;
 
+  }),
+
+  on(orderUsers, (state, props) => {
+    if (!props.users || props.users.length == 0) return;
+
+    let st = copy(state);
+
+    let order: { [key: string]: number } = {};
+
+    props.users.forEach((user, index) => {
+      order[user.id] = index;
+    });
+
+    let cps = [...st.selfProjects, ...st.otherProjects].find(p => p.projectId == state.currentProject);
+
+    cps.users.forEach(user => {
+      user.order = order[user.id];
+    });
+
+    return st;
   }),
 
 

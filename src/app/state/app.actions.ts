@@ -1,4 +1,5 @@
 import { createAction, props } from '@ngrx/store';
+import { User } from '../models/user.model';
 import { ProjectState } from './project.state';
 
 export const noOp = createAction('[App] No Operation');
@@ -23,12 +24,11 @@ export const orderProjects = createAction('[Project] Order', props<{ projects: P
 export const addUser = createAction('[User] Add', props<{ userName: string }>());
 export const removeUser = createAction('[User] Remove', props<{ userId: string }>());
 export const renameUser = createAction('[User] Rename', props<{ userId: string, newName: string }>());
+export const orderUsers = createAction('[User] Order', props<{ users: User[] }>());
 
 // 🔽 TO IMPLEMENT 🔽
-export const orderUsers = createAction('[User] Order');
-
-export const getUsers = createAction('[User] Get All');
 export const setWeights = createAction('[User] Set Weights');
+
 export const unsetWeights = createAction('[User] Unset Weights');
 
 export const addExpense = createAction('[Expense] Add');
@@ -48,3 +48,4 @@ export const removeFileFromPayment = createAction('[Payment] Remove File');
 
 export const updateProject = createAction('[Project] Update');
 export const resetProjects = createAction('[Project] Reset All');
+export const getUsers = createAction('[User] Get All');
