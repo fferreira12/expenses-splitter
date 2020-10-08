@@ -20,10 +20,11 @@ export const addEditor = createAction('[Project] Add Editor', props<{ projectId:
 export const removeEditor = createAction('[Project] Remove Editor', props<{ projectId: string, editorEmail: string }>());
 export const orderProjects = createAction('[Project] Order', props<{ projects: ProjectState[] }>());
 
-// 🔽 TO IMPLEMENT 🔽
-
 export const addUser = createAction('[User] Add', props<{ userName: string }>());
-export const removeUser = createAction('[User] Remove');
+
+// 🔽 TO IMPLEMENT 🔽
+export const removeUser = createAction('[User] Remove', props<{ userId: string }>());
+
 export const renameUser = createAction('[User] Rename');
 export const orderUsers = createAction('[User] Order');
 export const getUsers = createAction('[User] Get All');

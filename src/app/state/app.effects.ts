@@ -8,7 +8,7 @@ import { Project } from '../models/project.model';
 import { AuthService } from "../services/auth.service";
 
 import { Firebasev2Service } from "../services/firebasev2.service";
-import { addEditor, addUser, appStartup, archiveProject, deleteProject, loadProjects, noOp, orderProjects, removeEditor, renameProject, setCurrentProject, setUser, unarchiveProject } from "./app.actions";
+import { addEditor, addUser, appStartup, archiveProject, deleteProject, loadProjects, noOp, orderProjects, removeEditor, removeUser, renameProject, setCurrentProject, setUser, unarchiveProject } from "./app.actions";
 import { AppState } from './app.state';
 
 @Injectable()
@@ -102,12 +102,12 @@ export class AppEffects {
 
   @Effect({ dispatch: false })
   saveCurrentProject$ = this.actions$.pipe(
-    ofType(addUser),
+    ofType(addUser, removeUser),
     withLatestFrom(this.store),
     tap(([action, appState]) => {
       let st: AppState = copy(appState).projects;
       let p = [...st.selfProjects, ...st.otherProjects].find(p => p.projectId == appState.projects.currentProject);
-      console.log('saving user to db', action.userName);
+      //console.log('saving user to db', action.userName);
       // debugger;
       this.db.saveProject(p.ownerId, Project.fromState(p));
     })

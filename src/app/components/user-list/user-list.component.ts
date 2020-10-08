@@ -8,6 +8,7 @@ import { Store } from '@ngrx/store';
 import { AppState } from 'src/app/state/app.state';
 import { selectCurrentProject } from 'src/app/state/app.selectors';
 import { map } from 'rxjs/operators';
+import { removeUser } from 'src/app/state/app.actions';
 
 @Component({
   selector: "app-user-list",
@@ -44,7 +45,7 @@ export class UserListComponent implements OnInit {
   }
 
   onRemoveUser(user: User) {
-    this.splitterService.removeUser(user);
+    this.store.dispatch(removeUser({userId: user.id}));
   }
 
   onEditUser(user: User) {

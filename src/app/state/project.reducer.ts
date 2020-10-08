@@ -12,7 +12,7 @@ import {
   archiveProject,
   setCurrentProject,
   unarchiveProject,
-  loadProjects, setUser, addEditor, removeEditor, orderProjects, addUser
+  loadProjects, setUser, addEditor, removeEditor, orderProjects, addUser, removeUser
 } from "./app.actions";
 import { AppState } from './app.state';
 import { initialState } from './initial.state';
@@ -153,6 +153,15 @@ const _projectReducer = createReducer<AppState>(
     cps.users = [...cps.users, new User(props.userName)];
 
     debugger;
+
+    return st;
+  }),
+
+  on(removeUser, (state, props) => {
+    let st = copy(state);
+    let cps = [...st.selfProjects, ...st.otherProjects].find(p => p.projectId == state.currentProject);
+
+    cps.users = [...cps.users].filter(user => user.id !== props.userId);
 
     return st;
   })
