@@ -8,7 +8,7 @@ import { Store } from '@ngrx/store';
 import { AppState } from 'src/app/state/app.state';
 import { selectCurrentProject } from 'src/app/state/app.selectors';
 import { map } from 'rxjs/operators';
-import { removeUser } from 'src/app/state/app.actions';
+import { removeUser, renameUser } from 'src/app/state/app.actions';
 
 @Component({
   selector: "app-user-list",
@@ -53,16 +53,19 @@ export class UserListComponent implements OnInit {
       return;
     }
     this.editMode = !this.editMode;
-    this.editingUser = user;
+    this.editingUser = {...user};
     this.editingWeight = this.getWeightForUser(this.editingUser);
   }
 
   isEditing(user: User) {
-    return this.editingUser == user && this.editMode;
+    return this.editingUser && this.editingUser.id == user.id && this.editMode;
   }
 
   onSave(user: User) {
-    this.splitterService.renameUser(user, user.name);
+    this.store.dispatch(renameUser({
+      userId: user.id,
+      newName: this.editingUser.name
+    }));
     this.splitterService.setWeightForUser(user, this.editingWeight);
     this.editingUser = null;
     this.editingWeight = null;

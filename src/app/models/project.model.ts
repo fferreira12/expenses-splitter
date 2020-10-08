@@ -178,6 +178,15 @@ export class Project {
     }
   }
 
+  renameUserById(userId: string, newName: string) {
+    let user = this.users.find(u => u.id === userId);
+    if (!user) {
+      return false;
+    } else {
+      return this.renameUser(user, newName);
+    }
+  }
+
   updateUsernameInExpensesMade(user: User, newName: string) {
     //update expense
     this.expenses.forEach((expense, expenseIndex) => {

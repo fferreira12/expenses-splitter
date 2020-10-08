@@ -1,6 +1,6 @@
 <div *ngIf="(users$ | async)">
   <h1>{{'People' | translate}}</h1>
-  <ul class="list-group" cdkDropList (cdkDropListDropped)="drop($event)"> 
+  <ul class="list-group" cdkDropList (cdkDropListDropped)="drop($event)">
     <li *ngFor="let user of (users$ | async)" class="list-group-item" cdkDrag [cdkDragData]="user">
       <i class="fas fa-arrows-alt mr-2" cdkDragHandle></i>
       <button class="btn btn-danger btn-sm" (click)="onRemoveUser(user)">

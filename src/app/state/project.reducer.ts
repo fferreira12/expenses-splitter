@@ -12,7 +12,7 @@ import {
   archiveProject,
   setCurrentProject,
   unarchiveProject,
-  loadProjects, setUser, addEditor, removeEditor, orderProjects, addUser, removeUser
+  loadProjects, setUser, addEditor, removeEditor, orderProjects, addUser, removeUser, renameUser
 } from "./app.actions";
 import { AppState } from './app.state';
 import { initialState } from './initial.state';
@@ -152,8 +152,6 @@ const _projectReducer = createReducer<AppState>(
 
     cps.users = [...cps.users, new User(props.userName)];
 
-    debugger;
-
     return st;
   }),
 
@@ -169,8 +167,8 @@ const _projectReducer = createReducer<AppState>(
       return st;
     }
 
+    //TODO: remove duplicate code below
     let projectState = project.getState();
-
     if (state.userId === projectState.ownerId) {
       let index = state.selfProjects.findIndex(p => p.projectId === projectState.projectId);
       st.selfProjects[index] = projectState;
@@ -178,9 +176,30 @@ const _projectReducer = createReducer<AppState>(
       let index = state.otherProjects.findIndex(p => p.projectId === projectState.projectId);
       st.otherProjects[index] = projectState;
     }
-
     return st;
-  })
+  }),
+
+  on(renameUser, (state, props) => {
+    let st = copy(state);
+    let cps = [...st.selfProjects, ...st.otherProjects].find(p => p.projectId == state.currentProject);
+
+    let project = Project.fromState(cps);
+
+    project.renameUserById(props.userId, props.newName);
+
+
+    //TODO: remove duplicate code below
+    let projectState = project.getState();
+    if (state.userId === projectState.ownerId) {
+      let index = state.selfProjects.findIndex(p => p.projectId === projectState.projectId);
+      st.selfProjects[index] = projectState;
+    } else {
+      let index = state.otherProjects.findIndex(p => p.projectId === projectState.projectId);
+      st.otherProjects[index] = projectState;
+    }
+    return st;
+
+  }),
 
 
 );

@@ -53,7 +53,7 @@ export class AddExpenseComponent implements OnInit {
   ngOnInit() {
     this.startForm();
     //this.users$ = this.splitterService.getUsers$()
-    this.users$ = this.store.select(selectCurrentProject).pipe(map(curr => curr.users));
+    this.users$ = this.store.select(selectCurrentProject).pipe(map(curr => curr?.users));
     this.users$.subscribe(users => {
       this.users = users;
       this.startForm();
@@ -91,7 +91,6 @@ export class AddExpenseComponent implements OnInit {
   }
 
   updateForm() {
-    //debugger;
     if (!this._editingExpense) return;
     let onePayer = this._editingExpense.payers.length == 1;
     this.singlePayer = onePayer;
@@ -212,6 +211,11 @@ export class AddExpenseComponent implements OnInit {
   }
 
   addCheckboxes() {
+
+    if (!this.users || this.users.length == 0) {
+      return;
+    }
+
     this.users.map((o, i) => {
       const control = new FormControl(this.userIsParticipating(o));
       const valueControl = new FormControl(0);

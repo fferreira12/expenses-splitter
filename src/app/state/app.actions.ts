@@ -22,11 +22,11 @@ export const orderProjects = createAction('[Project] Order', props<{ projects: P
 
 export const addUser = createAction('[User] Add', props<{ userName: string }>());
 export const removeUser = createAction('[User] Remove', props<{ userId: string }>());
+export const renameUser = createAction('[User] Rename', props<{ userId: string, newName: string }>());
 
 // 🔽 TO IMPLEMENT 🔽
-export const renameUser = createAction('[User] Rename');
-
 export const orderUsers = createAction('[User] Order');
+
 export const getUsers = createAction('[User] Get All');
 export const setWeights = createAction('[User] Set Weights');
 export const unsetWeights = createAction('[User] Unset Weights');
