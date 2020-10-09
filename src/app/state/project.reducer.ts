@@ -12,7 +12,7 @@ import {
   archiveProject,
   setCurrentProject,
   unarchiveProject,
-  loadProjects, setUser, addEditor, removeEditor, orderProjects, addUser, removeUser, renameUser, orderUsers
+  loadProjects, setUser, addEditor, removeEditor, orderProjects, addUser, removeUser, renameUser, orderUsers, setWeight
 } from "./app.actions";
 import { AppState } from './app.state';
 import { initialState } from './initial.state';
@@ -55,7 +55,6 @@ const _projectReducer = createReducer<AppState>(
   on(setCurrentProject, (state, props) => {
     let st: AppState = copy(state);
     //let cps = [...st.selfProjects, ...st.otherProjects].find(p => p.projectId == props.projectId);
-    // debugger;
     console.log('inside action reducer');
 
     return {
@@ -167,16 +166,7 @@ const _projectReducer = createReducer<AppState>(
       return st;
     }
 
-    //TODO: remove duplicate code below
-    let projectState = project.getState();
-    if (state.userId === projectState.ownerId) {
-      let index = state.selfProjects.findIndex(p => p.projectId === projectState.projectId);
-      st.selfProjects[index] = projectState;
-    } else {
-      let index = state.otherProjects.findIndex(p => p.projectId === projectState.projectId);
-      st.otherProjects[index] = projectState;
-    }
-    return st;
+    return replaceProjectState(project, st);
   }),
 
   on(renameUser, (state, props) => {
@@ -187,18 +177,9 @@ const _projectReducer = createReducer<AppState>(
 
     project.renameUserById(props.userId, props.newName);
 
+    debugger;
 
-    //TODO: remove duplicate code below
-    let projectState = project.getState();
-    if (state.userId === projectState.ownerId) {
-      let index = state.selfProjects.findIndex(p => p.projectId === projectState.projectId);
-      st.selfProjects[index] = projectState;
-    } else {
-      let index = state.otherProjects.findIndex(p => p.projectId === projectState.projectId);
-      st.otherProjects[index] = projectState;
-    }
-    return st;
-
+    return replaceProjectState(project, st);
   }),
 
   on(orderUsers, (state, props) => {
@@ -221,8 +202,35 @@ const _projectReducer = createReducer<AppState>(
     return st;
   }),
 
+  on(setWeight, (state, props) => {
+    if (!props.user || props.weight) return;
+
+    let st = copy(state);
+
+    let cps = [...st.selfProjects, ...st.otherProjects].find(p => p.projectId == state.currentProject);
+
+    let project = Project.fromState(cps);
+
+    project.setWeightForUser(props.user, props.weight);
+
+    return replaceProjectState(project, st);
+  }),
+
 
 );
+
+function replaceProjectState(newProject: Project, state: AppState): AppState {
+  let projectState = newProject.getState();
+  let st = copy(state);
+  if (state.userId === projectState.ownerId) {
+    let index = state.selfProjects.findIndex(p => p.projectId === projectState.projectId);
+    st.selfProjects[index] = projectState;
+  } else {
+    let index = state.otherProjects.findIndex(p => p.projectId === projectState.projectId);
+    st.otherProjects[index] = projectState;
+  }
+  return st;
+}
 
 export function projectReducer(state, action) {
   return _projectReducer(state, action);

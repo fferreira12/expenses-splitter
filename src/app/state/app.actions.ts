@@ -3,12 +3,14 @@ import { User } from '../models/user.model';
 import { ProjectState } from './project.state';
 
 export const noOp = createAction('[App] No Operation');
+export const apiCalled = createAction('[App] Api was called');
+export const dataReceived = createAction('[App] Api returned data');
 
 export const appStartup = createAction('[App] Startup');
 export const setUser = createAction('[App] Set User', props<{userId: string, userEmail: string}>());
 
 export const createProject = createAction('[Project] Create', props<{projectName: string}>());
-export const loadProjects = createAction('[Project] Load', props<{projects: ProjectState[]}>());
+export const loadProjects = createAction('[Project] Load projects', props<{projects: ProjectState[]}>());
 
 export const getAllProjects = createAction('[Project] Get All');
 export const getCurrentProject = createAction('[Project] Get Current');
@@ -27,7 +29,7 @@ export const renameUser = createAction('[User] Rename', props<{ userId: string, 
 export const orderUsers = createAction('[User] Order', props<{ users: User[] }>());
 
 // 🔽 TO IMPLEMENT 🔽
-export const setWeights = createAction('[User] Set Weights');
+export const setWeight = createAction('[User] Set Weight', props<{user: User, weight: number}>());
 
 export const unsetWeights = createAction('[User] Unset Weights');
 

@@ -132,6 +132,10 @@ export class Project {
     return true;
   }
 
+  getUser(userId: string): User {
+    return this.users.find(u => u.id === userId);
+  }
+
   addEditor(email: string) {
     if (this.editors.includes(email)) {
       return;
