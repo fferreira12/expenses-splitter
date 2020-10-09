@@ -177,8 +177,6 @@ const _projectReducer = createReducer<AppState>(
 
     project.renameUserById(props.userId, props.newName);
 
-    debugger;
-
     return replaceProjectState(project, st);
   }),
 

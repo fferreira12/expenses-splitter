@@ -25,6 +25,7 @@ import {
   renameUser,
   setCurrentProject,
   setUser,
+  setWeight,
   unarchiveProject,
 } from "./app.actions";
 import { AppState } from "./app.state";
@@ -146,7 +147,7 @@ export class AppEffects {
 
   saveCurrentProject$ = createEffect(() => {
     return this.actions$.pipe(
-      ofType(addUser, removeUser, renameUser, orderUsers),
+      ofType(addUser, removeUser, renameUser, orderUsers, setWeight),
       withLatestFrom(this.store),
       map(([action, appState]) => {
         let st: AppState = copy(appState).projects;
@@ -154,7 +155,7 @@ export class AppEffects {
           (p) => p.projectId == appState.projects.currentProject
         );
         //console.log('saving user to db', action.userName);
-        this.db.saveProject(p.ownerId, Project.fromState(p), false);
+        this.db.saveProject(p.ownerId, Project.fromState(p));
         return apiCalled();
       })
     );

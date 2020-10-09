@@ -6,9 +6,9 @@ import { User } from "src/app/models/user.model";
 import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { AppState } from 'src/app/state/app.state';
-import { selectCurrentProject } from 'src/app/state/app.selectors';
+import { selectCurrentProject, selectIsEvenSplit, selectWeightsForCurrentProject } from 'src/app/state/app.selectors';
 import { map } from 'rxjs/operators';
-import { orderUsers, removeUser, renameUser } from 'src/app/state/app.actions';
+import { orderUsers, removeUser, renameUser, setWeight } from 'src/app/state/app.actions';
 
 @Component({
   selector: "app-user-list",
@@ -30,19 +30,18 @@ export class UserListComponent implements OnInit {
   constructor(private splitterService: SplitterService, private store: Store<{projects: AppState}>) {}
 
   ngOnInit() {
-    //this.users$ = this.splitterService.getUsers$();
     this.users$ = this.store.select(selectCurrentProject).pipe(map(curr => curr?.users.slice().sort((a, b) => a.order - b.order)));
     this.users$.subscribe(users => {
       if (!users) return;
       this.users = [...users];
     });
 
-    this.weights$ = this.splitterService.getWeights$();
-    this.evenSplit = this.splitterService.isEvenSplit();
+    this.weights$ = this.store.select(selectWeightsForCurrentProject);
     this.weights$.subscribe(weights => {
-      this.weights = weights;
-      this.evenSplit = this.splitterService.isEvenSplit();
+      if (!weights) return;
+      this.weights = [...weights];
     })
+    this.store.select(selectIsEvenSplit).subscribe(isEven => this.evenSplit = isEven);
   }
 
   onRemoveUser(user: User) {
@@ -67,7 +66,10 @@ export class UserListComponent implements OnInit {
       userId: user.id,
       newName: this.editingUser.name
     }));
-    this.splitterService.setWeightForUser(user, this.editingWeight);
+    this.store.dispatch(setWeight({
+      user,
+      weight: this.editingWeight
+    }))
     this.editingUser = null;
     this.editingWeight = null;
     this.editMode = false;

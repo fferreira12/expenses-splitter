@@ -26,3 +26,25 @@ export const selectCurrentProject = createSelector(
     return p;
   }
 );
+
+export const selectWeightsForCurrentProject = createSelector(
+  (state: {projects: AppState}) => {
+    return state.projects
+  },
+  (state: AppState) => {
+    let p = [...state.selfProjects, ...state.otherProjects].find(p => p.projectId == state.currentProject);
+    if (!p) return;
+    return p.weights;
+  }
+);
+
+export const selectIsEvenSplit = createSelector(
+  (state: {projects: AppState}) => {
+    return state.projects
+  },
+  (state: AppState) => {
+    let p = [...state.selfProjects, ...state.otherProjects].find(p => p.projectId == state.currentProject);
+    let project = Project.fromState(p);
+    return project.isEvenSplit();
+  }
+);

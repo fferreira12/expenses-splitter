@@ -587,7 +587,7 @@ export class SplitterService {
     );
   }
 
-  getWeights() {
+  private getWeights() {
     return this.currentProject.weights;
   }
 
