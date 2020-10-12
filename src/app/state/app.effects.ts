@@ -28,6 +28,7 @@ import {
   setUser,
   setWeight,
   unarchiveProject,
+  unsetWeights,
 } from "./app.actions";
 import { AppState } from "./app.state";
 
@@ -167,10 +168,11 @@ export class AppEffects {
 
   saveCurrentProject$ = createEffect(() => {
     return this.actions$.pipe(
-      ofType(addUser, removeUser, renameUser, orderUsers, setWeight),
+      ofType(addUser, removeUser, renameUser, orderUsers, setWeight, unsetWeights),
       withLatestFrom(this.store),
       map(([action, appState]) => {
         let st: AppState = copy(appState).projects;
+        if (!st) return noOp();
         let p = [...st.selfProjects, ...st.otherProjects].find(
           (p) => p.projectId == appState.projects.currentProject
         );

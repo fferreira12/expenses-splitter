@@ -27,13 +27,12 @@ export const addUser = createAction('[User] Add', props<{ userName: string }>())
 export const removeUser = createAction('[User] Remove', props<{ userId: string }>());
 export const renameUser = createAction('[User] Rename', props<{ userId: string, newName: string }>());
 export const orderUsers = createAction('[User] Order', props<{ users: User[] }>());
-
-// 🔽 TO IMPLEMENT 🔽
 export const setWeight = createAction('[User] Set Weight', props<{user: User, weight: number}>());
-
 export const unsetWeights = createAction('[User] Unset Weights');
 
+// 🔽 TO IMPLEMENT 🔽
 export const addExpense = createAction('[Expense] Add');
+
 export const editExpense = createAction('[Expense] Edit');
 export const removeExpense = createAction('[Expense] Remove');
 export const getExpenses = createAction('[Expense] Get');

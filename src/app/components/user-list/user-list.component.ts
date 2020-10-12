@@ -8,7 +8,7 @@ import { Store } from '@ngrx/store';
 import { AppState } from 'src/app/state/app.state';
 import { selectCurrentProject, selectIsEvenSplit, selectWeightsForCurrentProject } from 'src/app/state/app.selectors';
 import { map } from 'rxjs/operators';
-import { orderUsers, removeUser, renameUser, setWeight } from 'src/app/state/app.actions';
+import { orderUsers, removeUser, renameUser, setWeight, unsetWeights } from 'src/app/state/app.actions';
 
 @Component({
   selector: "app-user-list",
@@ -76,11 +76,11 @@ export class UserListComponent implements OnInit {
   }
 
   getWeightForUser(user: User) {
-    return this.splitterService.getWeightForUser(user);
+    return this.weights?.find(w => w.user.id === user.id).weight || 1;
   }
 
   onResetWeights() {
-    this.splitterService.unSetWeights();
+    this.store.dispatch(unsetWeights());
   }
 
   drop(event: CdkDragDrop<string[]>) {

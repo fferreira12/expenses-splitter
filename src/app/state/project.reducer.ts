@@ -12,7 +12,7 @@ import {
   archiveProject,
   setCurrentProject,
   unarchiveProject,
-  loadProjects, setUser, addEditor, removeEditor, orderProjects, addUser, removeUser, renameUser, orderUsers, setWeight
+  loadProjects, setUser, addEditor, removeEditor, orderProjects, addUser, removeUser, renameUser, orderUsers, setWeight, unsetWeights
 } from "./app.actions";
 import { AppState } from './app.state';
 import { initialState } from './initial.state';
@@ -204,7 +204,7 @@ const _projectReducer = createReducer<AppState>(
   }),
 
   on(setWeight, (state, props) => {
-    if (!props.user || props.weight) return;
+    if (!props.user || !props.weight) return state;
 
     let st = copy(state);
 
@@ -213,6 +213,18 @@ const _projectReducer = createReducer<AppState>(
     let project = Project.fromState(cps);
 
     project.setWeightForUser(props.user, props.weight);
+
+    return replaceProjectState(project, st);
+  }),
+
+  on(unsetWeights, (state) => {
+    let st = copy(state);
+
+    let cps = [...st.selfProjects, ...st.otherProjects].find(p => p.projectId == state.currentProject);
+
+    let project = Project.fromState(cps);
+
+    project.setEvenSplit();
 
     return replaceProjectState(project, st);
   }),
