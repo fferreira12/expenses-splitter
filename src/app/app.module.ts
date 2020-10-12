@@ -6,13 +6,13 @@ import { Routes, RouterModule } from "@angular/router";
 import { HttpClientModule, HttpClient } from "@angular/common/http";
 import { TranslateModule, TranslateLoader } from "@ngx-translate/core";
 import { TranslateHttpLoader } from "@ngx-translate/http-loader";
-import { AngularFireModule } from '@angular/fire';
-import { AngularFirestoreModule } from '@angular/fire/firestore';
-import { AngularFireAuthModule } from '@angular/fire/auth';
-import { AngularFireStorageModule } from '@angular/fire/storage';
-import { DragDropModule } from '@angular/cdk/drag-drop'
-import { MatSnackBarModule } from '@angular/material';
-import { environment } from '../environments/environment';
+import { AngularFireModule } from "@angular/fire";
+import { AngularFirestoreModule, FirestoreSettingsToken as SETTINGS } from "@angular/fire/firestore";
+import { AngularFireAuthModule } from "@angular/fire/auth";
+import { AngularFireStorageModule } from "@angular/fire/storage";
+import { DragDropModule } from "@angular/cdk/drag-drop";
+import { MatSnackBarModule } from "@angular/material";
+import { environment } from "../environments/environment";
 
 import { AppRoutingModule } from "./app-routing.module";
 import { AppComponent } from "./app.component";
@@ -35,12 +35,12 @@ import { ProjectListComponent } from "./components/project-list/project-list.com
 import { ProjectsComponent } from "./components/projects/projects.component";
 import { LoadingComponent } from "./components/loading/loading.component";
 import { LanguageListComponent } from "./components/language-list/language-list.component";
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { StoreModule } from '@ngrx/store';
-import { projectReducer } from './state/project.reducer';
-import { EffectsModule } from '@ngrx/effects';
-import { AppEffects } from './state/app.effects';
-import { StoreDevtoolsModule } from '@ngrx/store-devtools';
+import { NoopAnimationsModule } from "@angular/platform-browser/animations";
+import { StoreModule } from "@ngrx/store";
+import { projectReducer } from "./state/project.reducer";
+import { EffectsModule } from "@ngrx/effects";
+import { AppEffects } from "./state/app.effects";
+import { StoreDevtoolsModule } from "@ngrx/store-devtools";
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http);
@@ -52,28 +52,29 @@ const appRoutes: Routes = [
   {
     path: "projects",
     component: ProjectsComponent,
-    canActivate: [AuthGuardService]
+    canActivate: [AuthGuardService],
   },
   { path: "users", component: UsersComponent, canActivate: [AuthGuardService] },
   {
     path: "expenses",
     component: ExpensesComponent,
-    canActivate: [AuthGuardService]
+    canActivate: [AuthGuardService],
   },
   {
     path: "payments",
     component: PaymentsComponent,
-    canActivate: [AuthGuardService]
+    canActivate: [AuthGuardService],
   },
   {
     path: "balance",
     component: BalanceComponent,
-    canActivate: [AuthGuardService]
+    canActivate: [AuthGuardService],
   },
   { path: "signup", component: SignupComponent },
-  { path: "signin", component: SigninComponent }
+  { path: "signin", component: SigninComponent },
 ];
 
+const shouldUseEmulator = () => false;
 @NgModule({
   declarations: [
     AppComponent,
@@ -94,7 +95,7 @@ const appRoutes: Routes = [
     HomeComponent,
     ProjectListComponent,
     ProjectsComponent,
-    LanguageListComponent
+    LanguageListComponent,
   ],
   imports: [
     BrowserModule,
@@ -107,8 +108,8 @@ const appRoutes: Routes = [
       loader: {
         provide: TranslateLoader,
         useFactory: HttpLoaderFactory,
-        deps: [HttpClient]
-      }
+        deps: [HttpClient],
+      },
     }),
     AngularFireModule.initializeApp(environment.firebaseconfig), // imports firebase/app needed for everything
     AngularFirestoreModule, // imports firebase/firestore, only needed for database features
@@ -117,19 +118,30 @@ const appRoutes: Routes = [
     NoopAnimationsModule,
     DragDropModule,
     MatSnackBarModule,
-    StoreModule.forRoot({ projects: projectReducer }, {
-      runtimeChecks: {
-        strictActionImmutability: false,
-        strictStateImmutability: true
+    StoreModule.forRoot(
+      { projects: projectReducer },
+      {
+        runtimeChecks: {
+          strictActionImmutability: false,
+          strictStateImmutability: true,
+        },
       }
-    }),
+    ),
     StoreDevtoolsModule.instrument({
       maxAge: 25, // Retains last 25 states
       logOnly: environment.production, // Restrict extension to log-only mode
     }),
-    EffectsModule.forRoot([AppEffects])
+    EffectsModule.forRoot([AppEffects]),
   ],
-  providers: [],
-  bootstrap: [AppComponent]
+  providers: [
+    {
+      provide: SETTINGS,
+      useValue: environment.emulator ? {
+        host: 'localhost:8080',
+        ssl: false
+      } : undefined
+    }
+  ],
+  bootstrap: [AppComponent],
 })
 export class AppModule {}
