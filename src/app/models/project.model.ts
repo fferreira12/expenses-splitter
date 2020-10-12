@@ -269,9 +269,13 @@ export class Project {
     //this.expensesObservable.next(this.currentProject.expenses);
   }
 
+  //TODO: improve expense deletion
   removeExpense(expense: Expense) {
+    let s = JSON.stringify(expense);
+    let index = this.expenses.findIndex(exp => JSON.stringify(exp) == s);
+
     try {
-      this.expenses.splice(this.expenses.indexOf(expense), 1);
+      this.expenses.splice(index, 1);
       return true;
     } catch {
       return false;

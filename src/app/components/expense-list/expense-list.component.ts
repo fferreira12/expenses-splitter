@@ -6,7 +6,13 @@ import { Project } from "src/app/models/project.model";
 import { CdkDragDrop, moveItemInArray } from "@angular/cdk/drag-drop";
 import { MatSnackBar } from '@angular/material/snack-bar';
 import * as firebase from "firebase";
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
+import { AppState } from 'src/app/state/app.state';
+import { Store } from '@ngrx/store';
+import { selectCurrentProject, selectExpenses } from 'src/app/state/app.selectors';
+import { Actions, ofType } from '@ngrx/effects';
+import { takeUntil, tap } from 'rxjs/operators';
+import { fileUploadProgressToExpense, fileUploadToExpenseSuccess, removeExpense, startRemoveFileFromExpense, startFileUploadToExpense } from 'src/app/state/app.actions';
 
 @Component({
   selector: "app-expense-list",
@@ -24,19 +30,44 @@ export class ExpenseListComponent implements OnInit {
 
   @Output() editExpense = new EventEmitter<Expense>();
 
-  constructor(private splitterService: SplitterService, private _snackBar: MatSnackBar) {}
+  expenseFile: File = null;
+  destroyed$ = new Subject<boolean>();
+
+  constructor(
+    private splitterService: SplitterService,
+    private store: Store<{projects: AppState}>,
+    private _snackBar: MatSnackBar,
+    private actions$: Actions
+  ) {
+
+   }
 
   ngOnInit() {
-    this.expenses$ = this.splitterService.getExpenses$();
-    this.currentProject = this.splitterService.currentProject;
+    this.expenses$ = this.store.select(selectExpenses);
+    this.store.select(selectCurrentProject).subscribe(p => this.currentProject = p);
     this.expenses$.subscribe(expenses => {
-      this.currentProject = this.splitterService.currentProject;
       this.expenses = expenses;
     });
+
+    this.actions$.pipe(
+      ofType(fileUploadProgressToExpense),
+      tap((status) => {
+        this.percentUploaded = Math.floor(status.percent);
+      })
+    ).subscribe();
+
+    this.actions$.pipe(
+      ofType(fileUploadToExpenseSuccess),
+      tap((status) => {
+        this.openSnackBar("Upload Complete");
+        this.percentUploaded = 0;
+        this.expenseFile = null;
+      })
+    ).subscribe();
   }
 
   onRemoveExpense(expense: Expense) {
-    this.splitterService.removeExpense(expense);
+    this.store.dispatch(removeExpense({ expense }));
   }
 
   onEditExpense(expense: Expense) {
@@ -54,36 +85,14 @@ export class ExpenseListComponent implements OnInit {
   onFilesAdded(expense: Expense, event) {
     this.expenseUploading = expense;
 
-    let file = event.target.files[0];
-    let promise = this.splitterService.addFileToExpense(file, expense);
+    this.expenseFile = event.target.files[0];
 
-    promise.snapshotChanges().subscribe(task => {
-      console.log("got task", task);
-      this.percentUploaded = Math.floor((100 * task.bytesTransferred) / task.totalBytes);
-    });
+    this.store.dispatch(startFileUploadToExpense({expense: expense, file: this.expenseFile}))
 
-    //TODO: refactor: add expense has same code
-    promise.then(task => {
-      if (task.state === firebase.storage.TaskState.SUCCESS) {
-        task.ref.getDownloadURL().then(url => {
-          let newExpense = new Expense(expense.name, expense.value);
-          Object.assign(newExpense, expense);
-          newExpense.fileUrl = url;
-          newExpense.filePath = task.ref.fullPath;
-          newExpense.order = expense.order;
-          console.log("saving expense",  expense);
-          let success = this.splitterService.editExpense(expense, newExpense);
-          if(success) {
-            this.openSnackBar('Upload Complete');
-          }
-        });
-      }
-    });
   }
 
   onDeleteFile(expense: Expense) {
-    let url = expense.fileUrl;
-    this.splitterService.deleteFileFromExpense(expense);
+    this.store.dispatch(startRemoveFileFromExpense({ expense }));
     this.openSnackBar('File Deleted');
   }
 
@@ -92,7 +101,7 @@ export class ExpenseListComponent implements OnInit {
     this.expenses.forEach((exp, i) => {
       this.splitterService.setExpenseOrder(exp, i);
     });
-    
+
   }
 
   openSnackBar(message: string) {

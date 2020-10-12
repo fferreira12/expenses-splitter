@@ -1,40 +1,49 @@
 import { Injectable } from "@angular/core";
-import { Actions, createEffect, Effect, ofType } from "@ngrx/effects";
+import { AngularFireUploadTask } from "@angular/fire/storage";
+import { Actions, createEffect, ofType } from "@ngrx/effects";
 import { Store } from "@ngrx/store";
 import copy from "fast-copy";
-import { EMPTY, from } from "rxjs";
-import { map, mergeMap, catchError, tap, withLatestFrom } from "rxjs/operators";
+import { from, merge, of } from "rxjs";
+import { map, mergeMap, tap, withLatestFrom } from "rxjs/operators";
 import { Project } from "../models/project.model";
 import { AuthService } from "../services/auth.service";
 
 import { Firebasev2Service } from "../services/firebasev2.service";
 import {
   addEditor,
+  addExpense,
   addUser,
   apiCalled,
   appStartup,
   archiveProject,
   createProject,
   deleteProject,
+  editExpense,
+  fileUploadProgressToExpense,
+  fileUploadToExpenseSuccess,
   loadProjects,
   noOp,
   orderProjects,
   orderUsers,
   removeEditor,
+  removeExpense,
+  startRemoveFileFromExpense,
   removeUser,
   renameProject,
   renameUser,
   setCurrentProject,
   setUser,
   setWeight,
+  startFileUploadToExpense,
   unarchiveProject,
   unsetWeights,
+  removeFileFromExpenseSuccess,
 } from "./app.actions";
+import { selectCurrentProject } from "./app.selectors";
 import { AppState } from "./app.state";
 
 @Injectable()
 export class AppEffects {
-
   loadProjects$ = createEffect(() =>
     this.actions$.pipe(
       ofType(setUser),
@@ -87,8 +96,6 @@ export class AppEffects {
     return this.actions$.pipe(
       ofType(setCurrentProject),
       map((action) => {
-        console.log("inside effect");
-
         this.db.saveLastProject(action.projectId);
 
         return apiCalled();
@@ -97,47 +104,41 @@ export class AppEffects {
   });
 
   // @Effect({ dispatch: false })
-  saveProject$ = createEffect(
-    () => {
-      return this.actions$.pipe(
-        ofType(
-          renameProject,
-          archiveProject,
-          unarchiveProject,
-          addEditor,
-          removeEditor
-        ),
-        withLatestFrom(this.store),
-        map(([action, appState]) => {
-          let st: AppState = copy(appState).projects;
-          let p = [...st.selfProjects, ...st.otherProjects].find(
-            (p) => p.projectId == action.projectId
-          );
-          this.db.saveProject(p.ownerId, Project.fromState(p), false);
-          return apiCalled();
-        })
-      );
-    }
-  );
+  saveProject$ = createEffect(() => {
+    return this.actions$.pipe(
+      ofType(
+        renameProject,
+        archiveProject,
+        unarchiveProject,
+        addEditor,
+        removeEditor
+      ),
+      withLatestFrom(this.store),
+      map(([action, appState]) => {
+        let st: AppState = copy(appState).projects;
+        let p = [...st.selfProjects, ...st.otherProjects].find(
+          (p) => p.projectId == action.projectId
+        );
+        this.db.saveProject(p.ownerId, Project.fromState(p), false);
+        return apiCalled();
+      })
+    );
+  });
 
-  saveProjectAfterCreation$ = createEffect(
-    () => {
-      return this.actions$.pipe(
-        ofType(
-          createProject
-        ),
-        withLatestFrom(this.store),
-        map(([action, appState]) => {
-          let st: AppState = copy(appState).projects;
-          let p = [...st.selfProjects, ...st.otherProjects].find(
-            (p) => p.projectId == appState.projects.currentProject
-          );
-          this.db.saveProject(p.ownerId, Project.fromState(p), true);
-          return apiCalled();
-        })
-      );
-    }
-  );
+  saveProjectAfterCreation$ = createEffect(() => {
+    return this.actions$.pipe(
+      ofType(createProject),
+      withLatestFrom(this.store),
+      map(([, appState]) => {
+        let st: AppState = copy(appState).projects;
+        let p = [...st.selfProjects, ...st.otherProjects].find(
+          (p) => p.projectId == appState.projects.currentProject
+        );
+        this.db.saveProject(p.ownerId, Project.fromState(p), true);
+        return apiCalled();
+      })
+    );
+  });
 
   deleteProject$ = createEffect(() => {
     return this.actions$.pipe(
@@ -149,40 +150,128 @@ export class AppEffects {
   });
 
   saveAllProjects$ = createEffect(() => {
-      return this.actions$.pipe(
-        ofType(orderProjects),
-        withLatestFrom(this.store),
-        map(([action, appState]) => {
-          let st: AppState = copy(appState).projects;
-          [
-            ...appState.projects.selfProjects,
-            ...appState.projects.otherProjects,
-          ].forEach((p) => {
-            this.db.saveProject(p.ownerId, Project.fromState(p), false);
-          });
-          return apiCalled();
-        })
-      );
-    }
-  );
+    return this.actions$.pipe(
+      ofType(orderProjects),
+      withLatestFrom(this.store),
+      map(([, appState]) => {
+        [
+          ...appState.projects.selfProjects,
+          ...appState.projects.otherProjects,
+        ].forEach((p) => {
+          this.db.saveProject(p.ownerId, Project.fromState(p), false);
+        });
+        return apiCalled();
+      })
+    );
+  });
 
   saveCurrentProject$ = createEffect(() => {
     return this.actions$.pipe(
-      ofType(addUser, removeUser, renameUser, orderUsers, setWeight, unsetWeights),
+      ofType(
+        addUser,
+        removeUser,
+        renameUser,
+        orderUsers,
+        setWeight,
+        unsetWeights,
+        addExpense,
+        editExpense,
+        removeExpense,
+        removeFileFromExpenseSuccess
+      ),
       withLatestFrom(this.store),
-      map(([action, appState]) => {
+      map(([, appState]) => {
         let st: AppState = copy(appState).projects;
         if (!st) return noOp();
         let p = [...st.selfProjects, ...st.otherProjects].find(
           (p) => p.projectId == appState.projects.currentProject
         );
-        //console.log('saving user to db', action.userName);
         this.db.saveProject(p.ownerId, Project.fromState(p));
         return apiCalled();
       })
     );
-  })
+  });
 
+  onStartFileUploadToExpense$ = createEffect(() => {
+    return this.actions$.pipe(
+      ofType(startFileUploadToExpense),
+      withLatestFrom(this.store),
+      mergeMap(([action, appState]) => {
+        console.log("starting upload");
+
+        let st: AppState = copy(appState).projects;
+        if (!st) return of(noOp());
+        let p: Project = selectCurrentProject({ projects: st });
+        let uploadTask: AngularFireUploadTask = this.db.uploadFile(
+          action.file,
+          p,
+          "expenses"
+        );
+
+        let percentageChanges$ = uploadTask.percentageChanges().pipe(
+          map((percentage) => {
+            console.log("progress: " + percentage);
+            let act = fileUploadProgressToExpense({
+              expense: action.expense,
+              percent: percentage,
+            });
+            console.log(act);
+            return act;
+          })
+        );
+
+        let path: string;
+
+        let completion$ = from(uploadTask).pipe(
+          mergeMap((snapshot) => {
+            console.log("snapshot: ", snapshot);
+            path = snapshot.ref.fullPath;
+            return from(snapshot.ref.getDownloadURL());
+          }),
+          map((downloadUrl) => {
+            let act = fileUploadToExpenseSuccess({
+              expense: action.expense,
+              filePath: path,
+              downloadUrl: downloadUrl,
+            });
+            console.log(act);
+            return act;
+          })
+        );
+
+        // percentageChanges$.subscribe();
+        // completion$.subscribe();
+
+        return merge(percentageChanges$, completion$);
+      })
+    );
+  });
+
+  onFileUploadToExpenseSuccess$ = createEffect(() => {
+    return this.actions$.pipe(
+      ofType(fileUploadToExpenseSuccess),
+      map((action) => {
+        let newExpense = copy(action.expense);
+        let oldExpense = Object.freeze(action.expense);
+        newExpense.filePath = action.filePath;
+        newExpense.fileUrl = action.downloadUrl;
+        return editExpense({ oldExpense, newExpense });
+      })
+    );
+  });
+
+  onExpenseFileDeletion$ = createEffect(() => {
+    return this.actions$.pipe(
+      ofType(startRemoveFileFromExpense),
+      mergeMap((action) => {
+        return this.db.deleteFile(action.expense.filePath).pipe(
+          map(() => {
+            return removeFileFromExpenseSuccess({ expense: action.expense });
+          })
+        );
+      })
+    );
+  });
 
   constructor(
     private actions$: Actions,

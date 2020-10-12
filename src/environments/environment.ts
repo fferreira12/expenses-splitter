@@ -11,7 +11,7 @@ export const environment = {
     authDomain: "expenses-splitter.firebaseapp.com",
     databaseURL: "http://localhost:9000?ns=expenses-splitter",
     projectId: "expenses-splitter",
-    //storageBucket: "expenses-splitter.appspot.com",
+    storageBucket: "expenses-splitter.appspot.com",
     //messagingSenderId: "774324107394"
   },
   emulator: true

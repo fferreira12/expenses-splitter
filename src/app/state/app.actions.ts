@@ -1,4 +1,5 @@
 import { createAction, props } from '@ngrx/store';
+import { Expense } from '../models/expense.model';
 import { User } from '../models/user.model';
 import { ProjectState } from './project.state';
 
@@ -30,15 +31,18 @@ export const orderUsers = createAction('[User] Order', props<{ users: User[] }>(
 export const setWeight = createAction('[User] Set Weight', props<{user: User, weight: number}>());
 export const unsetWeights = createAction('[User] Unset Weights');
 
-// 🔽 TO IMPLEMENT 🔽
-export const addExpense = createAction('[Expense] Add');
+export const addExpense = createAction('[Expense] Add', props<{expense: Expense}>());
+export const startFileUploadToExpense = createAction('[Expense] Start File Upload', props<{expense: Expense, file: File}>());
+export const fileUploadProgressToExpense = createAction('[Expense] File Upload Progress', props<{expense: Expense, percent: number}>());
+export const fileUploadToExpenseSuccess = createAction('[Expense] File Upload Success', props<{expense: Expense, downloadUrl: string, filePath: string}>());
+export const editExpense = createAction('[Expense] Edit', props<{oldExpense: Expense, newExpense: Expense}>());
+export const removeExpense = createAction('[Expense] Remove', props<{expense: Expense}>());
+export const startRemoveFileFromExpense = createAction('[Expense] Remove File Start', props<{expense: Expense}>());
+export const removeFileFromExpenseSuccess = createAction('[Expense] Remove File Success', props<{expense: Expense}>());
 
-export const editExpense = createAction('[Expense] Edit');
-export const removeExpense = createAction('[Expense] Remove');
+// 🔽 TO IMPLEMENT 🔽
 export const getExpenses = createAction('[Expense] Get');
 export const orderExpenses = createAction('[Expense] Order');
-export const addFileToExpense = createAction('[Expense] Add File');
-export const removeFileFromExpense = createAction('[Expense] Remove File');
 
 export const addPayment = createAction('[Payment] Add');
 export const editPayment = createAction('[Payment] Edit');

@@ -23,6 +23,8 @@ export class Expense {
     let e = new Expense(expense.name, expense.value);
     e.users = [...expense.users];
     e.payers = [...expense.payers];
+    e.fileUrl = expense.fileUrl;
+    e.filePath = expense.filePath;
     return e;
   }
 

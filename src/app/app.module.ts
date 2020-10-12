@@ -11,7 +11,7 @@ import { AngularFirestoreModule, FirestoreSettingsToken as SETTINGS } from "@ang
 import { AngularFireAuthModule } from "@angular/fire/auth";
 import { AngularFireStorageModule } from "@angular/fire/storage";
 import { DragDropModule } from "@angular/cdk/drag-drop";
-import { MatSnackBarModule } from "@angular/material";
+import { MatSnackBarModule } from "@angular/material/snack-bar";
 import { environment } from "../environments/environment";
 
 import { AppRoutingModule } from "./app-routing.module";

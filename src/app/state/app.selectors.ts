@@ -48,3 +48,14 @@ export const selectIsEvenSplit = createSelector(
     return project.isEvenSplit();
   }
 );
+
+export const selectExpenses = createSelector(
+  (state: {projects: AppState}) => {
+    return state.projects
+  },
+  (state: AppState) => {
+    let p = [...state.selfProjects, ...state.otherProjects].find(p => p.projectId == state.currentProject);
+    let project = Project.fromState(p);
+    return project.expenses;
+  }
+);
