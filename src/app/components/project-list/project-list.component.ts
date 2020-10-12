@@ -57,7 +57,7 @@ export class ProjectListComponent implements OnInit {
   onAddNewProject() {
     //this.splitterService.createNewProject(this.name.value);
 
-    this.store.dispatch(createProject(this.name.value));
+    this.store.dispatch(createProject({projectName: this.name.value}));
   }
 
   onChangeProject(project: Project) {

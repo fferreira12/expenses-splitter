@@ -14,6 +14,7 @@ import {
   apiCalled,
   appStartup,
   archiveProject,
+  createProject,
   deleteProject,
   loadProjects,
   noOp,
@@ -112,6 +113,25 @@ export class AppEffects {
             (p) => p.projectId == action.projectId
           );
           this.db.saveProject(p.ownerId, Project.fromState(p), false);
+          return apiCalled();
+        })
+      );
+    }
+  );
+
+  saveProjectAfterCreation$ = createEffect(
+    () => {
+      return this.actions$.pipe(
+        ofType(
+          createProject
+        ),
+        withLatestFrom(this.store),
+        map(([action, appState]) => {
+          let st: AppState = copy(appState).projects;
+          let p = [...st.selfProjects, ...st.otherProjects].find(
+            (p) => p.projectId == appState.projects.currentProject
+          );
+          this.db.saveProject(p.ownerId, Project.fromState(p), true);
           return apiCalled();
         })
       );

@@ -23,14 +23,17 @@ const _projectReducer = createReducer<AppState>(
 
   on(createProject, (state, props) => {
     //let newState: AppState = copy(state);
-    let p = new ProjectState();
+    let p = new Project();
     p.ownerId = state.userId;
     p.ownerEmail = state.userEmail;
+    p.projectName = props.projectName;
+    p.order = 0;
+    p.archived = false;
     return {
       ...copy(state),
-      selfProjects: [...state.selfProjects, p],
-      currentProject: p.projectId
-    }
+      selfProjects: [...state.selfProjects, p.getState()],
+      currentProject: p.projectId,
+    };
   }),
 
   on(getAllProjects, (state) => {
