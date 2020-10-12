@@ -45,7 +45,7 @@ export class ProjectListComponent implements OnInit {
     this.allProjects$ = this.store.select(selectOrderedProjects);
     this.allProjects$.subscribe(projects => this.allProjects = projects);
 
-    this.currentProject$ = this.store.select(selectCurrentProject).pipe(map(ps => Project.fromState(ps)));
+    this.currentProject$ = this.store.select(selectCurrentProject);
     this.currentProject$.subscribe(project => {
       //console.log('got current project', project)
       this.currentProject = project

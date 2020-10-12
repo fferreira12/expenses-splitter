@@ -23,7 +23,7 @@ export const selectCurrentProject = createSelector(
   },
   (state: AppState) => {
     let p = [...state.selfProjects, ...state.otherProjects].find(p => p.projectId == state.currentProject);
-    return p;
+    return Project.fromState(p);
   }
 );
 

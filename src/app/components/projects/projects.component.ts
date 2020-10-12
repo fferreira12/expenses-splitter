@@ -49,7 +49,7 @@ export class ProjectsComponent implements OnInit {
       // this.currentProject = this.allProjects[0];
     });
 
-    this.currentProject$ = this.store.select(selectCurrentProject).pipe(map(curr => Project.fromState(curr)));
+    this.currentProject$ = this.store.select(selectCurrentProject);
     // this.currentProject$ = this.splitterService.getCurrentProject$();
 
     this.currentProject$.subscribe(currProject => {

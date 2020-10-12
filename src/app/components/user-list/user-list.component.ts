@@ -9,6 +9,7 @@ import { AppState } from 'src/app/state/app.state';
 import { selectCurrentProject, selectIsEvenSplit, selectWeightsForCurrentProject } from 'src/app/state/app.selectors';
 import { map } from 'rxjs/operators';
 import { orderUsers, removeUser, renameUser, setWeight, unsetWeights } from 'src/app/state/app.actions';
+import { Project } from 'src/app/models/project.model';
 
 @Component({
   selector: "app-user-list",
@@ -25,11 +26,16 @@ export class UserListComponent implements OnInit {
   weights: { user: User, weight: number }[];
   weights$: Observable<{ user: User, weight: number }[]>;
 
+  currentProject$: Observable<Project>;
+  currentProject: Project;
+
   evenSplit: boolean;
 
   constructor(private splitterService: SplitterService, private store: Store<{projects: AppState}>) {}
 
   ngOnInit() {
+    this.currentProject$ = this.store.select(selectCurrentProject);
+    this.currentProject$.subscribe(p => this.currentProject = p);
     this.users$ = this.store.select(selectCurrentProject).pipe(map(curr => curr?.users.slice().sort((a, b) => a.order - b.order)));
     this.users$.subscribe(users => {
       if (!users) return;
@@ -76,11 +82,12 @@ export class UserListComponent implements OnInit {
   }
 
   getWeightForUser(user: User) {
-    return this.weights?.find(w => w.user.id === user.id).weight || 1;
+    return this.currentProject.getWeightForUser(user);
   }
 
   onResetWeights() {
     this.store.dispatch(unsetWeights());
+    delete this.weights;
   }
 
   drop(event: CdkDragDrop<string[]>) {
