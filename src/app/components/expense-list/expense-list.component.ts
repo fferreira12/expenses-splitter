@@ -1,5 +1,4 @@
 import { Component, OnInit, Output, EventEmitter } from "@angular/core";
-import { SplitterService } from "src/app/services/splitter.service";
 import { Expense } from "src/app/models/expense.model";
 import { User } from "src/app/models/user.model";
 import { Project } from "src/app/models/project.model";
@@ -34,7 +33,6 @@ export class ExpenseListComponent implements OnInit {
   destroyed$ = new Subject<boolean>();
 
   constructor(
-    private splitterService: SplitterService,
     private store: Store<{projects: AppState}>,
     private _snackBar: MatSnackBar,
     private actions$: Actions

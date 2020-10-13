@@ -2,7 +2,6 @@ import { Component, OnInit, Input, OnDestroy } from "@angular/core";
 import { FormGroup, FormControl, FormBuilder, FormArray } from "@angular/forms";
 import { MatSnackBar } from "@angular/material/snack-bar";
 
-import { SplitterService } from "src/app/services/splitter.service";
 import { User } from "src/app/models/user.model";
 import { Expense } from "src/app/models/expense.model";
 import { OcrService } from "src/app/services/ocr.service";
@@ -11,7 +10,7 @@ import { Store } from '@ngrx/store';
 import { AppState } from 'src/app/state/app.state';
 import { selectCurrentProject } from 'src/app/state/app.selectors';
 import { map, takeUntil, tap } from 'rxjs/operators';
-import { addExpense, fileUploadProgressToExpense, fileUploadToExpenseSuccess, startFileUploadToExpense } from 'src/app/state/app.actions';
+import { addExpense, editExpense, fileUploadProgressToExpense, fileUploadToExpenseSuccess, startFileUploadToExpense } from 'src/app/state/app.actions';
 import { Actions, ofType } from '@ngrx/effects';
 
 @Component({
@@ -46,7 +45,6 @@ export class AddExpenseComponent implements OnInit, OnDestroy  {
   }
 
   constructor(
-    private splitterService: SplitterService,
     private formBuilder: FormBuilder,
     private ocr: OcrService,
     private _snackBar: MatSnackBar,
@@ -153,10 +151,8 @@ export class AddExpenseComponent implements OnInit, OnDestroy  {
   editExpense() {
     let newExpense = this.getNewExpenseFromForm();
 
-    let edited = this.splitterService.editExpense(this.oldExpense, newExpense);
-    if (edited) {
-      this.onCancelEdit();
-    }
+    this.store.dispatch(editExpense({ oldExpense: this.oldExpense, newExpense }));
+
   }
 
   getNewExpenseFromForm(): Expense {

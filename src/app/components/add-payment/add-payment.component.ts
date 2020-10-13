@@ -1,6 +1,5 @@
 import { Component, OnInit } from "@angular/core";
 import { FormGroup, FormBuilder, FormControl, FormArray } from "@angular/forms";
-import { SplitterService } from "src/app/services/splitter.service";
 import { User } from "src/app/models/user.model";
 import { Payment } from "src/app/models/payment.model";
 import { Observable } from 'rxjs';
@@ -8,6 +7,7 @@ import { Store } from '@ngrx/store';
 import { AppState } from 'src/app/state/app.state';
 import { selectCurrentProject } from 'src/app/state/app.selectors';
 import { map } from 'rxjs/operators';
+import { addPayment } from 'src/app/state/app.actions';
 
 @Component({
   selector: "app-add-payment",
@@ -20,7 +20,6 @@ export class AddPaymentComponent implements OnInit {
   paymentForm: FormGroup;
 
   constructor(
-    private splitterService: SplitterService,
     private formBuilder: FormBuilder,
     private store: Store<{projects: AppState}>
   ) {}
@@ -48,6 +47,6 @@ export class AddPaymentComponent implements OnInit {
     );
     let value = this.paymentForm.controls.value.value;
     let payment = new Payment(payer, receiver, value);
-    this.splitterService.addPayment(payment);
+    this.store.dispatch(addPayment({ payment }));
   }
 }

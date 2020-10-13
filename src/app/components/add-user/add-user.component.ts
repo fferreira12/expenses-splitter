@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { SplitterService } from 'src/app/services/splitter.service';
 import { User } from 'src/app/models/user.model';
 import { AppState } from 'src/app/state/app.state';
 import { Store } from '@ngrx/store';
@@ -15,7 +14,7 @@ export class AddUserComponent implements OnInit {
 
   name = new FormControl('');
 
-  constructor(private splitterService: SplitterService, private store: Store<{ projects: AppState }>) { }
+  constructor(private store: Store<{ projects: AppState }>) { }
 
   ngOnInit() {
   }

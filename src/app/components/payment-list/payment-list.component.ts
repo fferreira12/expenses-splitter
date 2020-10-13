@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
-import { SplitterService } from 'src/app/services/splitter.service';
 import { Payment } from 'src/app/models/payment.model';
 import * as firebase from 'firebase';
 import { Observable } from 'rxjs';
@@ -26,7 +25,6 @@ export class PaymentListComponent implements OnInit {
   paymentUploading: Payment;
 
   constructor(
-    private splitterService: SplitterService,
     private _snackBar: MatSnackBar,
     private store: Store<{ projects: AppState }>,
     private actions$: Actions

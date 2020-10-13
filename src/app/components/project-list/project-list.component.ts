@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { SplitterService } from 'src/app/services/splitter.service';
 import { Project } from 'src/app/models/project.model';
 import { FormControl } from '@angular/forms';
 import { Observable } from 'rxjs';
@@ -29,7 +28,6 @@ export class ProjectListComponent implements OnInit {
   }
 
   constructor(
-    private splitterService: SplitterService,
     private store: Store<{projects: AppState}>
   ) { }
 

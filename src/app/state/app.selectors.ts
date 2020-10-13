@@ -1,6 +1,7 @@
 import { createSelector } from '@ngrx/store';
 import copy from 'fast-copy';
 import { Project } from '../models/project.model';
+import { User } from '../models/user.model';
 import { AppState } from './app.state';
 import { ProjectState } from './project.state';
 
@@ -65,5 +66,65 @@ export const selectPayments = createSelector(
   (state: AppState) => {
     let project = selectCurrentProject({projects: state});
     return putInOrder(copy(project.payments));
+  }
+);
+
+export const selectUnarchivedProjects = createSelector(
+  (state: {projects: AppState}) => {
+    return state.projects
+  },
+  (state: AppState) => {
+    let projects = [...state.selfProjects, ...state.otherProjects].filter(p => !p.archived);
+    return putInOrder(copy(projects));
+  }
+);
+
+export const selectFairShares = createSelector(
+  (state: {projects: AppState}) => {
+    return state.projects
+  },
+  (state: AppState) => {
+    let project = selectCurrentProject({projects: state});
+    return copy(project.getFairShares());
+  }
+);
+
+export const selectWeights = createSelector(
+  (state: {projects: AppState}) => {
+    return state.projects
+  },
+  (state: AppState) => {
+    let project = selectCurrentProject({projects: state});
+    return copy(project.weights);
+  }
+);
+
+export const selectWeightsForUser = createSelector(
+  (state: {projects: AppState}) => {
+    return state.projects
+  },
+  (state: AppState, user: User) => {
+    let project = selectCurrentProject({projects: state});
+    return copy(project.getWeightForUser(user));
+  }
+);
+
+export const selectPaymentsMade = createSelector(
+  (state: {projects: AppState}) => {
+    return state.projects
+  },
+  (state: AppState, user: User) => {
+    let project = selectCurrentProject({projects: state});
+    return copy(project.getPaymentsMade(user));
+  }
+);
+
+export const selectPaymentsReceived = createSelector(
+  (state: {projects: AppState}) => {
+    return state.projects
+  },
+  (state: AppState, user: User) => {
+    let project = selectCurrentProject({projects: state});
+    return copy(project.getPaymentsReceived(user));
   }
 );
