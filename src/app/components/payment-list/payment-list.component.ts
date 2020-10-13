@@ -6,86 +6,87 @@ import { SplitterService } from 'src/app/services/splitter.service';
 import { Payment } from 'src/app/models/payment.model';
 import * as firebase from 'firebase';
 import { Observable } from 'rxjs';
+import { Store } from '@ngrx/store';
+import { AppState } from 'src/app/state/app.state';
+import { selectPayments } from 'src/app/state/app.selectors';
+import { fileUploadProgressToPayment, fileUploadToExpenseSuccess, orderPayments, removeFileFromPaymentSuccess, removePayment, startFileUploadToPayment, startRemoveFileFromPayment } from 'src/app/state/app.actions';
+import { Actions, ofType } from '@ngrx/effects';
+import { tap } from 'rxjs/operators';
 
 @Component({
-  selector: 'app-payment-list',
-  templateUrl: './payment-list.component.html',
-  styleUrls: ['./payment-list.component.css']
+  selector: "app-payment-list",
+  templateUrl: "./payment-list.component.html",
+  styleUrls: ["./payment-list.component.css"],
 })
 export class PaymentListComponent implements OnInit {
-
   payments: Payment[];
   payments$: Observable<Payment[]>;
-  
+
   percentUploaded: number = 0.0;
   paymentUploading: Payment;
 
-  constructor(private splitterService: SplitterService, private _snackBar: MatSnackBar) { }
+  constructor(
+    private splitterService: SplitterService,
+    private _snackBar: MatSnackBar,
+    private store: Store<{ projects: AppState }>,
+    private actions$: Actions
+    ) {}
 
   ngOnInit() {
-    this.payments$ = this.splitterService.getPayments$();
-    this.payments$.subscribe(payments => {
+    this.payments$ = this.store.select(selectPayments);
+    this.payments$.subscribe((payments) => {
       this.payments = payments;
     });
+
+    this.actions$.pipe(
+      ofType(fileUploadProgressToPayment),
+      tap((status) => {
+        this.percentUploaded = Math.floor(status.percent);
+      })
+    ).subscribe();
+
+    this.actions$.pipe(
+      ofType(fileUploadToExpenseSuccess),
+      tap((status) => {
+        this.openSnackBar("Upload Complete");
+        this.percentUploaded = 0;
+      })
+    ).subscribe();
+
+    this.actions$.pipe(
+      ofType(removeFileFromPaymentSuccess),
+      tap((status) => {
+        this.openSnackBar("File Deleted");
+      })
+    ).subscribe();
+
   }
 
   onRemovePayment(payment: Payment) {
-    this.splitterService.removePayment(payment);
+    this.store.dispatch(removePayment({ payment }));
   }
 
   onFilesAdded(payment: Payment, event: any) {
-    /*console.log(payment, event.target.files[0]);
-    let file = event.target.files[0];
-    this.splitterService.addFileToPayment(file, payment);*/
-
-
-
-
     this.paymentUploading = payment;
 
     let file = event.target.files[0];
-    let promise = this.splitterService.addFileToPayment(file, payment);
 
-    promise.snapshotChanges().subscribe(task => {
-      console.log("got task", task);
-      this.percentUploaded = Math.floor((100 * task.bytesTransferred) / task.totalBytes);
-    });
+    this.store.dispatch(startFileUploadToPayment({ payment, file }));
 
-    promise.then(task => {
-      if (task.state === firebase.storage.TaskState.SUCCESS) {
-        task.ref.getDownloadURL().then(url => {
-          let newPayment = new Payment(payment.payer, payment.receiver, payment.value);
-          Object.assign(newPayment, payment);
-          newPayment.fileUrl = url;
-          newPayment.filePath = task.ref.fullPath;
-          newPayment.order = payment.order;
-          console.log("saving payment",  newPayment);
-          let success = this.splitterService.editPayment(payment, newPayment);
-          if(success) {
-            this.openSnackBar('Upload Complete');
-          }
-        });
-      }
-    });
   }
 
   onDeleteFile(payment: Payment) {
-    this.splitterService.deleteFileFromPayment(payment);
-    this.openSnackBar('File Deleted');
+    this.store.dispatch(startRemoveFileFromPayment({ payment }));
   }
 
   drop(event: CdkDragDrop<Payment[]>) {
     moveItemInArray(this.payments, event.previousIndex, event.currentIndex);
-    this.splitterService.setPaymentOrder(event.item.data as Payment, event.currentIndex);
-    this.payments.forEach((pay, i) => {
-      this.splitterService.setPaymentOrder(pay, i);
-    });
+    this.store.dispatch(orderPayments({ payments: this.payments }));
   }
 
   openSnackBar(message: string) {
-    this._snackBar.open(message, 'Close', {
+    this._snackBar.open(message, "Close", {
       duration: 4000,
     });
   }
-
 }

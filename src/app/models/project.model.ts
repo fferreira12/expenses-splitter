@@ -318,13 +318,18 @@ export class Project {
     return true;
   }
 
+  //TODO: improve expense deletion
   removePayment(payment: Payment) {
+    let s = JSON.stringify(payment);
+    let index = this.payments.findIndex(p => JSON.stringify(p) == s);
+
     try {
-      this.payments.splice(this.payments.indexOf(payment), 1);
+      this.payments.splice(index, 1);
       return true;
     } catch {
       return false;
     }
+
   }
 
   updatePayment(oldPayment: Payment, newPayment: Payment) {

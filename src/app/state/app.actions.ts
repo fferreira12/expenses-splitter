@@ -1,5 +1,6 @@
 import { createAction, props } from '@ngrx/store';
 import { Expense } from '../models/expense.model';
+import { Payment } from '../models/payment.model';
 import { User } from '../models/user.model';
 import { ProjectState } from './project.state';
 
@@ -41,16 +42,13 @@ export const startRemoveFileFromExpense = createAction('[Expense] Remove File St
 export const removeFileFromExpenseSuccess = createAction('[Expense] Remove File Success', props<{expense: Expense}>());
 export const orderExpenses = createAction('[Expense] Order', props<{expenses: Expense[]}>());
 
-// 🔽 TO IMPLEMENT 🔽
+export const addPayment = createAction('[Payment] Add', props<{payment: Payment}>());
+export const removePayment = createAction('[Payment] Remove', props<{payment: Payment}>());
+export const orderPayments = createAction('[Payments] Order', props<{payments: Payment[]}>());
 
-export const addPayment = createAction('[Payment] Add');
-export const editPayment = createAction('[Payment] Edit');
-export const removePayment = createAction('[Payment] Remove');
-export const orderPayments = createAction('[Payments] Order');
-export const addFileToPayment = createAction('[Payment] Add File');
-export const removeFileFromPayment = createAction('[Payment] Remove File');
-
-export const updateProject = createAction('[Project] Update');
-export const resetProjects = createAction('[Project] Reset All');
-export const getUsers = createAction('[User] Get All');
-export const getExpenses = createAction('[Expense] Get');
+export const editPayment = createAction('[Payment] Edit', props<{oldPayment: Payment, newPayment: Payment}>());
+export const startFileUploadToPayment = createAction('[Payment] Start File Upload', props<{payment: Payment, file: File}>());
+export const fileUploadProgressToPayment = createAction('[Payment] File Upload Progress', props<{payment: Payment, percent: number}>());
+export const fileUploadToPaymentSuccess = createAction('[Payment] File Upload Success', props<{payment: Payment, downloadUrl: string, filePath: string}>());
+export const startRemoveFileFromPayment = createAction('[Payment] Remove File Start', props<{payment: Payment}>());
+export const removeFileFromPaymentSuccess = createAction('[Payment] Remove File Success', props<{payment: Payment}>());

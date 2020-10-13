@@ -8,7 +8,7 @@ import { WeightedCalculator } from 'src/app/util/weighted-calculator';
 import { Observable } from 'rxjs';
 import { AppState } from 'src/app/state/app.state';
 import { Store } from '@ngrx/store';
-import { selectCurrentProject } from 'src/app/state/app.selectors';
+import { selectCurrentProject, selectPayments } from 'src/app/state/app.selectors';
 import { map } from 'rxjs/operators';
 
 @Component({
@@ -36,19 +36,15 @@ export class BalanceComponent implements OnInit {
     this.fairShares = this.splitterService.getFairShares();
     this.calculator.setFairShares(this.fairShares);
 
-    //this.updateValuesSharesAndBalance();
-
     this.expenses$ = this.splitterService.getExpenses$();
     this.expenses$.subscribe(expenses => {
       this.expenses = expenses;
       this.updateValuesSharesAndBalance();
     });
 
-    this.splitterService.getPayments$().subscribe(payments => {
-      this.updateValuesSharesAndBalance();
-    });
 
-    //this.users$ = this.splitterService.getUsers$()
+    this.store.select(selectPayments).subscribe(payments => this.updateValuesSharesAndBalance());
+
     this.users$ = this.store.select(selectCurrentProject).pipe(map(curr => curr.users));
     this.users$.subscribe(users => {
       this.users = users;

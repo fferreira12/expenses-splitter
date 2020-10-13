@@ -2,6 +2,7 @@ import { state } from '@angular/animations';
 import { createReducer, on, props } from "@ngrx/store";
 import copy from "fast-copy";
 import { Expense } from '../models/expense.model';
+import { Payment } from '../models/payment.model';
 import { Project } from '../models/project.model';
 import { User } from '../models/user.model';
 import {
@@ -13,7 +14,7 @@ import {
   archiveProject,
   setCurrentProject,
   unarchiveProject,
-  loadProjects, setUser, addEditor, removeEditor, orderProjects, addUser, removeUser, renameUser, orderUsers, setWeight, unsetWeights, addExpense, editExpense, removeExpense, startRemoveFileFromExpense, removeFileFromExpenseSuccess, fileUploadToExpenseSuccess, orderExpenses
+  loadProjects, setUser, addEditor, removeEditor, orderProjects, addUser, removeUser, renameUser, orderUsers, setWeight, unsetWeights, addExpense, editExpense, removeExpense, startRemoveFileFromExpense, removeFileFromExpenseSuccess, fileUploadToExpenseSuccess, orderExpenses, addPayment, editPayment, removePayment, orderPayments, removeFileFromPaymentSuccess
 } from "./app.actions";
 import { AppState } from './app.state';
 import { initialState } from './initial.state';
@@ -296,6 +297,74 @@ const _projectReducer = createReducer<AppState>(
     return replaceProjectState(Project.fromState(cps), st);
   }),
 
+  on(addPayment, (state, props) => {
+    let st = copy(state);
+
+    let cps = getCurrentProjectFromState(st);
+
+    let project = Project.fromState(cps);
+
+    project.addPayment(props.payment, false);
+
+    return replaceProjectState(project, st);
+  }),
+
+  on(editPayment, (state, props) => {
+    let st = copy(state);
+
+    let cps = getCurrentProjectFromState(st);
+
+    let project = Project.fromState(cps);
+
+    project.updatePayment(props.oldPayment, props.newPayment);
+
+    return replaceProjectState(project, st);
+  }),
+
+  on(removePayment, (state, props) => {
+    let st = copy(state);
+
+    let cps = getCurrentProjectFromState(st);
+
+    let project = Project.fromState(cps);
+
+    project.removePayment(props.payment);
+
+    return replaceProjectState(project, st);
+  }),
+
+  on(orderPayments, (state, props) => {
+    let st = copy(state);
+
+    let cps = getCurrentProjectFromState(st);
+
+    let ordered = props.payments.map((payment, index) => {
+      payment.order = index;
+      return payment;
+    })
+
+    cps.payments = ordered;
+
+    return replaceProjectState(Project.fromState(cps), st);
+  }),
+
+  on(removeFileFromPaymentSuccess, (state, props) => {
+    let st = copy(state);
+
+    let cps = getCurrentProjectFromState(st);
+
+    let project = Project.fromState(cps);
+
+    let oldP = copy(props.payment);
+    let newP = copy(props.payment);
+
+    newP.filePath = "";
+    newP.fileUrl = "";
+
+    project.updatePayment(oldP, newP);
+
+    return replaceProjectState(project, st);
+  }),
 
 );
 

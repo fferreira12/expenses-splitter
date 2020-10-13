@@ -33,9 +33,8 @@ export const selectWeightsForCurrentProject = createSelector(
     return state.projects
   },
   (state: AppState) => {
-    let p = [...state.selfProjects, ...state.otherProjects].find(p => p.projectId == state.currentProject);
-    if (!p) return;
-    return p.weights;
+    let project = selectCurrentProject({projects: state});
+    return project.weights;
   }
 );
 
@@ -44,8 +43,7 @@ export const selectIsEvenSplit = createSelector(
     return state.projects
   },
   (state: AppState) => {
-    let p = [...state.selfProjects, ...state.otherProjects].find(p => p.projectId == state.currentProject);
-    let project = Project.fromState(p);
+    let project = selectCurrentProject({projects: state});
     return project.isEvenSplit();
   }
 );
@@ -55,8 +53,17 @@ export const selectExpenses = createSelector(
     return state.projects
   },
   (state: AppState) => {
-    let p = [...state.selfProjects, ...state.otherProjects].find(p => p.projectId == state.currentProject);
-    let project = Project.fromState(p);
+    let project = selectCurrentProject({projects: state});
     return putInOrder(copy(project.expenses));
+  }
+);
+
+export const selectPayments = createSelector(
+  (state: {projects: AppState}) => {
+    return state.projects
+  },
+  (state: AppState) => {
+    let project = selectCurrentProject({projects: state});
+    return putInOrder(copy(project.payments));
   }
 );
