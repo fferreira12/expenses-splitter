@@ -39,10 +39,9 @@ export const editExpense = createAction('[Expense] Edit', props<{oldExpense: Exp
 export const removeExpense = createAction('[Expense] Remove', props<{expense: Expense}>());
 export const startRemoveFileFromExpense = createAction('[Expense] Remove File Start', props<{expense: Expense}>());
 export const removeFileFromExpenseSuccess = createAction('[Expense] Remove File Success', props<{expense: Expense}>());
+export const orderExpenses = createAction('[Expense] Order', props<{expenses: Expense[]}>());
 
 // 🔽 TO IMPLEMENT 🔽
-export const getExpenses = createAction('[Expense] Get');
-export const orderExpenses = createAction('[Expense] Order');
 
 export const addPayment = createAction('[Payment] Add');
 export const editPayment = createAction('[Payment] Edit');
@@ -54,3 +53,4 @@ export const removeFileFromPayment = createAction('[Payment] Remove File');
 export const updateProject = createAction('[Project] Update');
 export const resetProjects = createAction('[Project] Reset All');
 export const getUsers = createAction('[User] Get All');
+export const getExpenses = createAction('[Expense] Get');

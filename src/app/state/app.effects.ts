@@ -38,6 +38,7 @@ import {
   unarchiveProject,
   unsetWeights,
   removeFileFromExpenseSuccess,
+  orderExpenses,
 } from "./app.actions";
 import { selectCurrentProject } from "./app.selectors";
 import { AppState } from "./app.state";
@@ -177,7 +178,8 @@ export class AppEffects {
         addExpense,
         editExpense,
         removeExpense,
-        removeFileFromExpenseSuccess
+        removeFileFromExpenseSuccess,
+        orderExpenses
       ),
       withLatestFrom(this.store),
       map(([, appState]) => {

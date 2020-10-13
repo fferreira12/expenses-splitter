@@ -12,7 +12,7 @@ import { Store } from '@ngrx/store';
 import { selectCurrentProject, selectExpenses } from 'src/app/state/app.selectors';
 import { Actions, ofType } from '@ngrx/effects';
 import { takeUntil, tap } from 'rxjs/operators';
-import { fileUploadProgressToExpense, fileUploadToExpenseSuccess, removeExpense, startRemoveFileFromExpense, startFileUploadToExpense } from 'src/app/state/app.actions';
+import { fileUploadProgressToExpense, fileUploadToExpenseSuccess, removeExpense, startRemoveFileFromExpense, startFileUploadToExpense, orderExpenses } from 'src/app/state/app.actions';
 
 @Component({
   selector: "app-expense-list",
@@ -98,10 +98,7 @@ export class ExpenseListComponent implements OnInit {
 
   drop(event: CdkDragDrop<string[]>) {
     moveItemInArray(this.expenses, event.previousIndex, event.currentIndex);
-    this.expenses.forEach((exp, i) => {
-      this.splitterService.setExpenseOrder(exp, i);
-    });
-
+    this.store.dispatch(orderExpenses({ expenses: this.expenses }));
   }
 
   openSnackBar(message: string) {

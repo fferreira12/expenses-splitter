@@ -13,7 +13,7 @@ import {
   archiveProject,
   setCurrentProject,
   unarchiveProject,
-  loadProjects, setUser, addEditor, removeEditor, orderProjects, addUser, removeUser, renameUser, orderUsers, setWeight, unsetWeights, addExpense, editExpense, removeExpense, startRemoveFileFromExpense, removeFileFromExpenseSuccess, fileUploadToExpenseSuccess
+  loadProjects, setUser, addEditor, removeEditor, orderProjects, addUser, removeUser, renameUser, orderUsers, setWeight, unsetWeights, addExpense, editExpense, removeExpense, startRemoveFileFromExpense, removeFileFromExpenseSuccess, fileUploadToExpenseSuccess, orderExpenses
 } from "./app.actions";
 import { AppState } from './app.state';
 import { initialState } from './initial.state';
@@ -279,6 +279,21 @@ const _projectReducer = createReducer<AppState>(
     project.updateExpense(oldE, newE);
 
     return replaceProjectState(project, st);
+  }),
+
+  on(orderExpenses, (state, props) => {
+    let st = copy(state);
+
+    let cps = getCurrentProjectFromState(st);
+
+    let ordered = props.expenses.map((expense, index) => {
+      expense.order = index;
+      return expense;
+    })
+
+    cps.expenses = ordered;
+
+    return replaceProjectState(Project.fromState(cps), st);
   }),
 
 
