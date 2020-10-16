@@ -102,7 +102,7 @@ export class Project {
     this.ownerEmail = state.ownerEmail;
     this.projectId = state.projectId;
     this.projectName = state.projectName;
-    this.setData(state.users, state.expenses, state.payments);
+    this.setData(state.users, state.expenses.map(e => Expense.createExpense(e)), state.payments);
     this.order = state.order;
     this._total = state._total;
     this.archived = state.archived;
@@ -271,8 +271,9 @@ export class Project {
 
   //TODO: improve expense deletion
   removeExpense(expense: Expense) {
-    let s = JSON.stringify(expense);
-    let index = this.expenses.findIndex(exp => JSON.stringify(exp) == s);
+    let index = this.expenses.findIndex(exp => exp.isEqualTo(expense));
+
+    if (index == -1) return false;
 
     try {
       this.expenses.splice(index, 1);
