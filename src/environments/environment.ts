@@ -4,15 +4,19 @@
 
 export const environment = {
   production: false,
-  firebaseconfig : {
+  firebaseconfig: {
+    host: "localhost:8080",
+    ssl: "false",
     apiKey: "AIzaSyCd_YNHAiC18p5OXcXTMBRdUjXkdmww3jk",
     authDomain: "expenses-splitter.firebaseapp.com",
-    databaseURL: "https://expenses-splitter.firebaseio.com",
+    databaseURL: "http://localhost:9000?ns=expenses-splitter",
     projectId: "expenses-splitter",
     storageBucket: "expenses-splitter.appspot.com",
-    messagingSenderId: "774324107394"
-  }
+    //messagingSenderId: "774324107394"
+  },
+  emulator: true
 };
+
 
 /*
  * For easier debugging in development mode, you can import the following file

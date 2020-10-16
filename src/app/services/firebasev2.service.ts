@@ -7,7 +7,7 @@ import { User } from "../models/user.model";
 import { Expense } from "../models/expense.model";
 import { Payment } from "../models/payment.model";
 import { AngularFirestore, AngularFirestoreDocument } from '@angular/fire/firestore';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { from } from 'rxjs';
 import { AuthService } from './auth.service';
@@ -40,7 +40,7 @@ export class Firebasev2Service {
 
   verifyUserId() {
     if (!this.userId) {
-      throw new Error("Must set the user id before using Firebase Service V2");
+      console.warn("Must set the user id before using Firebase Service V2");
     }
   }
 
@@ -60,22 +60,26 @@ export class Firebasev2Service {
     */
 
     // NEW
+    if (project.isEmptyProject()) return;
+
     project.ownerId = ownerId;
     let plainJSProject = JSON.parse(JSON.stringify(project));
     this.db.collection('projects2').doc<Project>(project.projectId).set(plainJSProject);
 
     if(isCurrentProject) {
-      this.saveLastProject(project);
+      this.saveLastProject(project.projectId);
     }
   }
 
-  saveLastProject(project: Project) {
-    this.db
+  saveLastProject(projectId: string) {
+    if (!projectId) return;
+
+    return this.db
     .collection("last-projects")
     .doc(this.userId)
     .set({
-      projectId: project.projectId,
-      projectName: project.projectName,
+      projectId: projectId,
+      //projectName: project.projectName,
       userId: this.userId
     });
   }
@@ -93,9 +97,12 @@ export class Firebasev2Service {
     return doc.get();
   }
 
-  getLastProject() {
-    this.verifyUserId();
-    return this.db.collection('last-projects').doc(this.userId).get();
+  getLastProject(userId: string = undefined) {
+    if (!(userId || this.userId)) {
+      this.verifyUserId();
+      return of(null);
+    }
+    return this.db.collection('last-projects').doc(userId || this.userId).get();
   }
 
   // saveUser(projectId: string, user: User) {
@@ -111,18 +118,25 @@ export class Firebasev2Service {
 
   // savePayment(payment: Payment) {}
 
-  getProjectsOfUser(getArchived: boolean = false) {
+  getProjectsOfUser(getArchived: boolean = false, userId = undefined) {
     //console.log('getting projects of user: ', this.afAuth.auth.currentUser)
 
-    let collection = getArchived ?
-      this.db.collection<Project>("projects2") :
-      this.db.collection<Project>("projects2", ref => ref.where('archived', '==', getArchived));
+    // let collection = getArchived ?
+    //   this.db.collection<Project>("projects2") :
+    //   this.db.collection<Project>("projects2", ref => ref.where('archived', '==', getArchived));
 
-    return collection.valueChanges().pipe(map(projects => {
-      return projects.filter(p => p.ownerId == this.userId);
+    if (!(this.userId || userId)) return of([]);
+
+
+    let collection = this.db.collection<Project>("projects2", ref => ref.where('ownerId', '==', userId || this.userId));
+
+    let result = collection.valueChanges().pipe(map(projects => {
+      let ps = projects.filter(p => getArchived || !p.archived);
+      return ps;
     }));
 
 
+    return result;
 
     /*
     .where("userId", "==", this.userId)

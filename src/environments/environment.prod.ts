@@ -7,5 +7,6 @@ export const environment = {
     projectId: "expenses-splitter",
     storageBucket: "expenses-splitter.appspot.com",
     messagingSenderId: "774324107394"
-  }
+  },
+  emulator: false
 };

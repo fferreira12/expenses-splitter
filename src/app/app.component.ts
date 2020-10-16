@@ -1,8 +1,9 @@
 import { Component, OnInit } from "@angular/core";
+import { Store } from '@ngrx/store';
 import { TranslateService } from "@ngx-translate/core";
-import * as firebase from "firebase";
 import { AuthService } from "./services/auth.service";
-import { SplitterService } from './services/splitter.service';
+import { appStartup } from './state/app.actions';
+import { AppState } from './state/app.state';
 
 @Component({
   selector: "app-root",
@@ -13,8 +14,8 @@ export class AppComponent implements OnInit {
   title = "expense-splitter-frontend";
 
   constructor(
-    private authService: AuthService,
-    private translate: TranslateService
+    private translate: TranslateService,
+    private store: Store<{ app: AppState }>
   ) {
     translate.setDefaultLang("en");
     // firebase.initializeApp({
@@ -31,7 +32,9 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit() {
-    
+    console.log('dispatching initial action');
+
+    this.store.dispatch(appStartup());
   }
 
   switchLanguage(language: string) {

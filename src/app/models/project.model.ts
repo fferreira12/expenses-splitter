@@ -2,6 +2,8 @@ import { User } from "./user.model";
 import { Expense } from "./expense.model";
 import { Payment } from "./payment.model";
 import { uuid } from "../util/uuid";
+import { ProjectState } from '../state/project.state';
+import copy from 'fast-copy';
 
 export class Project {
   editors: string[] = [];
@@ -16,7 +18,7 @@ export class Project {
 
   order: number;
 
-  _total: number;
+  _total: number = 0;
   get total(): number {
     if(!this.expenses) {
       return 0;
@@ -59,6 +61,54 @@ export class Project {
     this.setData(users, expenses, payments);
   }
 
+  isEmptyProject() {
+    return this.projectName == "Default" && this.users.length == 0 && this.expenses.length == 0 && this.payments.length == 0 && this.editors.length == 0;
+  }
+
+  public static fromState(projectState: ProjectState): Project {
+    let p = new Project();
+    p.setState(projectState);
+    return p;
+  }
+
+  public static batchFromState(projectStates: ProjectState[]): Project[] {
+    let clone = copy(projectStates);
+    return clone.map(state => Project.fromState(state));
+  }
+
+  getState(): ProjectState {
+    let clone: Project = copy(this);
+    let state: ProjectState = {
+      editors: clone.editors,
+      ownerId: clone.ownerId,
+      ownerEmail: clone.ownerEmail,
+      projectId: clone.projectId,
+      projectName: clone.projectName,
+      users: clone.users,
+      expenses: clone.expenses,
+      payments: clone.payments,
+      order: clone.order,
+      _total: clone._total,
+      archived: clone.archived,
+      weights: clone.weights,
+    }
+    return state;
+  }
+
+  setState(state: ProjectState) {
+    if (!state) return;
+    this.editors = state.editors;
+    this.ownerId = state.ownerId;
+    this.ownerEmail = state.ownerEmail;
+    this.projectId = state.projectId;
+    this.projectName = state.projectName;
+    this.setData(state.users, state.expenses.map(e => Expense.createExpense(e)), state.payments);
+    this.order = state.order;
+    this._total = state._total;
+    this.archived = state.archived;
+    this.weights = state.weights;
+  }
+
   setData(users?: User[], expenses?: Expense[], payments?: Payment[]) {
     this.users = users || [];
     this.expenses = expenses || [];
@@ -80,6 +130,10 @@ export class Project {
     }
     this.users.push(user);
     return true;
+  }
+
+  getUser(userId: string): User {
+    return this.users.find(u => u.id === userId);
   }
 
   addEditor(email: string) {
@@ -105,6 +159,16 @@ export class Project {
     return true;
   }
 
+  removeUserById(userId: string) {
+    let index = this.users.findIndex(user => user.id === userId);
+    if (index == -1) {
+      return false;
+    } else {
+      this.users.splice(index, 1);
+      return true;
+    }
+  }
+
   renameUser(user: User, newName: string): boolean {
     if (!this.users.includes(user)) {
       return false;
@@ -118,10 +182,19 @@ export class Project {
     }
   }
 
+  renameUserById(userId: string, newName: string) {
+    let user = this.users.find(u => u.id === userId);
+    if (!user) {
+      return false;
+    } else {
+      return this.renameUser(user, newName);
+    }
+  }
+
   updateUsernameInExpensesMade(user: User, newName: string) {
     //update expense
     this.expenses.forEach((expense, expenseIndex) => {
-      
+
       //updates users
       expense.users.forEach((u, userIndex) => {
         if(u.id === user.id) {
@@ -196,9 +269,14 @@ export class Project {
     //this.expensesObservable.next(this.currentProject.expenses);
   }
 
+  //TODO: improve expense deletion
   removeExpense(expense: Expense) {
+    let index = this.expenses.findIndex(exp => exp.isEqualTo(expense));
+
+    if (index == -1) return false;
+
     try {
-      this.expenses.splice(this.expenses.indexOf(expense), 1);
+      this.expenses.splice(index, 1);
       return true;
     } catch {
       return false;
@@ -241,13 +319,18 @@ export class Project {
     return true;
   }
 
+  //TODO: improve expense deletion
   removePayment(payment: Payment) {
+    let s = JSON.stringify(payment);
+    let index = this.payments.findIndex(p => JSON.stringify(p) == s);
+
     try {
-      this.payments.splice(this.payments.indexOf(payment), 1);
+      this.payments.splice(index, 1);
       return true;
     } catch {
       return false;
     }
+
   }
 
   updatePayment(oldPayment: Payment, newPayment: Payment) {
@@ -341,7 +424,7 @@ export class Project {
     if(!this.weights) {
       this.weights = [];
     }
-    
+
     this.weights = [
       ...this.weights.filter(weight => weight.user.id !== user.id),
       { user, weight: parseFloat(weight) }
@@ -377,7 +460,7 @@ export class Project {
     let evenSplit = !this.weights;
 
     this.expenses.forEach(expense => {
-      
+
       expense.users.forEach(user => {
         let amount = (expense.value * this.getWeightForUser(user)) / this.getTotalWeight(expense);
         fairShares[user.id] += amount;

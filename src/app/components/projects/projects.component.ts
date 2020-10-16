@@ -5,6 +5,11 @@ import { SplitterService } from "src/app/services/splitter.service";
 import { Project } from "src/app/models/project.model";
 import { FormControl } from "@angular/forms";
 import { Observable } from 'rxjs';
+import { Store } from '@ngrx/store';
+import { AppState } from 'src/app/state/app.state';
+import { createProject, renameProject, setCurrentProject, startLoadArchivedProjects } from 'src/app/state/app.actions';
+import { map } from 'rxjs/operators';
+import { selectCurrentProject, selectOrderedProjects } from 'src/app/state/app.selectors';
 
 @Component({
   selector: "app-projects",
@@ -26,7 +31,7 @@ export class ProjectsComponent implements OnInit {
   set showArchivedProjects(val: boolean) {
     this._showArchivedProjects = val;
     if(val) {
-      this.splitterService.getArchivedProjects();
+      this.store.dispatch(startLoadArchivedProjects());
     }
   }
 
@@ -34,23 +39,29 @@ export class ProjectsComponent implements OnInit {
     return this._showArchivedProjects;
   }
 
-  constructor(private splitterService: SplitterService) {}
+  constructor(private splitterService: SplitterService, private store: Store<{ projects: AppState }>) {}
 
   ngOnInit() {
-    this.allProjects$ = this.splitterService.getAllProjects$();
+    // this.allProjects$ = this.splitterService.getAllProjects$();
+    this.allProjects$ = this.store.select(selectOrderedProjects);
     this.allProjects$.subscribe(allProjects => {
       this.allProjects = allProjects;
+      // this.currentProject = this.allProjects[0];
     });
-    
-    this.currentProject$ = this.splitterService.getCurrentProject$();
+
+    this.currentProject$ = this.store.select(selectCurrentProject);
+    // this.currentProject$ = this.splitterService.getCurrentProject$();
+
     this.currentProject$.subscribe(currProject => {
       this.currentProject = currProject;
     });
+
   }
 
   onActivateProject(project: Project) {
     //console.log('project to activate: ' + project.projectName);
-    this.splitterService.setCurrentProject(project);
+    //this.splitterService.setCurrentProject(project);
+    this.store.dispatch(setCurrentProject({ projectId: project.projectId }));
   }
 
   onDeleteProject(project: Project) {
@@ -59,12 +70,14 @@ export class ProjectsComponent implements OnInit {
   }
 
   onAddProject() {
-    this.splitterService.createNewProject(this.projectName.value);
+    //this.splitterService.createNewProject(this.projectName.value);
+    this.store.dispatch(createProject({projectName: this.projectName.value}));
   }
 
   onRenameProject(project: Project) {
     //console.log('project to rename: ' + project.projectName);
-    this.splitterService.renameProject(project, this.projectNewName.value);
+    //this.splitterService.renameProject(project, this.projectNewName.value);
+    this.store.dispatch(renameProject({ projectId: project.projectId, newName: this.projectNewName.value }));
   }
 
   onToggleInviteUser() {
@@ -86,10 +99,10 @@ export class ProjectsComponent implements OnInit {
   }
 
   isCurrentProject(project: Project) {
-    if(!project) {
+    if(!project || !this.currentProject) {
       return false;
     }
-    return project.projectName == this.currentProject.projectName;
+    return project.projectId == this.currentProject.projectId;
   }
 
   onArchiveProject(project: Project) {

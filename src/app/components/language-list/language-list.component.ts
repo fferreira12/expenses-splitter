@@ -1,7 +1,6 @@
 import { Component, OnInit, Output, EventEmitter } from "@angular/core";
 import { TranslateService } from "@ngx-translate/core";
 import { Firebasev2Service } from 'src/app/services/firebasev2.service';
-import { SplitterService } from 'src/app/services/splitter.service';
 
 
 @Component({

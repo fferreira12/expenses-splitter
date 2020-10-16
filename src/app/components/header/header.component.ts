@@ -1,6 +1,5 @@
 import { Component, OnInit, Output, EventEmitter } from "@angular/core";
 import { AuthService } from "src/app/services/auth.service";
-import { SplitterService } from "src/app/services/splitter.service";
 
 @Component({
   selector: "app-header",

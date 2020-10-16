@@ -1,5 +1,4 @@
 import { User } from "./user.model";
-import { throwError } from "rxjs";
 import { PayersArray } from "../util/types";
 
 export class Expense {
@@ -23,6 +22,9 @@ export class Expense {
     let e = new Expense(expense.name, expense.value);
     e.users = [...expense.users];
     e.payers = [...expense.payers];
+    e.fileUrl = expense.fileUrl;
+    e.filePath = expense.filePath;
+    e.order = expense.order;
     return e;
   }
 
@@ -76,5 +78,28 @@ export class Expense {
       }
     });
     return total;
+  }
+
+  isEqualTo(expense: Expense) {
+
+    let sameName = this.name == expense.name;
+    let sameValue = this.value == expense.value;
+
+    let sameUsers = this.users.every(user => {
+      return expense.users.some(u => u.id == user.id);
+    }) && this.users.length === expense.users.length;
+
+    let samePayers = this.payers.every(payer => {
+      return expense.payers.some(p => {
+        return p.payer.id == payer.payer.id && p.amount == payer.amount;
+      });
+    });
+
+    let sameUrl = this.fileUrl == expense.fileUrl;
+    let samePath = this.filePath == expense.filePath;
+
+    return (
+      sameName && sameValue && sameUsers && samePayers && sameUrl && samePath
+    );
   }
 }

@@ -17,9 +17,9 @@
         <td>{{ user.name }}</td>
         <td>{{ fairShares[user.id] | currency: "R$ " }}</td>
         <td>{{ paidValues[user.id] | currency: "R$ " }}</td>
-        <td>{{ getPaymentsMade(user) | currency: "R$ " }}</td>
+        <td>{{ getPaymentsMade(user) | async | currency: "R$ " }}</td>
         <td>
-          {{ getPaymentsReceived(user) | currency: "R$ " }}
+          {{ getPaymentsReceived(user) | async | currency: "R$ " }}
         </td>
         <td>{{ balances[user.id] | currency: "R$ " }}</td>
       </tr>

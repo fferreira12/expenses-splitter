@@ -129,7 +129,7 @@ export class SplitterService {
 
   setCurrentProject(project: Project) {
     this.currentProject = project;
-    this.db.saveLastProject(project);
+    this.db.saveLastProject(project.projectId);
     this.emitAllCurrentData();
   }
 
@@ -587,7 +587,7 @@ export class SplitterService {
     );
   }
 
-  getWeights() {
+  private getWeights() {
     return this.currentProject.weights;
   }
 
@@ -606,6 +606,7 @@ export class SplitterService {
     this.emitAllCurrentData();
   }
 
+  // TODO: not being used, evaluate removal
   setWeights(weigths: { user: User; weight: number }[]) {
     this.currentProject.setUnevenSplit(weigths);
     this.weightsObservable.next(this.getWeights());

@@ -1,20 +1,24 @@
-import { Component, OnInit, Input } from "@angular/core";
+import { Component, OnInit, Input, OnDestroy } from "@angular/core";
 import { FormGroup, FormControl, FormBuilder, FormArray } from "@angular/forms";
 import { MatSnackBar } from "@angular/material/snack-bar";
-import * as firebase from "firebase";
 
-import { SplitterService } from "src/app/services/splitter.service";
 import { User } from "src/app/models/user.model";
 import { Expense } from "src/app/models/expense.model";
 import { OcrService } from "src/app/services/ocr.service";
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
+import { Store } from '@ngrx/store';
+import { AppState } from 'src/app/state/app.state';
+import { selectCurrentProject } from 'src/app/state/app.selectors';
+import { map, takeUntil, tap } from 'rxjs/operators';
+import { addExpense, editExpense, fileUploadProgressToExpense, fileUploadToExpenseSuccess, startFileUploadToExpense } from 'src/app/state/app.actions';
+import { Actions, ofType } from '@ngrx/effects';
 
 @Component({
   selector: "app-add-expense",
   templateUrl: "./add-expense.component.html",
   styleUrls: ["./add-expense.component.css"]
 })
-export class AddExpenseComponent implements OnInit {
+export class AddExpenseComponent implements OnInit, OnDestroy  {
   expenseForm: FormGroup;
   users: User[] = [];
   users$: Observable<User[]>;
@@ -26,6 +30,8 @@ export class AddExpenseComponent implements OnInit {
 
   expenseFile: File = null;
   percentUploaded: number = 0.0;
+
+  destroyed$ = new Subject<boolean>();
 
   @Input() set editingExpense(expense: Expense) {
     if (!expense) {
@@ -39,19 +45,44 @@ export class AddExpenseComponent implements OnInit {
   }
 
   constructor(
-    private splitterService: SplitterService,
     private formBuilder: FormBuilder,
     private ocr: OcrService,
-    private _snackBar: MatSnackBar
+    private _snackBar: MatSnackBar,
+    private store: Store<{ projects: AppState }>,
+    private actions$: Actions
   ) {}
 
   ngOnInit() {
     this.startForm();
-    this.users$ = this.splitterService.getUsers$()
+    //this.users$ = this.splitterService.getUsers$()
+    this.users$ = this.store.select(selectCurrentProject).pipe(map(curr => curr?.users));
     this.users$.subscribe(users => {
       this.users = users;
       this.startForm();
     });
+
+    this.actions$.pipe(
+      ofType(fileUploadProgressToExpense),
+      takeUntil(this.destroyed$),
+      tap((status) => {
+        this.percentUploaded = Math.floor(status.percent);
+      })
+    );
+
+    this.actions$.pipe(
+      ofType(fileUploadToExpenseSuccess),
+      takeUntil(this.destroyed$),
+      tap((status) => {
+        this.openSnackBar("Upload Complete");
+        this.percentUploaded = 0;
+        this.expenseFile = null;
+      })
+    );
+  }
+
+  ngOnDestroy() {
+    this.destroyed$.next(true);
+    this.destroyed$.complete();
   }
 
   startForm() {
@@ -85,7 +116,6 @@ export class AddExpenseComponent implements OnInit {
   }
 
   updateForm() {
-    //debugger;
     if (!this._editingExpense) return;
     let onePayer = this._editingExpense.payers.length == 1;
     this.singlePayer = onePayer;
@@ -108,48 +138,21 @@ export class AddExpenseComponent implements OnInit {
     if (this._editingExpense) {
       this.editExpense();
     } else {
-      let success = this.splitterService.addExpense(e);
+      // let success = this.splitterService.addExpense(e);
+      this.store.dispatch(addExpense({ expense: e }));
 
-      if (success && this.expenseFile) {
-        let task = this.splitterService.addFileToExpense(this.expenseFile, e);
-
-        task.snapshotChanges().subscribe(task => {
-          console.log("got task", task);
-          this.percentUploaded = Math.floor(
-            (100 * task.bytesTransferred) / task.totalBytes
-          );
-        });
-
-        //TODO: refactor: expense list has same code
-        task.then(task => {
-          if (task.state === firebase.storage.TaskState.SUCCESS) {
-            task.ref.getDownloadURL().then(url => {
-              let newExpense = new Expense(e.name, e.value);
-              Object.assign(newExpense, e);
-              newExpense.fileUrl = url;
-              newExpense.filePath = task.ref.fullPath;
-              newExpense.order = e.order;
-              console.log("saving expense", e);
-              let success = this.splitterService.editExpense(e, newExpense);
-              if (success) {
-                this.openSnackBar("Upload Complete");
-              }
-              this.percentUploaded = 0;
-              this.expenseFile = null;
-            });
-          }
-        });
+      if (this.expenseFile) {
+        this.store.dispatch(startFileUploadToExpense({expense: e, file: this.expenseFile}))
       }
+
     }
   }
 
   editExpense() {
     let newExpense = this.getNewExpenseFromForm();
 
-    let edited = this.splitterService.editExpense(this.oldExpense, newExpense);
-    if (edited) {
-      this.onCancelEdit();
-    }
+    this.store.dispatch(editExpense({ oldExpense: this.oldExpense, newExpense }));
+
   }
 
   getNewExpenseFromForm(): Expense {
@@ -206,6 +209,11 @@ export class AddExpenseComponent implements OnInit {
   }
 
   addCheckboxes() {
+
+    if (!this.users || this.users.length == 0) {
+      return;
+    }
+
     this.users.map((o, i) => {
       const control = new FormControl(this.userIsParticipating(o));
       const valueControl = new FormControl(0);
