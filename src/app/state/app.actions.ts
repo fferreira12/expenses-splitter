@@ -13,6 +13,7 @@ export const setUser = createAction('[App] Set User', props<{userId: string, use
 
 export const createProject = createAction('[Project] Create', props<{projectName: string}>());
 export const loadProjects = createAction('[Project] Load projects', props<{projects: ProjectState[]}>());
+export const startLoadArchivedProjects = createAction('[Project] Load archived projects');
 
 export const getAllProjects = createAction('[Project] Get All');
 export const getCurrentProject = createAction('[Project] Get Current');

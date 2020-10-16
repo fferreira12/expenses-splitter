@@ -7,7 +7,7 @@ import { FormControl } from "@angular/forms";
 import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { AppState } from 'src/app/state/app.state';
-import { createProject, renameProject, setCurrentProject } from 'src/app/state/app.actions';
+import { createProject, renameProject, setCurrentProject, startLoadArchivedProjects } from 'src/app/state/app.actions';
 import { map } from 'rxjs/operators';
 import { selectCurrentProject, selectOrderedProjects } from 'src/app/state/app.selectors';
 
@@ -31,7 +31,7 @@ export class ProjectsComponent implements OnInit {
   set showArchivedProjects(val: boolean) {
     this._showArchivedProjects = val;
     if(val) {
-      this.splitterService.getArchivedProjects();
+      this.store.dispatch(startLoadArchivedProjects());
     }
   }
 

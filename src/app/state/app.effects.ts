@@ -68,6 +68,19 @@ export class AppEffects {
     )
   );
 
+  loadAllProjects$ = createEffect(() =>
+  this.actions$.pipe(
+    ofType(setUser),
+    mergeMap((action) => {
+      return this.db.getProjectsOfUser(true, action.userId).pipe(
+        map((projects) => {
+          return loadProjects({ projects });
+        })
+      );
+    })
+  )
+);
+
   loadUsers$ = createEffect(() =>
     this.actions$.pipe(
       ofType(appStartup),
