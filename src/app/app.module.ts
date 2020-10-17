@@ -41,6 +41,7 @@ import { projectReducer } from "./state/project.reducer";
 import { EffectsModule } from "@ngrx/effects";
 import { AppEffects } from "./state/app.effects";
 import { StoreDevtoolsModule } from "@ngrx/store-devtools";
+import { ServiceWorkerModule } from '@angular/service-worker';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http);
@@ -112,7 +113,9 @@ const shouldUseEmulator = () => false;
       },
     }),
     AngularFireModule.initializeApp(environment.firebaseconfig), // imports firebase/app needed for everything
-    AngularFirestoreModule, // imports firebase/firestore, only needed for database features
+    AngularFirestoreModule.enablePersistence({
+      synchronizeTabs: true
+    }),
     AngularFireAuthModule, // imports firebase/auth, only needed for auth features,
     AngularFireStorageModule,
     NoopAnimationsModule,
@@ -132,6 +135,7 @@ const shouldUseEmulator = () => false;
       logOnly: environment.production, // Restrict extension to log-only mode
     }),
     EffectsModule.forRoot([AppEffects]),
+    ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
   ],
   providers: [
     {
