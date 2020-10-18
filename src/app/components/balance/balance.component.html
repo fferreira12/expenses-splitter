@@ -9,6 +9,7 @@
         <th>{{'PaymentsMade' | translate}}</th>
         <th>{{'PaymentsReceived' | translate}}</th>
         <th>{{'Balance' | translate}}</th>
+        <th>{{'Report' | translate}}</th>
       </tr>
     </thead>
     <tbody>
@@ -22,6 +23,7 @@
           {{ getPaymentsReceived(user) | async | currency: "R$ " }}
         </td>
         <td>{{ balances[user.id] | currency: "R$ " }}</td>
+        <td><app-get-report [project]="currentProject$ | async" [user]="user">{{user.name}} {{'Report' | translate}}</app-get-report></td>
       </tr>
     </tbody>
   </table>
