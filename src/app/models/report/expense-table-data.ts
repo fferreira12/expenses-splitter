@@ -6,7 +6,9 @@ export interface ExpenseTableData {
   value: number,
   users: User[],
   currentUser: User,
+  share: number,
   paid: number,
+  diff: number,
   userWeight: number,
   weights: { [key: string]: number }
   totalWeight: number,
@@ -40,6 +42,9 @@ export function CreateExpenseTableData(userReportData: UserReportData): ExpenseT
       return c.payer.id === userReportData.user.id ? p + c.amount : p;
     }, 0);
 
+    let share = 1.0 * e.value * userWeight / totalWeight;
+    let diff = paid - share;
+
     let data: ExpenseTableData = {
       expenseName: e.name,
       value: e.value,
@@ -49,7 +54,9 @@ export function CreateExpenseTableData(userReportData: UserReportData): ExpenseT
       totalWeight,
       balance,
       weights,
-      paid
+      paid,
+      share,
+      diff
     }
 
     eData.push(data);
