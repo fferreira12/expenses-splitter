@@ -42,6 +42,7 @@ import { EffectsModule } from "@ngrx/effects";
 import { AppEffects } from "./state/app.effects";
 import { StoreDevtoolsModule } from "@ngrx/store-devtools";
 import { ServiceWorkerModule } from '@angular/service-worker';
+import { GetReportComponent } from './components/report/get-report/get-report.component';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http);
@@ -97,6 +98,7 @@ const shouldUseEmulator = () => false;
     ProjectListComponent,
     ProjectsComponent,
     LanguageListComponent,
+    GetReportComponent,
   ],
   imports: [
     BrowserModule,

@@ -10,6 +10,7 @@ import { Store } from '@ngrx/store';
 import { selectCurrentProject, selectExpenses, selectFairShares, selectPayments, selectPaymentsMade, selectPaymentsReceived, selectWeights, selectWeightsForUser } from 'src/app/state/app.selectors';
 import { map } from 'rxjs/operators';
 import { addPayment } from 'src/app/state/app.actions';
+import { Project } from 'src/app/models/project.model';
 
 @Component({
   selector: "app-balance",
@@ -21,6 +22,7 @@ export class BalanceComponent implements OnInit {
   users$: Observable<User[]>;
   expenses: Expense[];
   expenses$: Observable<Expense[]>;
+  currentProject$: Observable<Project>;
   paidValues: any;
   fairShares: any;
   balances: any = {};
@@ -46,6 +48,7 @@ export class BalanceComponent implements OnInit {
 
     this.store.select(selectPayments).subscribe(payments => this.updateValuesSharesAndBalance());
 
+    this.currentProject$ = this.store.select(selectCurrentProject);
     this.users$ = this.store.select(selectCurrentProject).pipe(map(curr => curr.users));
     this.users$.subscribe(users => {
       this.users = users;
