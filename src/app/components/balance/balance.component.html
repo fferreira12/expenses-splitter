@@ -12,9 +12,10 @@
         <th>{{'Report' | translate}}</th>
       </tr>
     </thead>
-    <tbody>
+    <tbody class="users-balance">
       <tr *ngFor="let user of users$ | async"
-        [ngClass]="{'text-success': balances[user.id] > 0.01, 'text-danger': balances[user.id] < -0.01}">
+        [ngClass]="{'text-success': balances[user.id] > 0.01, 'text-danger': balances[user.id] < -0.01}"
+        [routerLink]="'/balance/'+user.id">
         <td>{{ user.name }}</td>
         <td>{{ fairShares[user.id] | currency: "R$ " }}</td>
         <td>{{ paidValues[user.id] | currency: "R$ " }}</td>

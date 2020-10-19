@@ -4,6 +4,8 @@ import { UserReportData } from './user-report-data';
 
 export function CreateUserReportData(project: Project, user: User): UserReportData {
 
+  if (!project || !user) return;
+
   if (!project.users.some(u => u.id === user.id)) {
     throw new Error(`Can't generate report: user ${user.name} does not belong to project ${project.projectName}`);
   };

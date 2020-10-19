@@ -1,0 +1,32 @@
+<div class="container">
+  <table class="table" *ngIf="expenseData">
+    <thead class="thead-light">
+      <tr>
+        <th>Id</th>
+        <th>Expense</th>
+        <th>Users</th>
+        <th>Value</th>
+        <th>Share</th>
+        <th>Paid</th>
+        <th>Diff</th>
+        <th>Balance</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr
+        *ngFor="let e of expenseData; let i = index"
+        [ngClass]="{'text-success': e.balance > 0.01, 'text-danger': e.balance < -0.01}">
+        <td>{{i + 1}}</td>
+        <td>{{e.expenseName}}</td>
+        <td><p *ngFor="let u of getUsersString(e)">{{u}}</p></td>
+        <td>{{e.value.toFixed(2)}}</td>
+        <td>{{e.share.toFixed(2)}}</td>
+        <td>{{e.paid.toFixed(2)}}</td>
+        <td>{{getDiffString(e)}}</td>
+        <td>{{e.balance.toFixed(2)}}</td>
+      </tr>
+    </tbody>
+  </table>
+  <button class="btn btn-primary mr-2" routerLink="/balance" >Back</button>
+  <app-get-report *ngIf="expenseData" [project]="currentProject$ | async" [user]="currentUser$ | async"></app-get-report>
+</div>

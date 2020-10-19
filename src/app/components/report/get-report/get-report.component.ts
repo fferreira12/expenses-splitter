@@ -22,10 +22,11 @@ export class GetReportComponent implements OnInit {
   constructor(private reportService: ReportService) { }
 
   ngOnInit(): void {
-    this.file = this.reportService.generateReport(this.project, this.user);
+    this.file = this.reportService.generatePdfReport(this.project, this.user);
   }
 
-  getReport() {
+  getReport(event) {
+    event.stopPropagation();
     return this.file.save(`ExpenseSplitter-${this.project.projectName}-${this.user.name}.pdf`);
   }
 

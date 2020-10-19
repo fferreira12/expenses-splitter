@@ -87,10 +87,8 @@ export class PdfGenerator {
       });
 
       let proportion: string = `${eData.userWeight}/${eData.totalWeight} (${(100 * eData.userWeight / eData.totalWeight).toFixed(2)}%)`
-      let share = eData.value * eData.userWeight / eData.totalWeight;
 
-      let diff = eData.paid - share;
-      let diffTxt = diff > 0 ? `+${diff.toFixed(2)}` : diff.toFixed(2);
+      let diffTxt = eData.diff > 0 ? `+${eData.diff.toFixed(2)}` : eData.diff.toFixed(2);
 
       let row: string[] = [
         i.toString(),
@@ -98,7 +96,7 @@ export class PdfGenerator {
         eData.value.toFixed(2),
         users,
         proportion,
-        share.toFixed(2),
+        eData.share.toFixed(2),
         eData.paid.toFixed(2),
         diffTxt,
         eData.balance.toFixed(2)
