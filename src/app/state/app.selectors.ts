@@ -109,6 +109,16 @@ export const selectWeightsForUser = createSelector(
   }
 );
 
+export const selectUser = createSelector(
+  (state: {projects: AppState}) => {
+    return state.projects
+  },
+  (state: AppState, userId: string) => {
+    let project = selectCurrentProject({projects: state});
+    return copy(project.getUser(userId));
+  }
+);
+
 export const selectPaymentsMade = createSelector(
   (state: {projects: AppState}) => {
     return state.projects

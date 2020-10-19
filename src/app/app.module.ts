@@ -43,6 +43,7 @@ import { AppEffects } from "./state/app.effects";
 import { StoreDevtoolsModule } from "@ngrx/store-devtools";
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { GetReportComponent } from './components/report/get-report/get-report.component';
+import { UserReportComponent } from './components/report/user-report/user-report.component';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http);
@@ -65,6 +66,11 @@ const appRoutes: Routes = [
   {
     path: "payments",
     component: PaymentsComponent,
+    canActivate: [AuthGuardService],
+  },
+  {
+    path: "balance/:userId",
+    component: UserReportComponent,
     canActivate: [AuthGuardService],
   },
   {
@@ -99,6 +105,7 @@ const shouldUseEmulator = () => false;
     ProjectsComponent,
     LanguageListComponent,
     GetReportComponent,
+    UserReportComponent,
   ],
   imports: [
     BrowserModule,

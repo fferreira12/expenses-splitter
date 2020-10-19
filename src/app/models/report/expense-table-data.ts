@@ -20,6 +20,8 @@ export function CreateExpenseTableData(userReportData: UserReportData): ExpenseT
   let balance = 0;
   let eData: ExpenseTableData[] = []
 
+  if (!userReportData) return;
+
   userReportData.expenses.forEach(e => {
 
     let totalWeight = e.users.reduce((p, c) => p + userReportData.project.getWeightForUser(c), 0);
