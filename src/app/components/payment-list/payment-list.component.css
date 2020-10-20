@@ -1,3 +1,7 @@
 input[type="file"] {
   display: none;
 }
+
+.table tbody td.align-middle label {
+  margin: 0;
+}
