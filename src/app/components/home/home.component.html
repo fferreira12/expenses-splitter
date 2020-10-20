@@ -1,46 +1,60 @@
-<div class="container pt-3">
-  <div class="card-deck">
+<div class="container">
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5">
 
-    <div class="card" style="width: 18rem;">
-      <div class="card-body d-flex flex-column">
-        <h5 class="card-title">{{'Projects' | translate}}</h5>
-        <p class="card-text">{{'ProjectsDesc' | translate}}</p>
-        <a class="btn btn-primary mt-auto" routerLink="/projects">{{'GoToProjects' | translate}}</a>
+
+    <div class="col mb-3">
+      <div class="card mb-3 h-100">
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title">{{'Projects' | translate}}</h5>
+          <p class="card-text">{{'ProjectsDesc' | translate}}</p>
+          <a class="btn btn-primary mt-auto" routerLink="/projects">{{'GoToProjects' | translate}}</a>
+        </div>
       </div>
     </div>
 
-    <div class="card" style="width: 18rem;">
-      <div class="card-body d-flex flex-column">
-        <h5 class="card-title">{{'Users' | translate}}</h5>
-        <p class="card-text">{{'UserDesc' | translate}}</p>
-        <a class="btn btn-primary mt-auto" routerLink="/users">{{'GoToUser' | translate}}</a>
+    <div class="col mb-3">
+      <div class="card mb-3 h-100">
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title">{{'Users' | translate}}</h5>
+          <p class="card-text">{{'UserDesc' | translate}}</p>
+          <a class="btn btn-primary mt-auto" routerLink="/users">{{'GoToUser' | translate}}</a>
+        </div>
       </div>
     </div>
 
-    <div class="card" style="width: 18rem;">
-      <div class="card-body d-flex flex-column">
-        <h5 class="card-title">{{'Expenses' | translate}}</h5>
-        <p class="card-text">{{'ExpensesDesc' | translate}}</p>
-        <a class="btn btn-primary mt-auto" routerLink="/expenses">{{'GoToExpenses' | translate}}</a>
+    <div class="col mb-3">
+      <div class="card mb-3 h-100">
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title">{{'Expenses' | translate}}</h5>
+          <p class="card-text">{{'ExpensesDesc' | translate}}</p>
+          <a class="btn btn-primary mt-auto" routerLink="/expenses">{{'GoToExpenses' | translate}}</a>
+        </div>
       </div>
     </div>
 
-    <div class="card" style="width: 18rem;">
-      <div class="card-body d-flex flex-column">
-        <h5 class="card-title">{{'Payments' | translate}}</h5>
-        <p class="card-text">{{'PaymentsDesc' | translate}}</p>
-        <a class="btn btn-primary mt-auto" routerLink="/payments">{{'GoToPayments' | translate}}</a>
+    <div class="col mb-3">
+      <div class="card mb-3 h-100">
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title">{{'Payments' | translate}}</h5>
+          <p class="card-text">{{'PaymentsDesc' | translate}}</p>
+          <a class="btn btn-primary mt-auto" routerLink="/payments">{{'GoToPayments' | translate}}</a>
+        </div>
       </div>
     </div>
 
-    <div class="card" style="width: 18rem;">
-      <div class="card-body d-flex flex-column">
-        <h5 class="card-title">{{'Balance' | translate}}</h5>
-        <p class="card-text">{{'BalanceDesc' | translate}}</p>
-        <a class="btn btn-primary mt-auto" routerLink="/balance">{{'GoToBalance' | translate}}</a>
+    <div class="col mb-3">
+      <div class="card mb-3 h-100">
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title">{{'Balance' | translate}}</h5>
+          <p class="card-text">{{'BalanceDesc' | translate}}</p>
+          <a class="btn btn-primary mt-auto" routerLink="/balance">{{'GoToBalance' | translate}}</a>
+        </div>
       </div>
     </div>
+
+
 
   </div>
 </div>
+
 <app-loading></app-loading>
