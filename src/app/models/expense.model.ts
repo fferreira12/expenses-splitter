@@ -1,5 +1,6 @@
 import { User } from "./user.model";
 import { PayersArray } from "../util/types";
+import { SetUnevenSplit, SetEvenSplit, IsEvenSplit, GetTotalWeight, GetWeightForUser, SetWeightForUser } from './weight/weighted-item-operators';
 
 export class Expense {
   name: string;
@@ -10,7 +11,9 @@ export class Expense {
   //multiplePayers = false;
   fileUrl: string;
   filePath: string
-  order:number;
+  order: number;
+
+  weights: {user: User, weight: number}[];
 
   constructor(expenseName: string, value: number) {
     this.users = [];
@@ -25,6 +28,7 @@ export class Expense {
     e.fileUrl = expense.fileUrl;
     e.filePath = expense.filePath;
     e.order = expense.order;
+    e.weights = expense.weights;
     return e;
   }
 
@@ -98,8 +102,38 @@ export class Expense {
     let sameUrl = this.fileUrl == expense.fileUrl;
     let samePath = this.filePath == expense.filePath;
 
+    let sameWeights = this.weights.every(weight => {
+      return expense.weights.some(w => {
+        return w.user.id == weight.user.id && w.weight == weight.weight;
+      });
+    });
+
     return (
-      sameName && sameValue && sameUsers && samePayers && sameUrl && samePath
+      sameName && sameValue && sameUsers && samePayers && sameUrl && samePath && sameWeights
     );
+  }
+
+  setUnevenSplit(weights: {user: User, weight: number}[]) {
+    return SetUnevenSplit(this, weights);
+  }
+
+  setEvenSplit() {
+    return SetEvenSplit(this);
+  }
+
+  isEvenSplit(): boolean {
+    return IsEvenSplit(this);
+  }
+
+  getTotalWeight() {
+    return GetTotalWeight(this, this);
+  }
+
+  getWeightForUser(user: User): number {
+    return GetWeightForUser(this, user);
+  }
+
+  setWeightForUser(user: User, weight: any) {
+    return SetWeightForUser(this, user, weight);
   }
 }
