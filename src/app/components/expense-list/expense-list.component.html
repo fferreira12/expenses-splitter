@@ -16,7 +16,7 @@
     </button>
   </div>
 
-  <table class="table">
+  <table class="table table-sm">
     <thead class="thead-light">
       <tr>
         <th></th>
@@ -29,15 +29,15 @@
     </thead>
     <tbody cdkDropList (cdkDropListDropped)="drop($event)">
       <tr *ngFor="let expense of expenses, let i = index" cdkDrag [cdkDragData]="expense">
-        <td cdkDragHandle><i class="fas fa-arrows-alt"></i></td>
-        <td>{{ expense.name }}</td>
-        <td>{{ expense.value | currency: "R$ " }}</td>
-        <td>
+        <td class="align-middle" cdkDragHandle><i class="fas fa-arrows-alt"></i></td>
+        <td class="align-middle">{{ expense.name }}</td>
+        <td class="align-middle">{{ expense.value | currency: "R$ " }}</td>
+        <td class="align-middle">
           <span *ngFor="let user of expense.users" [ngClass]="{ payer: checkIsPayer(expense, user) }">{{ user.name }}
             <span *ngIf="getAmountPaid(expense, user) > 0">(R$ {{getAmountPaid(expense, user)}})</span> <br />
           </span>
         </td>
-        <td>
+        <td class="align-middle">
           <button class="btn btn-danger btn-sm" (click)="onRemoveExpense(expense)">
             <i class="fas fa-trash-alt"></i>
           </button>
@@ -45,8 +45,8 @@
             <i class="fas fa-edit"></i>
           </button>
         </td>
-        <td>
-          <label [for]="'upload-'+i" *ngIf="!expense.fileUrl" class="btn btn-primary mt-2">
+        <td class="align-middle">
+          <label [for]="'upload-'+i" *ngIf="!expense.fileUrl" class="btn btn-primary btn-sm">
             <i class="fas fa-file-upload"></i>
           </label>
           <input *ngIf="!expense.fileUrl" class="form-control" type="file" name="upload" [id]="'upload-'+i"
@@ -55,11 +55,11 @@
               <div class="progress-bar" role="progressbar" [ngStyle]="{'width': percentUploaded+'%'}" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
             </div>
           <a *ngIf="expense.fileUrl" href="{{expense.fileUrl}}">
-            <button class="btn btn-success mt-2">
+            <button class="btn btn-success btn-sm">
               <i class="fas fa-download"></i>
             </button>
           </a>
-          <button *ngIf="expense.fileUrl" class="btn btn-danger mt-2 ml-2" (click)="onDeleteFile(expense)">
+          <button *ngIf="expense.fileUrl" class="btn btn-danger btn-sm" (click)="onDeleteFile(expense)">
             <i class="fas fa-times"></i>
           </button>
         </td>
