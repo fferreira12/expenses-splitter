@@ -1,6 +1,9 @@
 <div class="container tableFixHead">
   <div class="controls">
-    <button class="btn btn-primary mr-2" routerLink="/balance" >Back</button>
+    <button class="btn btn-primary mr-2" routerLink="/balance" >
+      <i class="fas fa-chevron-left"></i>
+      Back
+    </button>
     <app-get-report *ngIf="expenseData"
       [project]="currentProject$ | async"
       [user]="currentUser$ | async"
@@ -24,14 +27,14 @@
       <tr
         *ngFor="let e of expenseData; let i = index"
         [ngClass]="{'text-success': e.balance > 0.01, 'text-danger': e.balance < -0.01}">
-        <td>{{i + 1}}</td>
-        <td>{{e.expenseName}}</td>
-        <td><p *ngFor="let u of getUsersString(e)">{{u}}</p></td>
-        <td>{{e.value.toFixed(2)}}</td>
-        <td>{{e.share.toFixed(2)}}</td>
-        <td>{{e.paid.toFixed(2)}}</td>
-        <td>{{getDiffString(e)}}</td>
-        <td>{{e.balance.toFixed(2)}}</td>
+        <td class="align-middle">{{i + 1}}</td>
+        <td class="align-middle">{{e.expenseName}}</td>
+        <td class="align-middle"><div *ngFor="let u of getUsersString(e)">{{u}}</div></td>
+        <td class="align-middle">{{e.value.toFixed(2)}}</td>
+        <td class="align-middle">{{e.share.toFixed(2)}}</td>
+        <td class="align-middle">{{e.paid.toFixed(2)}}</td>
+        <td class="align-middle">{{getDiffString(e)}}</td>
+        <td class="align-middle">{{e.balance.toFixed(2)}}</td>
       </tr>
     </tbody>
   </table>
