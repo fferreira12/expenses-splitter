@@ -14,8 +14,10 @@
   <br />
   <ng-template [ngIf]="singlePayer">
     <div class="radio" *ngFor="let user of users$ | async" class="form-check form-check-inline">
-      <input type="radio" [value]="user.id" formControlName="payer" />
-      {{ user.name }}
+      <label>
+        <input type="radio" [value]="user.id" formControlName="payer" />
+        {{ user.name }}
+      </label>
     </div>
   </ng-template>
   <ng-template [ngIf]="!singlePayer">
