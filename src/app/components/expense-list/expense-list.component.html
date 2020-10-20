@@ -1,8 +1,20 @@
 <div *ngIf="expenses.length > 0">
   <h1>{{'Expenses' | translate}}</h1>
-<h2 *ngIf="currentProject && currentProject.expensesCount && currentProject.expensesCount > 0">{{'Expense(s)' | translate}}: {{ currentProject.expensesCount }}</h2>
-<h2 *ngIf="currentProject && currentProject.total && currentProject.total > 0">{{ 'Total' | translate }}: {{ currentProject.total | currency:"R$" }}</h2>
-<h2 *ngIf="currentProject && currentProject.expensesAverage && currentProject.expensesAverage > 0">{{ 'Average' | translate }}: R$ {{ currentProject.expensesAverage | currency:"R$" }}</h2>
+
+  <div class="btn-group mb-2" role="group" aria-label="First group">
+    <button type="button" class="btn btn-outline-secondary"
+      *ngIf="currentProject && currentProject.expensesCount && currentProject.expensesCount > 0">
+      {{'Expense(s)' | translate}}: {{ currentProject.expensesCount }}
+    </button>
+    <button type="button" class="btn btn-outline-secondary"
+      *ngIf="currentProject && currentProject.total && currentProject.total > 0">
+      {{ 'Total' | translate }}: {{ currentProject.total | currency:"R$" }}
+    </button>
+    <button type="button" class="btn btn-outline-secondary"
+      *ngIf="currentProject && currentProject.expensesAverage && currentProject.expensesAverage > 0">
+      {{ 'Average' | translate }}: {{ currentProject.expensesAverage | currency:"R$" }}
+    </button>
+  </div>
 
   <table class="table">
     <thead class="thead-light">
