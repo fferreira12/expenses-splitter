@@ -17,6 +17,9 @@ export class GetReportComponent implements OnInit {
   @Input()
   user: User;
 
+  @Input('text')
+  buttonText: string;
+
   private file: jsPDF;
 
   constructor(private reportService: ReportService) { }
@@ -28,6 +31,10 @@ export class GetReportComponent implements OnInit {
   getReport(event) {
     event.stopPropagation();
     return this.file.save(`ExpenseSplitter-${this.project.projectName}-${this.user.name}.pdf`);
+  }
+
+  getButtonText(): string {
+    return this.buttonText || `${this.user.name}'s Report`;
   }
 
 }

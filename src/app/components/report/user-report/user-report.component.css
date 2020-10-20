@@ -1,0 +1,13 @@
+.tableFixHead {
+  overflow-y: visible;
+  height: 100%;
+}
+
+.tableFixHead thead th {
+  position: sticky;
+  top: 0;
+}
+
+.controls {
+  margin: 0.5rem 0;
+}
