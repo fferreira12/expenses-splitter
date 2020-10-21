@@ -31,13 +31,15 @@
       <tr *ngFor="let expense of expenses, let i = index" cdkDrag [cdkDragData]="expense">
         <td class="align-middle" cdkDragHandle><i class="fas fa-arrows-alt"></i></td>
         <td class="align-middle">{{ expense.name }}
-          <div *ngIf="expense.weights" class="font-italic">*Custom Weights</div>
         </td>
         <td class="align-middle">{{ expense.value | currency: "R$ " }}</td>
         <td class="align-middle">
           <span *ngFor="let user of expense.users" [ngClass]="{ payer: checkIsPayer(expense, user) }">{{ user.name }}
-            <span *ngIf="getAmountPaid(expense, user) > 0">(R$ {{getAmountPaid(expense, user)}})</span> <br />
+            <span *ngIf="getAmountPaid(expense, user) > 0">(R$ {{getAmountPaid(expense, user)}}) </span>
+            <span *ngIf="expense.weights">[{{expense.getWeightForUser(user)}}]</span>
+            <br />
           </span>
+          <div *ngIf="expense.weights" class="font-italic">*Custom Weights</div>
 
         </td>
         <td class="align-middle">

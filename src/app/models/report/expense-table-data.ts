@@ -1,3 +1,4 @@
+import { Expense } from '../expense.model';
 import { User } from '../user.model';
 import { UserReportData } from './user-report-data';
 
@@ -12,7 +13,9 @@ export interface ExpenseTableData {
   userWeight: number,
   weights: { [key: string]: number }
   totalWeight: number,
-  balance: number
+  balance: number,
+  isLocalWeight: boolean,
+  expense: Expense
 }
 
 export function CreateExpenseTableData(userReportData: UserReportData): ExpenseTableData[] {
@@ -24,10 +27,15 @@ export function CreateExpenseTableData(userReportData: UserReportData): ExpenseT
 
   userReportData.expenses.forEach(e => {
 
-    let totalWeight = e.users.reduce((p, c) => p + userReportData.project.getWeightForUser(c), 0);
-    let userWeight = userReportData.project.getWeightForUser(userReportData.user);
+    let hasLocalWeights = !!e.weights;
+
+    let totalWeight = hasLocalWeights ? e.getTotalWeight() : e.users.reduce((p, c) => p + userReportData.project.getWeightForUser(c), 0);
+    let userWeight = hasLocalWeights ? e.getWeightForUser(userReportData.user) : userReportData.project.getWeightForUser(userReportData.user);
     let weights: { [key: string]: number } = {};
-    if (userReportData.project.weights) {
+
+    if (hasLocalWeights) {
+      e.weights.forEach(w => weights[w.user.id] = w.weight);
+    } else if (userReportData.project.weights) {
       userReportData.project.weights.forEach(w => weights[w.user.id] = w.weight);
     } else {
       userReportData.project.users.forEach(u => weights[u.id] = 1);
@@ -58,7 +66,9 @@ export function CreateExpenseTableData(userReportData: UserReportData): ExpenseT
       weights,
       paid,
       share,
-      diff
+      diff,
+      isLocalWeight: hasLocalWeights,
+      expense: e
     }
 
     eData.push(data);

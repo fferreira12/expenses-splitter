@@ -88,8 +88,6 @@ export class Expense {
 
   isEqualTo(expense: Expense) {
 
-    debugger;
-
     let sameName = this.name == expense.name;
     let sameValue = this.value == expense.value;
 

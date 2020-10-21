@@ -25,3 +25,7 @@ span.info {
   font-size: 0.8rem;
   font-weight: normal;
 }
+
+.container {
+  padding-bottom: 3rem;
+}

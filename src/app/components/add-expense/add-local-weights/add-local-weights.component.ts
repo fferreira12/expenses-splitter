@@ -13,18 +13,19 @@ import { AppState } from 'src/app/state/app.state';
 })
 export class AddLocalWeightsComponent implements OnInit {
 
-  useLocalWeights: boolean = false;
+  _useLocalWeights: boolean = false;
+  projectWeights: { user: User, weight: number }[];
   weights: { user: User, weight: number }[];
   users: User[];
   _expense: Expense;
 
   @Input() set expense(expense: Expense) {
-    if (!expense) return;
-    this._expense = expense;
-    this.useLocalWeights = !!this._expense.weights;
-    if (this.weights) {
-      this.weights = this._expense.weights;
+    if (!expense) {
+      this.useLocalWeights = false;
     }
+    this._expense = expense;
+    this.weights = this._expense?.weights || this.projectWeights;
+    this.useLocalWeights = !!this._expense?.weights;
   }
 
   constructor(private store: Store<{ projects: AppState }>) { }
@@ -33,18 +34,35 @@ export class AddLocalWeightsComponent implements OnInit {
     return this.weights;
   }
 
+  set useLocalWeights(use: boolean) {
+    this._useLocalWeights = use;
+    this.startWeights();
+  }
+
+  get useLocalWeights() {
+    return this._useLocalWeights;
+  }
+
+  startWeights() {
+    if (this.users && (!this.weights || this.weights.length == 0)) {
+      this.weights = this.users.map(u => {
+        return {
+          user: u,
+          weight: 1
+        }
+      });
+    }
+  }
+
   ngOnInit(): void {
-    this.store.select(selectWeights).subscribe(w => this.weights = w);
+    this.store.select(selectWeights).subscribe(w => {
+      if (!w) return;
+      this.projectWeights = w;
+      this.weights = w;
+    });
     this.store.select(selectUsers).subscribe(users => {
       this.users = users;
-      if (this.users && !this.weights) {
-        this.weights = this.users.map(u => {
-          return {
-            user: u,
-            weight: 1
-          }
-        })
-      }
+      this.startWeights();
     });
   }
 

@@ -29,7 +29,10 @@
         [ngClass]="{'text-success': e.balance > 0.01, 'text-danger': e.balance < -0.01}">
         <td class="align-middle">{{i + 1}}</td>
         <td class="align-middle">{{e.expenseName}}</td>
-        <td class="align-middle"><div *ngFor="let u of getUsersString(e)">{{u}}</div></td>
+        <td class="align-middle">
+          <div *ngFor="let u of getUsersString(e)">{{u}}</div>
+          <div *ngIf="e.isLocalWeight" class="font-italic">*Custom Weights</div>
+        </td>
         <td class="align-middle">{{e.value.toFixed(2)}}</td>
         <td class="align-middle">{{e.share.toFixed(2)}}</td>
         <td class="align-middle">{{e.paid.toFixed(2)}}</td>

@@ -47,9 +47,10 @@ export class UserReportComponent implements OnInit {
   }
 
   getUsersString(eData: ExpenseTableData): string[] {
+    let localWeights = eData.isLocalWeight;
     let users: string[] = [];
     eData.users.forEach(u => {
-      users.push(u.name + ` (${eData.weights[u.id]})`);
+        users.push(u.name + ` [${eData.weights[u.id]}]`);
     });
     return users;
   }

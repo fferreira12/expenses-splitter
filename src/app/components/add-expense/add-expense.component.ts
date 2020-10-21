@@ -161,7 +161,6 @@ export class AddExpenseComponent implements OnInit, OnDestroy  {
   editExpense() {
     let newExpense = this.getNewExpenseFromForm();
 
-    debugger;
     this.store.dispatch(editExpense({ oldExpense: this.oldExpense, newExpense }));
 
   }
@@ -224,7 +223,6 @@ export class AddExpenseComponent implements OnInit, OnDestroy  {
       expense.setEvenSplit();
     }
 
-    debugger;
     return expense;
   }
 
