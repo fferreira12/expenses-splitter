@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, OnDestroy } from "@angular/core";
+import { Component, OnInit, Input, OnDestroy, ViewChild } from "@angular/core";
 import { FormGroup, FormControl, FormBuilder, FormArray } from "@angular/forms";
 import { MatSnackBar } from "@angular/material/snack-bar";
 
@@ -8,10 +8,12 @@ import { OcrService } from "src/app/services/ocr.service";
 import { Observable, Subject } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { AppState } from 'src/app/state/app.state';
-import { selectCurrentProject } from 'src/app/state/app.selectors';
+import { selectCurrentProject, selectWeights } from 'src/app/state/app.selectors';
 import { map, takeUntil, tap } from 'rxjs/operators';
 import { addExpense, editExpense, fileUploadProgressToExpense, fileUploadToExpenseSuccess, startFileUploadToExpense } from 'src/app/state/app.actions';
 import { Actions, ofType } from '@ngrx/effects';
+import { AddLocalWeightsComponent } from './add-local-weights/add-local-weights.component';
+import copy from 'fast-copy';
 
 @Component({
   selector: "app-add-expense",
@@ -33,12 +35,16 @@ export class AddExpenseComponent implements OnInit, OnDestroy  {
 
   destroyed$ = new Subject<boolean>();
 
+  projectWeights: { user: User, weight: number }[];
+
+  @ViewChild(AddLocalWeightsComponent) localWeightsComp: AddLocalWeightsComponent;
+
   @Input() set editingExpense(expense: Expense) {
     if (!expense) {
       return;
     }
     this.editing = true;
-    this.oldExpense = Object.freeze(expense);
+    this.oldExpense = Expense.createExpense(copy(expense));
     this._editingExpense = expense;
     this.updateForm();
     window.scroll(0, 0);
@@ -59,6 +65,10 @@ export class AddExpenseComponent implements OnInit, OnDestroy  {
     this.users$.subscribe(users => {
       this.users = users;
       this.startForm();
+    });
+
+    this.store.select(selectWeights).subscribe(w => {
+      this.projectWeights = w
     });
 
     this.actions$.pipe(
@@ -151,6 +161,7 @@ export class AddExpenseComponent implements OnInit, OnDestroy  {
   editExpense() {
     let newExpense = this.getNewExpenseFromForm();
 
+    debugger;
     this.store.dispatch(editExpense({ oldExpense: this.oldExpense, newExpense }));
 
   }
@@ -205,6 +216,15 @@ export class AddExpenseComponent implements OnInit, OnDestroy  {
       expense.setPayers(payers);
     }
 
+    let localWeightsResult = this.localWeightsComp.getLocalWeightsResult();
+
+    if (localWeightsResult.useLocalWeights) {
+      expense.setUnevenSplit(localWeightsResult.localWeights);
+    } else {
+      expense.setEvenSplit();
+    }
+
+    debugger;
     return expense;
   }
 

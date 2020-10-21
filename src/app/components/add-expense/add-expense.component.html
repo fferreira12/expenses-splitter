@@ -31,6 +31,9 @@
   <input *ngIf="singlePayer" class="form-control" type="number" name="value" formControlName="value"
     placeholder="{{'Value' | translate}}" />
   <br />
+
+  <app-add-local-weights [expense]="_editingExpense"></app-add-local-weights>
+
   <button class="btn btn-danger mt-2" type="button" (click)="onCancelEdit()" *ngIf="_editingExpense">
     {{ "Cancel" | translate}}
   </button>

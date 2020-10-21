@@ -45,6 +45,7 @@ import { ServiceWorkerModule } from '@angular/service-worker';
 import { GetReportComponent } from './components/report/get-report/get-report.component';
 import { UserReportComponent } from './components/report/user-report/user-report.component';
 import { BottomBarComponent } from './components/bottom-bar/bottom-bar.component';
+import { AddLocalWeightsComponent } from './components/add-expense/add-local-weights/add-local-weights.component';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http);
@@ -108,6 +109,7 @@ const shouldUseEmulator = () => false;
     GetReportComponent,
     UserReportComponent,
     BottomBarComponent,
+    AddLocalWeightsComponent,
   ],
   imports: [
     BrowserModule,

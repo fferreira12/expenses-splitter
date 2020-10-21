@@ -1,0 +1,15 @@
+
+<label for="local-weights">
+  <input type="checkbox" name="localweights" id="local-weights" [(ngModel)]="useLocalWeights">
+  <span class="ml-2">Use Local Weights?</span>
+</label>
+<br/>
+
+<ng-template [ngIf]="useLocalWeights">
+  <div *ngFor="let w of weights" class="input-group mb-3">
+    <div class="input-group-prepend">
+      <span class="input-group-text">{{w.user.name}}</span>
+    </div>
+    <input type="number" class="form-control" [(ngModel)]="w.weight">
+  </div>
+</ng-template>
