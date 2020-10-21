@@ -1,3 +1,7 @@
 .users-balance tr {
   cursor: pointer;
 }
+
+.container {
+  padding-bottom: 3rem;
+}

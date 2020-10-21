@@ -14,8 +14,10 @@
   <br />
   <ng-template [ngIf]="singlePayer">
     <div class="radio" *ngFor="let user of users$ | async" class="form-check form-check-inline">
-      <input type="radio" [value]="user.id" formControlName="payer" />
-      {{ user.name }}
+      <label>
+        <input type="radio" [value]="user.id" formControlName="payer" />
+        {{ user.name }}
+      </label>
     </div>
   </ng-template>
   <ng-template [ngIf]="!singlePayer">
@@ -29,6 +31,9 @@
   <input *ngIf="singlePayer" class="form-control" type="number" name="value" formControlName="value"
     placeholder="{{'Value' | translate}}" />
   <br />
+
+  <app-add-local-weights [expense]="_editingExpense"></app-add-local-weights>
+
   <button class="btn btn-danger mt-2" type="button" (click)="onCancelEdit()" *ngIf="_editingExpense">
     {{ "Cancel" | translate}}
   </button>

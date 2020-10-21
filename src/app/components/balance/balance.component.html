@@ -1,6 +1,6 @@
 <div class="container">
   <h1>{{'Balance' | translate}}</h1>
-  <table class="table">
+  <table class="table table-sm">
     <thead class="thead-light">
       <tr>
         <th>{{'People' | translate}}</th>
@@ -16,22 +16,22 @@
       <tr *ngFor="let user of users$ | async"
         [ngClass]="{'text-success': balances[user.id] > 0.01, 'text-danger': balances[user.id] < -0.01}"
         [routerLink]="'/balance/'+user.id">
-        <td>{{ user.name }}</td>
-        <td>{{ fairShares[user.id] | currency: "R$ " }}</td>
-        <td>{{ paidValues[user.id] | currency: "R$ " }}</td>
-        <td>{{ getPaymentsMade(user) | async | currency: "R$ " }}</td>
-        <td>
+        <td class="align-middle">{{ user.name }}</td>
+        <td class="align-middle">{{ fairShares[user.id] | currency: "R$ " }}</td>
+        <td class="align-middle">{{ paidValues[user.id] | currency: "R$ " }}</td>
+        <td class="align-middle">{{ getPaymentsMade(user) | async | currency: "R$ " }}</td>
+        <td class="align-middle">
           {{ getPaymentsReceived(user) | async | currency: "R$ " }}
         </td>
-        <td>{{ balances[user.id] | currency: "R$ " }}</td>
-        <td><app-get-report [project]="currentProject$ | async" [user]="user">{{user.name}} {{'Report' | translate}}</app-get-report></td>
+        <td class="align-middle">{{ balances[user.id] | currency: "R$ " }}</td>
+        <td class="align-middle"><app-get-report [project]="currentProject$ | async" [user]="user">{{user.name}} {{'Report' | translate}}</app-get-report></td>
       </tr>
     </tbody>
   </table>
 
   <div *ngIf="suggestedPayments?.length > 0">
     <h1>{{'SuggestedPayments' | translate}}</h1>
-    <table class="table col-md-8">
+    <table class="table table-sm">
       <thead class="thead-light">
         <tr>
           <th>{{'Payer' | translate}}</th>
@@ -42,10 +42,10 @@
       </thead>
       <tbody>
         <tr *ngFor="let p of suggestedPayments">
-          <td>{{ p.payer.name }}</td>
-          <td>{{ p.amount | currency: "R$ "}}</td>
-          <td>{{ p.receiver.name }}</td>
-          <td>
+          <td class="align-middle">{{ p.payer.name }}</td>
+          <td class="align-middle">{{ p.amount | currency: "R$ "}}</td>
+          <td class="align-middle">{{ p.receiver.name }}</td>
+          <td class="align-middle">
             <button class="btn btn-success" (click)="onAddToPayments(p)" title="{{'AddToPayments' | translate}}">
               <i class="fas fa-plus mr-1"></i>
               <i class="fas fa-file-invoice-dollar"></i>

@@ -1,0 +1,19 @@
+nav {
+  min-height: 3rem;
+}
+
+i {
+  color: white;
+}
+
+.navbar {
+  text-align: center;
+}
+
+@media only screen and (min-width: 992px) {
+
+  :host {
+    display: none;
+  }
+
+}
