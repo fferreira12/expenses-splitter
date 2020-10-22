@@ -114,9 +114,9 @@ export class ProjectsComponent implements OnInit {
   }
 
   drop(event: CdkDragDrop<string[]>) {
-    moveItemInArray(this.allProjects, event.previousIndex, event.currentIndex);
-    //this.splitterService.setProjectsOrder(this.allProjects);
-    this.store.dispatch(orderProjects({ projects: this.allProjects }));
+    let projects = this._showArchivedProjects ? this.allProjects : this.allProjects.filter(p => !p.archived);
+    moveItemInArray(projects, event.previousIndex, event.currentIndex);
+    this.store.dispatch(orderProjects({ projects }));
   }
 
 }
