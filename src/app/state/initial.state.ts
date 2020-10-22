@@ -9,5 +9,6 @@ export const initialState: AppState = {
     new ProjectState()
   ],
   otherProjects: [],
-  currentProject: null
+  currentProject: null,
+  projectsOrder: {}
 };

@@ -9,4 +9,6 @@ export type AppState = {
   selfProjects: ProjectState[];
   otherProjects: ProjectState[];
   currentProject: string;
+
+  projectsOrder: { [key:string]: number }
 }

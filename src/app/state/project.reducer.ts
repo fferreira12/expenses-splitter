@@ -14,7 +14,7 @@ import {
   archiveProject,
   setCurrentProject,
   unarchiveProject,
-  loadProjects, setUser, addEditor, removeEditor, orderProjects, addUser, removeUser, renameUser, orderUsers, setWeight, unsetWeights, addExpense, editExpense, removeExpense, startRemoveFileFromExpense, removeFileFromExpenseSuccess, fileUploadToExpenseSuccess, orderExpenses, addPayment, editPayment, removePayment, orderPayments, removeFileFromPaymentSuccess
+  loadProjects, setUser, addEditor, removeEditor, orderProjects, addUser, removeUser, renameUser, orderUsers, setWeight, unsetWeights, addExpense, editExpense, removeExpense, startRemoveFileFromExpense, removeFileFromExpenseSuccess, fileUploadToExpenseSuccess, orderExpenses, addPayment, editPayment, removePayment, orderPayments, removeFileFromPaymentSuccess, loadProjectOrder
 } from "./app.actions";
 import { AppState } from './app.state';
 import { initialState } from './initial.state';
@@ -142,6 +142,14 @@ const _projectReducer = createReducer<AppState>(
           order: orders[p.projectId]
         }
       })
+    }
+  }),
+
+  on(loadProjectOrder, (state, props) => {
+    let st: AppState = copy(state);
+    return {
+      ...st,
+      projectsOrder: props.order
     }
   }),
 

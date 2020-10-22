@@ -11,13 +11,21 @@ export const projectStatesToProjects = (projects: ProjectState[]) => projects.ma
 export const selectOrderedProjects = createSelector(
   (state: { projects: AppState }) => {
     if (!state || !state.projects) return;
-    return [...state.projects?.selfProjects, ...state.projects?.otherProjects]
+    return state.projects;
   },
-  (projectStates: ProjectState[]) => {
+  (state: AppState) => {
+    let projectStates = [...state.selfProjects, ...state.otherProjects]
     if (!projectStates) return;
     let archived = projectStates.filter(p => p.archived);
-    let notArchived = projectStates.filter(p => !p.archived);
-    return projectStatesToProjects([...putInOrder(notArchived), ...archived]);
+    let notArchived = projectStates.filter(p => !p.archived).sort((a, b) => {
+      if (state.projectsOrder) {
+        return state.projectsOrder[a.projectId] - state.projectsOrder[b.projectId]
+      } else {
+        return a.order - b.order;
+      }
+    });
+
+    return projectStatesToProjects([...notArchived, ...archived]);
   }
 );
 

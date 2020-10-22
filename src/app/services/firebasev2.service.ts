@@ -105,6 +105,25 @@ export class Firebasev2Service {
     return this.db.collection('last-projects').doc(userId || this.userId).get();
   }
 
+  saveProjectsOrder(order: { [key: string]: number }) {
+    var doc = this.db.collection('project-order').doc(this.userId);
+    return doc.set({
+      order,
+      userId: this.userId
+    }, { merge: true });
+  }
+
+  getProjectsOrder(userId: string = undefined): Observable<{ [key: string]: number }> {
+    if (!(userId || this.userId)) {
+      this.verifyUserId();
+      return of(null);
+    }
+    return this.db.collection('project-order').doc(userId || this.userId).get().pipe(
+      map(snapshot => snapshot.data()),
+      map(data => data.order)
+    );
+  }
+
   // saveUser(projectId: string, user: User) {
   //   this.verifyUserId();
   //   this.db

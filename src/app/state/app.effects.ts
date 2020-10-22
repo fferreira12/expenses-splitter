@@ -49,31 +49,48 @@ import {
   fileUploadToPaymentSuccess,
   startRemoveFileFromPayment,
   removeFileFromPaymentSuccess,
+  loadProjectOrder,
 } from "./app.actions";
 import { selectCurrentProject } from "./app.selectors";
 import { AppState } from "./app.state";
 
 @Injectable()
 export class AppEffects {
-  loadProjects$ = createEffect(() =>
+  // loadProjects$ = createEffect(() =>
+  //   this.actions$.pipe(
+  //     ofType(setUser),
+  //     concatMap((action) => {
+  //       return this.db.getProjectsOfUser(false, action.userId);
+  //     }),
+  //     map(projects => loadProjects({ projects }))
+  //   )
+  // );
+
+  loadAllProjects$ = createEffect(() =>
     this.actions$.pipe(
       ofType(setUser),
       concatMap((action) => {
-        return this.db.getProjectsOfUser(false, action.userId);
+        return this.db.getProjectsOfUser(true, action.userId);
       }),
-      map(projects => loadProjects({ projects }))
+      map((projects) => loadProjects({ projects }))
     )
   );
 
-  loadAllProjects$ = createEffect(() =>
-  this.actions$.pipe(
-    ofType(setUser),
-    concatMap((action) => {
-      return this.db.getProjectsOfUser(true, action.userId);
-    }),
-    map(projects => loadProjects({ projects }))
-  )
-);
+  loadProjectOrder$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(setUser),
+      concatMap((action) => {
+        return this.db.getProjectsOrder(action.userId);
+      }),
+      map((order) => {
+        if (order) {
+          return loadProjectOrder({ order: order })
+        } else {
+          return noOp();
+        }
+      })
+    )
+  );
 
   loadUsers$ = createEffect(() =>
     this.actions$.pipe(
@@ -172,14 +189,17 @@ export class AppEffects {
     return this.actions$.pipe(
       ofType(orderProjects),
       withLatestFrom(this.store),
-      map(([, appState]) => {
-        [
-          ...appState.projects.selfProjects,
-          ...appState.projects.otherProjects,
-        ].forEach((p) => {
-          this.db.saveProject(p.ownerId, Project.fromState(p), false);
+      map(([action, appState]) => {
+
+        let order: { [key: string]: number } = {};
+
+        action.projects.forEach((p,i) => {
+          //this.db.saveProject(p.ownerId, Project.fromState(p), false);
+          order[p.projectId] = i;
         });
-        return apiCalled();
+
+        this.db.saveProjectsOrder(order);
+        return loadProjectOrder({order});
       })
     );
   });
@@ -219,10 +239,7 @@ export class AppEffects {
 
   onStartFileUpload$ = createEffect(() => {
     return this.actions$.pipe(
-      ofType(
-        startFileUploadToExpense,
-        startFileUploadToPayment
-      ),
+      ofType(startFileUploadToExpense, startFileUploadToPayment),
       withLatestFrom(this.store),
       mergeMap(([action, appState]) => {
         console.log("starting upload");
@@ -232,21 +249,30 @@ export class AppEffects {
         if (action.type == startFileUploadToExpense.type) {
           collection = "expenses";
         } else {
-          collection = "payments"
+          collection = "payments";
         }
 
         let st: AppState = copy(appState).projects;
         if (!st) return of(noOp());
         let p: Project = selectCurrentProject({ projects: st });
-        let uploadTask: AngularFireUploadTask = this.db.uploadFile(action.file, p, collection);
+        let uploadTask: AngularFireUploadTask = this.db.uploadFile(
+          action.file,
+          p,
+          collection
+        );
 
         let percentageChanges$ = uploadTask.percentageChanges().pipe(
           map((percentage) => {
-
-            let act = action.type ==
-              startFileUploadToExpense.type ?
-              fileUploadProgressToExpense({ expense: action.expense, percent: percentage, }) :
-              fileUploadProgressToPayment({ payment: action.payment, percent: percentage, });
+            let act =
+              action.type == startFileUploadToExpense.type
+                ? fileUploadProgressToExpense({
+                    expense: action.expense,
+                    percent: percentage,
+                  })
+                : fileUploadProgressToPayment({
+                    payment: action.payment,
+                    percent: percentage,
+                  });
 
             return act;
           })
@@ -261,11 +287,18 @@ export class AppEffects {
             return from(snapshot.ref.getDownloadURL());
           }),
           map((downloadUrl) => {
-
-            let act = action.type ==
-              startFileUploadToExpense.type ?
-              fileUploadToExpenseSuccess({ expense: action.expense, filePath: path, downloadUrl: downloadUrl, }) :
-              fileUploadToPaymentSuccess({ payment: action.payment, filePath: path, downloadUrl: downloadUrl, });
+            let act =
+              action.type == startFileUploadToExpense.type
+                ? fileUploadToExpenseSuccess({
+                    expense: action.expense,
+                    filePath: path,
+                    downloadUrl: downloadUrl,
+                  })
+                : fileUploadToPaymentSuccess({
+                    payment: action.payment,
+                    filePath: path,
+                    downloadUrl: downloadUrl,
+                  });
 
             return act;
           })
@@ -278,12 +311,8 @@ export class AppEffects {
 
   onFileUploadSuccess$ = createEffect(() => {
     return this.actions$.pipe(
-      ofType(
-        fileUploadToExpenseSuccess,
-        fileUploadToPaymentSuccess
-      ),
+      ofType(fileUploadToExpenseSuccess, fileUploadToPaymentSuccess),
       map((action) => {
-
         if (action.type === fileUploadToExpenseSuccess.type) {
           let newExpense = copy(action.expense);
           let oldExpense = Object.freeze(action.expense);
@@ -297,17 +326,13 @@ export class AppEffects {
           newPayment.fileUrl = action.downloadUrl;
           return editPayment({ oldPayment, newPayment });
         }
-
       })
     );
   });
 
   onFileDeletion$ = createEffect(() => {
     return this.actions$.pipe(
-      ofType(
-        startRemoveFileFromExpense,
-        startRemoveFileFromPayment
-      ),
+      ofType(startRemoveFileFromExpense, startRemoveFileFromPayment),
       mergeMap((action) => {
         if (action.type === startRemoveFileFromExpense.type) {
           return this.db.deleteFile(action.expense.filePath).pipe(

@@ -25,6 +25,7 @@ export const deleteProject = createAction('[Project] Delete', props<{ projectId:
 export const addEditor = createAction('[Project] Add Editor', props<{ projectId: string, editorEmail: string }>());
 export const removeEditor = createAction('[Project] Remove Editor', props<{ projectId: string, editorEmail: string }>());
 export const orderProjects = createAction('[Project] Order', props<{ projects: ProjectState[] }>());
+export const loadProjectOrder = createAction('[Project] Set Order', props<{ order: { [key: string]: number } }>());
 
 export const addUser = createAction('[User] Add', props<{ userName: string }>());
 export const removeUser = createAction('[User] Remove', props<{ userId: string }>());
