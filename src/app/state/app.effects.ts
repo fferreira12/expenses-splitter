@@ -4,7 +4,7 @@ import { Actions, createEffect, ofType } from "@ngrx/effects";
 import { Store } from "@ngrx/store";
 import copy from "fast-copy";
 import { from, merge, of } from "rxjs";
-import { concatMap, map, mergeMap, tap, withLatestFrom } from "rxjs/operators";
+import { concatMap, map, mergeMap, take, tap, withLatestFrom } from "rxjs/operators";
 import { Expense } from '../models/expense.model';
 import { Project } from "../models/project.model";
 import { AuthService } from "../services/auth.service";
@@ -161,8 +161,9 @@ export class AppEffects {
   deleteProject$ = createEffect(() => {
     return this.actions$.pipe(
       ofType(deleteProject),
-      tap((action) => {
+      map((action) => {
         this.db.deleteProject(action.projectId);
+        return apiCalled();
       })
     );
   });

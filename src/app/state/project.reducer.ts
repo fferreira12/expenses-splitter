@@ -77,6 +77,7 @@ const _projectReducer = createReducer<AppState>(
     let st: AppState = copy(state);
     let p = [...st.selfProjects, ...st.otherProjects].find(p => p.projectId == props.projectId);
     p.archived = true;
+    p.order = Infinity;
     return {
       ...st
     }

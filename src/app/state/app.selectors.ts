@@ -15,7 +15,9 @@ export const selectOrderedProjects = createSelector(
   },
   (projectStates: ProjectState[]) => {
     if (!projectStates) return;
-    return projectStatesToProjects(putInOrder(projectStates));
+    let archived = projectStates.filter(p => p.archived);
+    let notArchived = projectStates.filter(p => !p.archived);
+    return projectStatesToProjects([...putInOrder(notArchived), ...archived]);
   }
 );
 
