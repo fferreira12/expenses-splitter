@@ -1,7 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { CdkDragDrop, moveItemInArray } from "@angular/cdk/drag-drop";
 
-import { SplitterService } from "src/app/services/splitter.service";
 import { User } from "src/app/models/user.model";
 import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
@@ -31,7 +30,7 @@ export class UserListComponent implements OnInit {
 
   evenSplit: boolean;
 
-  constructor(private splitterService: SplitterService, private store: Store<{projects: AppState}>) {}
+  constructor(private store: Store<{projects: AppState}>) {}
 
   ngOnInit() {
     this.currentProject$ = this.store.select(selectCurrentProject);

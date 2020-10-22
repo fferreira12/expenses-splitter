@@ -1,15 +1,13 @@
 import { Component, OnInit } from "@angular/core";
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 
-import { SplitterService } from "src/app/services/splitter.service";
 import { Project } from "src/app/models/project.model";
 import { FormControl } from "@angular/forms";
 import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { AppState } from 'src/app/state/app.state';
-import { createProject, renameProject, setCurrentProject, startLoadArchivedProjects } from 'src/app/state/app.actions';
-import { map } from 'rxjs/operators';
-import { selectCurrentProject, selectOrderedProjects } from 'src/app/state/app.selectors';
+import { addEditor, archiveProject, createProject, deleteProject, orderProjects, removeEditor, renameProject, setCurrentProject, startLoadArchivedProjects, unarchiveProject } from 'src/app/state/app.actions';
+import { selectCurrentProject, selectIsSelfProject, selectOrderedProjects } from 'src/app/state/app.selectors';
 
 @Component({
   selector: "app-projects",
@@ -39,7 +37,7 @@ export class ProjectsComponent implements OnInit {
     return this._showArchivedProjects;
   }
 
-  constructor(private splitterService: SplitterService, private store: Store<{ projects: AppState }>) {}
+  constructor(private store: Store<{ projects: AppState }>) {}
 
   ngOnInit() {
     // this.allProjects$ = this.splitterService.getAllProjects$();
@@ -66,7 +64,8 @@ export class ProjectsComponent implements OnInit {
 
   onDeleteProject(project: Project) {
     //console.log('project to delete: ' + project.projectName);
-    this.splitterService.deleteProject(project);
+    //this.splitterService.deleteProject(project);
+    this.store.dispatch(deleteProject({ projectId: project.projectId }));
   }
 
   onAddProject() {
@@ -85,17 +84,18 @@ export class ProjectsComponent implements OnInit {
   }
 
   onInviteUser(project: Project, email: string) {
-    this.splitterService.addEditor(project, email);
+    this.store.dispatch(addEditor({ projectId: project.projectId, editorEmail: email }));
 
     this.addingUser = false;
   }
 
   onRemoveEditor(project: Project, email: string) {
-    this.splitterService.removeEditor(project, email);
+    this.store.dispatch(removeEditor({ projectId: project.projectId, editorEmail: email }));
+
   }
 
   selfProject(project: Project) {
-    return this.splitterService.isSelfProject(project);
+    return this.store.select(selectIsSelfProject, project);
   }
 
   isCurrentProject(project: Project) {
@@ -106,17 +106,17 @@ export class ProjectsComponent implements OnInit {
   }
 
   onArchiveProject(project: Project) {
-    //console.log('archiving project', project);
-    this.splitterService.archiveProject(project);
+    this.store.dispatch(archiveProject({ projectId: project.projectId }));
   }
 
   onUnarchiveProject(project: Project) {
-    this.splitterService.unArchiveProject(project);
+    this.store.dispatch(unarchiveProject({ projectId: project.projectId }));
   }
 
   drop(event: CdkDragDrop<string[]>) {
     moveItemInArray(this.allProjects, event.previousIndex, event.currentIndex);
-    this.splitterService.setProjectsOrder(this.allProjects);
+    //this.splitterService.setProjectsOrder(this.allProjects);
+    this.store.dispatch(orderProjects({ projects: this.allProjects }));
   }
 
 }

@@ -49,6 +49,15 @@ export const selectIsEvenSplit = createSelector(
   }
 );
 
+export const selectIsSelfProject = createSelector(
+  (state: {projects: AppState}) => {
+    return state.projects
+  },
+  (state: AppState, project: Project) => {
+    return project.ownerEmail === state.userEmail;
+  }
+);
+
 export const selectExpenses = createSelector(
   (state: {projects: AppState}) => {
     return state.projects

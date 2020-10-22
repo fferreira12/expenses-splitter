@@ -118,7 +118,7 @@ export class Firebasev2Service {
 
   // savePayment(payment: Payment) {}
 
-  getProjectsOfUser(getArchived: boolean = false, userId = undefined) {
+  getProjectsOfUser(getArchived: boolean = false, userId = undefined): Observable<Project[]> {
     //console.log('getting projects of user: ', this.afAuth.auth.currentUser)
 
     // let collection = getArchived ?

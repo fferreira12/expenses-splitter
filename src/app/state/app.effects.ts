@@ -4,7 +4,7 @@ import { Actions, createEffect, ofType } from "@ngrx/effects";
 import { Store } from "@ngrx/store";
 import copy from "fast-copy";
 import { from, merge, of } from "rxjs";
-import { map, mergeMap, tap, withLatestFrom } from "rxjs/operators";
+import { concatMap, map, mergeMap, tap, withLatestFrom } from "rxjs/operators";
 import { Expense } from '../models/expense.model';
 import { Project } from "../models/project.model";
 import { AuthService } from "../services/auth.service";
@@ -58,26 +58,20 @@ export class AppEffects {
   loadProjects$ = createEffect(() =>
     this.actions$.pipe(
       ofType(setUser),
-      mergeMap((action) => {
-        return this.db.getProjectsOfUser(false, action.userId).pipe(
-          map((projects) => {
-            return loadProjects({ projects });
-          })
-        );
-      })
+      concatMap((action) => {
+        return this.db.getProjectsOfUser(false, action.userId);
+      }),
+      map(projects => loadProjects({ projects }))
     )
   );
 
   loadAllProjects$ = createEffect(() =>
   this.actions$.pipe(
     ofType(setUser),
-    mergeMap((action) => {
-      return this.db.getProjectsOfUser(true, action.userId).pipe(
-        map((projects) => {
-          return loadProjects({ projects });
-        })
-      );
-    })
+    concatMap((action) => {
+      return this.db.getProjectsOfUser(true, action.userId);
+    }),
+    map(projects => loadProjects({ projects }))
   )
 );
 
