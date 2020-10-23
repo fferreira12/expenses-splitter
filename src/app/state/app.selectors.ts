@@ -39,6 +39,16 @@ export const selectCurrentProject = createSelector(
   }
 );
 
+export const selectProjectById = createSelector(
+  (state: {projects: AppState}) => {
+    return state.projects
+  },
+  (state: AppState, projectId: string) => {
+    let p = [...state.selfProjects, ...state.otherProjects].find(p => p.projectId == projectId);
+    return p ? Project.fromState(p) : null;
+  }
+);
+
 export const selectWeightsForCurrentProject = createSelector(
   (state: {projects: AppState}) => {
     return state.projects

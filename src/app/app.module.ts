@@ -46,6 +46,7 @@ import { GetReportComponent } from './components/report/get-report/get-report.co
 import { UserReportComponent } from './components/report/user-report/user-report.component';
 import { BottomBarComponent } from './components/bottom-bar/bottom-bar.component';
 import { AddLocalWeightsComponent } from './components/add-expense/add-local-weights/add-local-weights.component';
+import { ProjectSummaryComponent } from './components/project/project-summary/project-summary.component';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http);
@@ -54,6 +55,10 @@ export function HttpLoaderFactory(http: HttpClient) {
 const appRoutes: Routes = [
   { path: "", component: HomeComponent, canActivate: [AuthGuardService] },
   { path: "home", component: HomeComponent, canActivate: [AuthGuardService] },
+  {
+    path: "projects/:projectId",
+    component: ProjectSummaryComponent,
+  },
   {
     path: "projects",
     component: ProjectsComponent,
@@ -110,6 +115,7 @@ const shouldUseEmulator = () => false;
     UserReportComponent,
     BottomBarComponent,
     AddLocalWeightsComponent,
+    ProjectSummaryComponent,
   ],
   imports: [
     BrowserModule,

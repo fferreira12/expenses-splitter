@@ -1,0 +1,92 @@
+<div *ngIf="project$ | async as project" class="container">
+  <h1>Project: {{project.projectName}}</h1>
+
+  <ul class="list-group">
+
+    <li class="list-group-item">
+      Owner: {{project.ownerEmail}}
+    </li>
+
+    <li class="list-group-item">
+      <h2>Users</h2>
+      <ul class="list-group list-group-horizontal-md">
+        <li class="list-group-item" *ngFor="let user of project.users">{{user.name}}
+          [{{project.getWeightForUser(user)}}]</li>
+      </ul>
+    </li>
+
+    <li class="list-group-item">
+      <h2>Expenses</h2>
+      <ul class="list-group">
+        <li class="list-group-item" *ngFor="let expense of project.expenses">
+          <h3>{{expense.name}}</h3>
+          <div>{{expense.value | currency:"R$"}}</div>
+          <div>Participants</div>
+          <ul class="list-group list-group-horizontal-md">
+            <li class="list-group-item" *ngFor="let user of expense.users">{{user.name}}
+              [{{expense.getWeightForUser(user)}}]</li>
+          </ul>
+          <div>Payers</div>
+          <ul class="list-group list-group-horizontal-md">
+            <li class="list-group-item" *ngFor="let payer of expense.payers">{{payer.payer.name}}
+              [{{payer.amount | currency:"R$"}}]</li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+
+    <li class="list-group-item">
+      <h2>Payments</h2>
+      <ul class="list-group list-group-horizontal-md">
+        <li class="list-group-item" *ngFor="let payment of project.payments">
+          <span>{{payment.payer.name}} </span>
+          <i class="fas fa-arrow-right"></i>
+          <span> {{payment.receiver.name}}</span>
+          <span> [{{payment.value | currency:"R$"}}]</span>
+        </li>
+      </ul>
+    </li>
+
+
+    <li class="list-group-item">
+      <h2>Balance</h2>
+
+      <!-- <ul class="list-group">
+        <li class="list-group-item" *ngFor="let user of project.users">
+          <div>{{user.name}} </div>
+          <div>Fair Share: {{fairShares[user.id] | currency:"R$"}}</div>
+          <div>Expenses Paid: {{paidValues[user.id] | currency:"R$"}}</div>
+          <div>Payments Made: {{project.getPaymentsMade(user) | currency:"R$"}}</div>
+          <div>Payments Received: {{project.getPaymentsReceived(user) | currency:"R$"}}</div>
+        </li>
+      </ul> -->
+
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">User</th>
+            <th scope="col">Fair Share</th>
+            <th scope="col">Expenses Paid</th>
+            <th scope="col">Payments Made</th>
+            <th scope="col">Payments Received</th>
+            <th scope="col">Balance</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let user of project.users">
+            <td>{{user.name}}</td>
+            <td>{{fairShares[user.id] | currency:"R$"}}</td>
+            <td>{{paidValues[user.id] | currency:"R$"}}</td>
+            <td>{{project.getPaymentsMade(user) | currency:"R$"}}</td>
+            <td>{{project.getPaymentsReceived(user) | currency:"R$"}}</td>
+            <td>{{balances[user.id] | currency:"R$"}}</td>
+          </tr>
+        </tbody>
+      </table>
+
+    </li>
+
+
+  </ul>
+
+</div>

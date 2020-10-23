@@ -8,7 +8,7 @@ import { Expense } from "../models/expense.model";
 import { Payment } from "../models/payment.model";
 import { AngularFirestore, AngularFirestoreDocument } from '@angular/fire/firestore';
 import { Observable, of } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, tap } from 'rxjs/operators';
 import { from } from 'rxjs';
 import { AuthService } from './auth.service';
 import { AngularFireStorage } from '@angular/fire/storage';
@@ -120,7 +120,7 @@ export class Firebasev2Service {
     }
     return this.db.collection('project-order').doc(userId || this.userId).get().pipe(
       map(snapshot => snapshot.data()),
-      map(data => data.order)
+      map(data => data?.order)
     );
   }
 
@@ -136,6 +136,17 @@ export class Firebasev2Service {
   // saveExpense(expense: Expense) {}
 
   // savePayment(payment: Payment) {}
+
+  getProjectById(projectId: string): Observable<Project> {
+    let col = this.db.collection<Project>("projects2");
+    let doc = col.doc<Project>(projectId);
+    return doc.valueChanges().pipe(
+      tap(v => {
+        console.log(v);
+
+      })
+    );
+  }
 
   getProjectsOfUser(getArchived: boolean = false, userId = undefined): Observable<Project[]> {
     //console.log('getting projects of user: ', this.afAuth.auth.currentUser)
