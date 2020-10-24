@@ -19,5 +19,7 @@ export class ProjectState {
   _total: number = 0;
 
   archived: boolean = false;
-  weights: {user: User, weight: number}[] = [];
+  weights: { user: User, weight: number }[] = [];
+
+  public: boolean;
 }

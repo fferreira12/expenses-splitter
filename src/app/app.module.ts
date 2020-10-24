@@ -47,6 +47,7 @@ import { UserReportComponent } from './components/report/user-report/user-report
 import { BottomBarComponent } from './components/bottom-bar/bottom-bar.component';
 import { AddLocalWeightsComponent } from './components/add-expense/add-local-weights/add-local-weights.component';
 import { ProjectSummaryComponent } from './components/project/project-summary/project-summary.component';
+import { CopyClipboardDirective } from './directives/copy-clipboard.directive';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http);
@@ -116,6 +117,7 @@ const shouldUseEmulator = () => false;
     BottomBarComponent,
     AddLocalWeightsComponent,
     ProjectSummaryComponent,
+    CopyClipboardDirective,
   ],
   imports: [
     BrowserModule,

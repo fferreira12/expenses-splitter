@@ -19,6 +19,8 @@ export class Project {
 
   order: number;
 
+  public: boolean = false;
+
   _total: number = 0;
   get total(): number {
     if(!this.expenses) {
@@ -92,6 +94,7 @@ export class Project {
       _total: clone._total,
       archived: clone.archived,
       weights: clone.weights,
+      public: clone.public
     }
     return state;
   }
@@ -108,6 +111,7 @@ export class Project {
     this._total = state._total;
     this.archived = state.archived;
     this.weights = state.weights;
+    this.public = state.public;
   }
 
   setData(users?: User[], expenses?: Expense[], payments?: Payment[]) {

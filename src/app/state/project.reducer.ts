@@ -14,7 +14,7 @@ import {
   archiveProject,
   setCurrentProject,
   unarchiveProject,
-  loadProjects, setUser, addEditor, removeEditor, orderProjects, addUser, removeUser, renameUser, orderUsers, setWeight, unsetWeights, addExpense, editExpense, removeExpense, startRemoveFileFromExpense, removeFileFromExpenseSuccess, fileUploadToExpenseSuccess, orderExpenses, addPayment, editPayment, removePayment, orderPayments, removeFileFromPaymentSuccess, loadProjectOrder
+  loadProjects, setUser, addEditor, removeEditor, orderProjects, addUser, removeUser, renameUser, orderUsers, setWeight, unsetWeights, addExpense, editExpense, removeExpense, startRemoveFileFromExpense, removeFileFromExpenseSuccess, fileUploadToExpenseSuccess, orderExpenses, addPayment, editPayment, removePayment, orderPayments, removeFileFromPaymentSuccess, loadProjectOrder, makeProjectPublic, makeProjectPrivate
 } from "./app.actions";
 import { AppState } from './app.state';
 import { initialState } from './initial.state';
@@ -68,6 +68,24 @@ const _projectReducer = createReducer<AppState>(
     let st: AppState = copy(state);
     let pToRename = [...st.selfProjects, ...st.otherProjects].find(p => p.projectId == props.projectId);
     pToRename.projectName = props.newName;
+    return {
+      ...st
+    }
+  }),
+
+  on(makeProjectPublic, (state, props) => {
+    let st: AppState = copy(state);
+    let p = [...st.selfProjects, ...st.otherProjects].find(p => p.projectId == props.projectId);
+    p.public = true;
+    return {
+      ...st
+    }
+  }),
+
+  on(makeProjectPrivate, (state, props) => {
+    let st: AppState = copy(state);
+    let p = [...st.selfProjects, ...st.otherProjects].find(p => p.projectId == props.projectId);
+    p.public = false;
     return {
       ...st
     }

@@ -50,6 +50,8 @@ import {
   startRemoveFileFromPayment,
   removeFileFromPaymentSuccess,
   loadProjectOrder,
+  makeProjectPublic,
+  makeProjectPrivate,
 } from "./app.actions";
 import { selectCurrentProject } from "./app.selectors";
 import { AppState } from "./app.state";
@@ -146,7 +148,9 @@ export class AppEffects {
         archiveProject,
         unarchiveProject,
         addEditor,
-        removeEditor
+        removeEditor,
+        makeProjectPublic,
+        makeProjectPrivate
       ),
       withLatestFrom(this.store),
       map(([action, appState]) => {

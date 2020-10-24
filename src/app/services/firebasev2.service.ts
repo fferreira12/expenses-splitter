@@ -217,7 +217,7 @@ export class Firebasev2Service {
 
     return this.projects$.pipe(map(projectsArray => {
       return projectsArray.filter(project => {
-        project.editors.some(editorEmail => editorEmail === email)
+        project.editors?.some(editorEmail => editorEmail === email)
       })
     }))
   }

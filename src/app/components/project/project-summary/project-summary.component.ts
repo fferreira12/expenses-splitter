@@ -1,8 +1,8 @@
 import { Component, OnInit } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 import { Store } from "@ngrx/store";
-import { Observable, of } from "rxjs";
-import { map, mergeMap, tap } from "rxjs/operators";
+import { Observable } from "rxjs";
+import { map, mergeMap } from "rxjs/operators";
 import { Project } from "src/app/models/project.model";
 import { Firebasev2Service } from "src/app/services/firebasev2.service";
 import { selectProjectById } from "src/app/state/app.selectors";

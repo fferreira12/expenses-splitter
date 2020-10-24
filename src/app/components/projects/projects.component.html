@@ -61,6 +61,11 @@
                 <i class="fas fa-archive"></i>
               </button>
 
+              <button class="btn btn-info ml-2" (click)="onShareProject(p)" [copy-clipboard]="getShareUrl(p)"
+                title="{{'Share' | translate}}">
+                <i class="fas fa-share-alt"></i>
+              </button>
+
               <button *ngIf="!addingUser" (click)="onToggleInviteUser()" class="btn btn-warning ml-2"
                 title="{{'AddEditor' | translate}}">
                 <i class="fas fa-user-plus"></i>

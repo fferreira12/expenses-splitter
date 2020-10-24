@@ -1,13 +1,15 @@
 import { Component, OnInit } from "@angular/core";
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { Project } from "src/app/models/project.model";
 import { FormControl } from "@angular/forms";
 import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { AppState } from 'src/app/state/app.state';
-import { addEditor, archiveProject, createProject, deleteProject, orderProjects, removeEditor, renameProject, setCurrentProject, startLoadArchivedProjects, unarchiveProject } from 'src/app/state/app.actions';
+import { addEditor, archiveProject, createProject, deleteProject, makeProjectPublic, orderProjects, removeEditor, renameProject, setCurrentProject, startLoadArchivedProjects, unarchiveProject } from 'src/app/state/app.actions';
 import { selectCurrentProject, selectIsSelfProject, selectOrderedProjects } from 'src/app/state/app.selectors';
+import { Router } from '@angular/router';
 
 @Component({
   selector: "app-projects",
@@ -37,7 +39,10 @@ export class ProjectsComponent implements OnInit {
     return this._showArchivedProjects;
   }
 
-  constructor(private store: Store<{ projects: AppState }>) {}
+  constructor(
+    private store: Store<{ projects: AppState }>,
+    private _snackBar: MatSnackBar,
+  ) { }
 
   ngOnInit() {
     // this.allProjects$ = this.splitterService.getAllProjects$();
@@ -118,6 +123,27 @@ export class ProjectsComponent implements OnInit {
     moveItemInArray(projects, event.previousIndex, event.currentIndex);
     let archived = this.allProjects.filter(p => p.archived);
     this.store.dispatch(orderProjects({ projects: [...projects, ...archived] }));
+  }
+
+  onShareProject(project: Project) {
+    //mark project as public
+    this.store.dispatch(makeProjectPublic({ projectId: project.projectId }));
+
+    //show toast
+    this._snackBar.open("URL copied to clipboard", 'Close', {
+      duration: 5000,
+    });
+  }
+
+  getShareUrl(project: Project) {
+    let usePort = window.location.hostname == "localhost";
+    if (usePort) {
+      return window.location.protocol + "//" + window.location.hostname + ":" + window.location.port + "/projects/" + project.projectId;
+
+    } else {
+      return window.location.protocol + "//" + window.location.hostname + "/projects/" + project.projectId;
+
+    }
   }
 
 }
