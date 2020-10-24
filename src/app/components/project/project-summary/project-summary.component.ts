@@ -1,4 +1,5 @@
 import { Component, OnInit } from "@angular/core";
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute } from "@angular/router";
 import { Store } from "@ngrx/store";
 import { Observable } from "rxjs";
@@ -25,7 +26,8 @@ export class ProjectSummaryComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private store: Store<{ projects: AppState }>,
-    private db: Firebasev2Service
+    private db: Firebasev2Service,
+    private _snackBar: MatSnackBar,
   ) {}
 
   ngOnInit(): void {
@@ -65,7 +67,24 @@ export class ProjectSummaryComponent implements OnInit {
     });
   }
 
+  onShareProject() {
+    //show toast
+    this._snackBar.open("URL copied to clipboard", 'Close', {
+      duration: 5000,
+    });
 
+    if (navigator) {
+      navigator.share({
+        url: location.href,
+        text: `${this.project.projectName} - Expenses Splitter`,
+        title: `${this.project.projectName} - Expenses Splitter`
+      });
+    }
+  }
+
+  getShareUrl() {
+    return location.href;
+  }
 
 
 
