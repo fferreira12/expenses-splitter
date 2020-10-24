@@ -133,6 +133,14 @@ export class ProjectsComponent implements OnInit {
     this._snackBar.open("URL copied to clipboard", 'Close', {
       duration: 5000,
     });
+
+    if (navigator) {
+      navigator.share({
+        url: this.getShareUrl(project),
+        text: `${project.projectName} - Expenses Splitter`,
+        title: `${project.projectName} - Expenses Splitter`
+      });
+    }
   }
 
   getShareUrl(project: Project) {
