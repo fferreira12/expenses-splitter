@@ -1,10 +1,54 @@
 <div *ngIf="project$ | async as project" class="container">
   <h1>Project: {{project.projectName}}</h1>
 
-  <button class="btn btn-info mb-2" (click)="onShareProject()" [copy-clipboard]="getShareUrl()"
+  <button class="btn btn-info mb-3" (click)="onShareProject()" [copy-clipboard]="getShareUrl()"
     title="{{'Share' | translate}}">
     <i class="fas fa-share-alt"></i>
   </button>
+
+  <div class="summary">
+
+    <app-number-card
+      title="Users"
+      [value]="project.users.length"
+      iconClass="fas fa-user-friends">
+    ></app-number-card>
+
+    <app-number-card
+      title="Expenses"
+      [value]="project.expenses.length"
+      iconClass="fas fa-file-invoice-dollar">
+    ></app-number-card>
+
+    <app-number-card
+      title="Expenses"
+      [value]="project.total"
+      iconClass="fas fa-money-bill-wave"
+      [isCurrency]="true">
+    ></app-number-card>
+
+    <app-number-card
+      title="Payments"
+      [value]="project.payments.length"
+      iconClass="far fa-handshake"
+      [isCurrency]="false">
+    ></app-number-card>
+
+    <app-number-card
+      title="Payments"
+      [value]="getTotalPaymentsMade(project)"
+      iconClass="fas fa-money-check-alt"
+      [isCurrency]="true">
+    ></app-number-card>
+
+    <app-number-card
+      title="Balance"
+      [value]="getProjectBalance(project)"
+      iconClass="fas fa-balance-scale"
+      [isCurrency]="true">
+    ></app-number-card>
+
+  </div>
 
   <ul class="list-group">
 

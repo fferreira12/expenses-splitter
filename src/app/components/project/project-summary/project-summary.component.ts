@@ -86,6 +86,20 @@ export class ProjectSummaryComponent implements OnInit {
     return location.href;
   }
 
+  getTotalPaymentsMade(project: Project) {
+    return !project ? 0 : project.payments.reduce((p, c) => p + c.value, 0);
+  }
 
+  getProjectBalance(project: Project) {
+    let userBalances = project.getBalances();
+    //let balance = 0;
+
+    let projectBalance = project.users.reduce((p, c) => {
+      return userBalances[c.id] < 0 ? p + userBalances[c.id] : p;
+    }, 0);
+
+
+    return projectBalance;
+  }
 
 }

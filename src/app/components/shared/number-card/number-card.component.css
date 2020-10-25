@@ -1,0 +1,35 @@
+:host {
+  display: inline-block;
+}
+
+.card {
+  min-width: 10rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: 1fr 1.5fr;
+  grid-template-areas: "title icon"
+                       "value value";
+  justify-items: stretch;
+  align-items: center;
+  grid-column-gap: 1rem;
+}
+
+.title {
+  font-weight: 100;
+  grid-area: title;
+}
+
+.value {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-top: 0.8rem;
+  grid-area: value;
+}
+
+.icon {
+  grid-area: icon;
+  margin: 0;
+  padding: 0;
+}

@@ -1,0 +1,12 @@
+<div class="card">
+  <div class="title">{{title}}</div>
+
+  <div class="value" *ngIf="isCurrency">{{ value | currency:"R$ " }}</div>
+  <div class="value" *ngIf="!isCurrency">{{value}}</div>
+
+  <div class="icon">
+    <i [class]="iconClass" class="fa-2x"></i>
+  </div>
+
+
+</div>

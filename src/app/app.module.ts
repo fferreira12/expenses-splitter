@@ -48,6 +48,7 @@ import { BottomBarComponent } from './components/bottom-bar/bottom-bar.component
 import { AddLocalWeightsComponent } from './components/add-expense/add-local-weights/add-local-weights.component';
 import { ProjectSummaryComponent } from './components/project/project-summary/project-summary.component';
 import { CopyClipboardDirective } from './directives/copy-clipboard.directive';
+import { NumberCardComponent } from './components/shared/number-card/number-card.component';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http);
@@ -118,6 +119,7 @@ const shouldUseEmulator = () => false;
     AddLocalWeightsComponent,
     ProjectSummaryComponent,
     CopyClipboardDirective,
+    NumberCardComponent,
   ],
   imports: [
     BrowserModule,
