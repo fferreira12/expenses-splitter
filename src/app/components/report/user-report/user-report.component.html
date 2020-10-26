@@ -10,6 +10,60 @@
       text="Download PDF"
       ></app-get-report>
   </div>
+
+  <div class="cards" *ngIf="userReportData && currentProject$ | async as project">
+
+    <app-number-card
+      title="Expenses Count"
+      [value]="getExpenseCountString(project)"
+      iconClass="fas fa-file-invoice-dollar"
+      [isCurrency]="false">
+    ></app-number-card>
+
+    <app-number-card
+      title="Expenses Value"
+      [value]="getExpenseValueString(project)"
+      iconClass="fas fa-money-bill-wave"
+      [isCurrency]="false">
+    ></app-number-card>
+
+    <app-number-card
+      title="Expenses Paid"
+      [value]="getExpensesPaid(currentUser$ | async)"
+      iconClass="far fa-handshake"
+      [isCurrency]="true">
+    ></app-number-card>
+
+    <app-number-card
+      title="Fair Share"
+      [value]="getFairShare(currentUser$ | async)"
+      iconClass="fas fa-divide"
+      [isCurrency]="true">
+    ></app-number-card>
+
+    <app-number-card
+      title="Payments Made"
+      [value]="getPaymentsMade(currentUser$ | async)"
+      iconClass="fas fa-donate"
+      [isCurrency]="true">
+    ></app-number-card>
+
+    <app-number-card
+      title="Payments Received"
+      [value]="getPaymentsReceived(currentUser$ | async)"
+      iconClass="fas fa-hand-holding-usd"
+      [isCurrency]="true">
+    ></app-number-card>
+
+    <app-number-card
+      title="Balance"
+      [value]="getBalance(currentUser$ | async)"
+      iconClass="fas fa-balance-scale"
+      [isCurrency]="false">
+    ></app-number-card>
+
+  </div>
+
   <table class="table" *ngIf="expenseData">
     <thead class="thead-light">
       <tr>
