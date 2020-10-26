@@ -78,7 +78,7 @@ export class UserReportComponent implements OnInit {
   }
 
   getExpenseValueString(project: Project) {
-    let percent = this.userReportData.expenses.length * 100.0 / project.expenses.length;
+    let percent = this.userReportData.totalExpenses * 100.0 / this.getTotalExpenses(project.expenses);
     return "R$ " + this.userReportData.totalExpenses.toFixed(0) + '/' + this.getTotalExpenses(project.expenses).toFixed(0) + ` (${percent.toFixed(0)}%)`;
   }
 
