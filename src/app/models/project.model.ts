@@ -398,7 +398,7 @@ export class Project {
 
     this.expenses.forEach(expense => {
 
-      let isWeightedExpense = !expense.isEvenSplit();
+      let isWeightedExpense = !!expense.weights;
       let totalWeight = isWeightedExpense ? expense.getTotalWeight() : this.getTotalWeight(expense);
 
       expense.users.forEach(user => {

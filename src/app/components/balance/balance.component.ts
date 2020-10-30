@@ -36,8 +36,10 @@ export class BalanceComponent implements OnInit {
 
     this.calculator.setAllUsers(this.users);
     // this.fairShares = this.splitterService.getFairShares();
-    this.store.select(selectFairShares).subscribe(fairShares => this.fairShares = fairShares)
-    this.calculator.setFairShares(this.fairShares);
+    this.store.select(selectFairShares).subscribe(fairShares => {
+      this.fairShares = fairShares
+      this.calculator.setFairShares(this.fairShares);
+    })
 
     this.expenses$ = this.store.select(selectExpenses);
     this.expenses$.subscribe(expenses => {
