@@ -5,6 +5,7 @@ import { Store } from "@ngrx/store";
 import { Observable } from "rxjs";
 import { map, mergeMap } from "rxjs/operators";
 import { Project } from "src/app/models/project.model";
+import { User } from 'src/app/models/user.model';
 import { Firebasev2Service } from "src/app/services/firebasev2.service";
 import { selectProjectById } from "src/app/state/app.selectors";
 import { AppState } from "src/app/state/app.state";
@@ -100,6 +101,10 @@ export class ProjectSummaryComponent implements OnInit {
 
 
     return projectBalance;
+  }
+
+  getUserSummaryLink(user: User) {
+    return `/projects/${this.project.projectId}/user/${user.id}`
   }
 
 }

@@ -58,6 +58,10 @@ const appRoutes: Routes = [
   { path: "", component: HomeComponent, canActivate: [AuthGuardService] },
   { path: "home", component: HomeComponent, canActivate: [AuthGuardService] },
   {
+    path: "projects/:projectId/user/:userId",
+    component: UserReportComponent,
+  },
+  {
     path: "projects/:projectId",
     component: ProjectSummaryComponent,
   },

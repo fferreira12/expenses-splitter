@@ -58,8 +58,8 @@
 
     <li class="list-group-item">
       <h2>Users</h2>
-      <ul class="list-group list-group-horizontal-md">
-        <li class="list-group-item" *ngFor="let user of project.users">{{user.name}}
+      <ul class="list-group list-group-horizontal-md user-links">
+        <li class="list-group-item" *ngFor="let user of project.users" [routerLink]="getUserSummaryLink(user)">{{user.name}}
           [{{project.getWeightForUser(user)}}]</li>
       </ul>
     </li>

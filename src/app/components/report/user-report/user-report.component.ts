@@ -1,16 +1,19 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { combineLatest, Observable } from 'rxjs';
+import { combineLatest, Observable, race } from 'rxjs';
 import { mergeMap } from 'rxjs/operators';
 import { Expense } from 'src/app/models/expense.model';
 import { Project } from 'src/app/models/project.model';
 import { ExpenseTableData } from 'src/app/models/report/expense-table-data';
 import { UserReportData } from 'src/app/models/report/user-report-data';
 import { User } from 'src/app/models/user.model';
+import { Firebasev2Service } from 'src/app/services/firebasev2.service';
 import { ReportService } from 'src/app/services/report.service';
-import { selectCurrentProject, selectUser } from 'src/app/state/app.selectors';
+import { selectCurrentProject, selectProjectById, selectUser } from 'src/app/state/app.selectors';
 import { AppState } from 'src/app/state/app.state';
+import { Location } from '@angular/common';
+
 
 @Component({
   selector: 'app-user-report',
@@ -32,11 +35,20 @@ export class UserReportComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private reportService: ReportService,
-    private store: Store<{projects: AppState}>
+    private store: Store<{ projects: AppState }>,
+    private db: Firebasev2Service,
+    private location: Location
   ) { }
 
   ngOnInit(): void {
-    this.currentProject$ = this.store.select(selectCurrentProject);
+    this.currentProject$ = race(
+      this.store.select(selectCurrentProject),
+      this.route.params.pipe(
+        mergeMap((params) => {
+          return this.db.getProjectById(params.projectId);
+        })
+      )
+    );
     this.currentProject$.subscribe(p => this.currentProject = p);
 
     this.currentUser$ = this.route.params.pipe(
@@ -108,6 +120,10 @@ export class UserReportComponent implements OnInit {
 
   getPaymentsReceived(user: User) {
     return this.currentProject.getPaymentsReceived(user);
+  }
+
+  back() {
+    this.location.back();
   }
 
 }
