@@ -88,15 +88,17 @@ export class Expense {
 
   isEqualTo(expense: Expense) {
 
+    if (this && !expense) return false;
+
     let sameName = this.name == expense.name;
     let sameValue = this.value == expense.value;
 
     let sameUsers = this.users.every(user => {
-      return expense.users.some(u => u.id == user.id);
+      return expense.users?.some(u => u.id == user.id);
     }) && this.users.length === expense.users.length;
 
     let samePayers = this.payers.every(payer => {
-      return expense.payers.some(p => {
+      return expense.payers?.some(p => {
         return p.payer.id == payer.payer.id && p.amount == payer.amount;
       });
     });
@@ -105,7 +107,7 @@ export class Expense {
     let samePath = this.filePath == expense.filePath;
 
     let sameWeights = !this.weights ? true : this.weights.every(weight => {
-      return expense.weights.some(w => {
+      return expense.weights?.some(w => {
         return w.user.id == weight.user.id && w.weight == weight.weight;
       });
     });

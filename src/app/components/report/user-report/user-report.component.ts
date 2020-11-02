@@ -2,7 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { combineLatest, Observable, race } from 'rxjs';
-import { mergeMap } from 'rxjs/operators';
+import { filter, mergeMap, tap } from 'rxjs/operators';
 import { Expense } from 'src/app/models/expense.model';
 import { Project } from 'src/app/models/project.model';
 import { ExpenseTableData } from 'src/app/models/report/expense-table-data';
@@ -13,6 +13,7 @@ import { ReportService } from 'src/app/services/report.service';
 import { selectCurrentProject, selectProjectById, selectUser } from 'src/app/state/app.selectors';
 import { AppState } from 'src/app/state/app.state';
 import { Location } from '@angular/common';
+import { loadProjects, setCurrentProject } from 'src/app/state/app.actions';
 
 
 @Component({
@@ -42,14 +43,26 @@ export class UserReportComponent implements OnInit {
 
   ngOnInit(): void {
     this.currentProject$ = race(
-      this.store.select(selectCurrentProject),
+      this.store.select(selectCurrentProject).pipe(
+        filter(v => v !== null),
+        tap(v => console.log(v))
+      ),
       this.route.params.pipe(
         mergeMap((params) => {
           return this.db.getProjectById(params.projectId);
+        }),
+        tap(p => {
+          console.log('p',p);
+          let states = [p];
+          this.store.dispatch(loadProjects({projects:states}))
         })
       )
     );
-    this.currentProject$.subscribe(p => this.currentProject = p);
+    this.currentProject$.subscribe(p => {
+      if (p) {
+        this.currentProject = p;
+      }
+    });
 
     this.currentUser$ = this.route.params.pipe(
       mergeMap((params) => {
@@ -58,6 +71,10 @@ export class UserReportComponent implements OnInit {
     );
 
     combineLatest([this.currentProject$, this.currentUser$]).subscribe(([project, user]) => {
+
+      if (!project || !user) {
+        return;
+      }
 
       this.fairShares = project.getFairShares();
       this.userReportData = this.reportService.getUserReportData(project, user);

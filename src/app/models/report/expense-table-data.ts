@@ -75,6 +75,38 @@ export function CreateExpenseTableData(userReportData: UserReportData): ExpenseT
 
   });
 
+  userReportData.payments.forEach(payment => {
+    let paymentMade: boolean = payment.payer.id == userReportData.user.id;
+    let name = paymentMade ? `Payment made to ${payment.receiver.name}` : `Payment received from ${payment.payer.name}`
+    let userWeight = userReportData.project.getWeightForUser(userReportData.user);
+    let balance = paymentMade ? eData[eData.length - 1].balance + payment.value : eData[eData.length - 1].balance - payment.value;
+    let weights: { [key: string]: number } = {};
+    weights[payment.payer.id] = userReportData.project.getWeightForUser(payment.payer);
+    weights[payment.receiver.id] = userReportData.project.getWeightForUser(payment.receiver);
+    let paid = paymentMade ? payment.value : -payment.value;
+    let diff = paymentMade ? payment.value : -payment.value;
+
+
+    let e: ExpenseTableData = {
+      expenseName: name,
+      value: payment.value,
+      users: [payment.payer, payment.receiver],
+      currentUser: userReportData.user,
+      userWeight,
+      totalWeight: userWeight,
+      balance,
+      weights,
+      paid,
+      share: 0,
+      diff,
+      isLocalWeight: false,
+      expense: null
+    }
+
+    eData.push(e);
+
+  })
+
   return eData;
 
 }

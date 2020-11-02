@@ -35,7 +35,7 @@ export const selectCurrentProject = createSelector(
   },
   (state: AppState) => {
     let p = [...state.selfProjects, ...state.otherProjects].find(p => p.projectId == state.currentProject);
-    return Project.fromState(p);
+    return p ? Project.fromState(p) : null;
   }
 );
 
@@ -84,7 +84,7 @@ export const selectExpenses = createSelector(
   },
   (state: AppState) => {
     let project = selectCurrentProject({projects: state});
-    return putInOrder(copy(project.expenses));
+    return project ? putInOrder(copy(project.expenses)) : null;
   }
 );
 
@@ -124,7 +124,7 @@ export const selectWeights = createSelector(
   },
   (state: AppState) => {
     let project = selectCurrentProject({projects: state});
-    return copy(project.weights);
+    return project ? copy(project.weights) : null;
   }
 );
 
@@ -144,7 +144,7 @@ export const selectUsers = createSelector(
   },
   (state: AppState) => {
     let project = selectCurrentProject({projects: state});
-    return copy(project.users);
+    return project ? copy(project.users) : null;
   }
 );
 
@@ -154,7 +154,7 @@ export const selectUser = createSelector(
   },
   (state: AppState, userId: string) => {
     let project = selectCurrentProject({projects: state});
-    return copy(project.getUser(userId));
+    return project ? copy(project.getUser(userId)) : null;
   }
 );
 

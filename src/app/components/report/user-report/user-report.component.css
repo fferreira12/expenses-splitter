@@ -1,6 +1,6 @@
 .tableFixHead {
   overflow-y: visible;
-  height: 100%;
+  padding-bottom: 3rem;
 }
 
 .tableFixHead thead th {

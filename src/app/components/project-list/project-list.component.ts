@@ -23,7 +23,7 @@ export class ProjectListComponent implements OnInit {
 
   get unarchivedProjects(): Project[] {
     return this.allProjects?.filter(p => {
-      return this.currentProject.projectId == p.projectId || !p.archived;
+      return this.currentProject?.projectId == p.projectId || !p.archived;
     });
   }
 
