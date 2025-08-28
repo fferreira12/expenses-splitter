@@ -45,7 +45,7 @@
     "fast-copy": "^2.1.0",
     "firebase": "^7.5.1",
     "jquery": "~3.4.1",
-    "jspdf": "^2.1.1",
+    "jspdf": "^3.0.2",
     "jspdf-autotable": "^3.5.13",
     "popper.js": "^1.15.0",
     "rxjs": "~6.6.3",
