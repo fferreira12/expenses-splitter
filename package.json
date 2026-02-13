@@ -42,7 +42,7 @@
     "@ngx-translate/http-loader": "^17.0.0",
     "bootstrap": "^5.3.3",
     "fast-copy": "^3.0.2",
-    "firebase": "^10.14.1",
+    "firebase": "^12.9.0",
     "jspdf": "^4.1.0",
     "jspdf-autotable": "^5.0.7",
     "rxjs": "^7.8.1",
