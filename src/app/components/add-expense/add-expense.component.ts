@@ -16,6 +16,7 @@ import { AddLocalWeightsComponent } from './add-local-weights/add-local-weights.
 import copy from 'fast-copy';
 
 @Component({
+  standalone: false,
   selector: "app-add-expense",
   templateUrl: "./add-expense.component.html",
   styleUrls: ["./add-expense.component.css"]

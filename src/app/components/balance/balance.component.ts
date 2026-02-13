@@ -13,6 +13,7 @@ import { addPayment } from 'src/app/state/app.actions';
 import { Project } from 'src/app/models/project.model';
 
 @Component({
+  standalone: false,
   selector: "app-balance",
   templateUrl: "./balance.component.html",
   styleUrls: ["./balance.component.css"]

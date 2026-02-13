@@ -1,7 +1,6 @@
-// import * as firebase from "firebase";
-
-import { AngularFireAuth } from '@angular/fire/auth';
-import { auth } from 'firebase/app';
+import { AngularFireAuth } from '@angular/fire/compat/auth';
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/auth';
 
 import { Injectable } from "@angular/core";
 import { BehaviorSubject, Subscription } from "rxjs";
@@ -39,9 +38,9 @@ export class AuthService {
       //firebase.auth().signInWithCustomToken(this.token);
     }
 
-    this.afAuth.auth.setPersistence(auth.Auth.Persistence.LOCAL)
+    this.afAuth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
 
-    this.afAuth.auth.onAuthStateChanged(user => {
+    this.afAuth.onAuthStateChanged(user => {
       if (user) {
         //console.log("signed in");
         //console.log(user);
@@ -76,13 +75,13 @@ export class AuthService {
   }
 
   signupUser(email: string, password: string) {
-    return this.afAuth.auth
+    return this.afAuth
       .createUserWithEmailAndPassword(email, password)
       .catch(error => console.log(error));
   }
 
   signinUser(email: string, password: string) {
-    return this.afAuth.auth
+    return this.afAuth
       .signInWithEmailAndPassword(email, password)
       .then(result => {
         return this.onSucessLogin(result);
@@ -96,8 +95,8 @@ export class AuthService {
   }
 
   googleSignin() {
-    var provider = new auth.GoogleAuthProvider()
-    return this.afAuth.auth.signInWithPopup(provider).then((result) => {
+    var provider = new firebase.auth.GoogleAuthProvider()
+    return this.afAuth.signInWithPopup(provider).then((result) => {
       return this.onSucessLogin(result);
 
     })
@@ -130,15 +129,15 @@ export class AuthService {
     this.localStorage.save("user-id", null);
     this.localStorage.save("user-token", null);
     this.cancelAllSubscriptionsAndSnapshots();
-    this.afAuth.auth.signOut().then(() => {
+    this.afAuth.signOut().then(() => {
       this.router.navigate(['signin']);
     });
 
   }
 
   getToken() {
-    this.afAuth.auth
-      .currentUser.getIdToken()
+    this.afAuth.currentUser
+      .then(user => user?.getIdToken())
       .then((token: string) => (this.token = token));
     return this.token;
   }
@@ -147,7 +146,8 @@ export class AuthService {
     if (this.userId !== null && this.userId !== null) {
       return this.userId;
     }
-    return this.afAuth.auth.currentUser ? this.afAuth.auth.currentUser.uid : "";
+    // currentUser is a Promise in compat mode, but we have userId cached
+    return this.userId || "";
   }
 
   isAuthenticated() {

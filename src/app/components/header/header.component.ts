@@ -2,6 +2,7 @@ import { Component, OnInit, Output, EventEmitter } from "@angular/core";
 import { AuthService } from "src/app/services/auth.service";
 
 @Component({
+  standalone: false,
   selector: "app-header",
   templateUrl: "./header.component.html",
   styleUrls: ["./header.component.css"]

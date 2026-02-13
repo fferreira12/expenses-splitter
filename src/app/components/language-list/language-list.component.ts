@@ -4,6 +4,7 @@ import { Firebasev2Service } from 'src/app/services/firebasev2.service';
 
 
 @Component({
+  standalone: false,
   selector: "app-language-list",
   templateUrl: "./language-list.component.html",
   styleUrls: ["./language-list.component.css"]

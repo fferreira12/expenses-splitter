@@ -12,7 +12,8 @@ import { Project } from "../models/project.model";
 import { Firebasev2Service } from "./firebasev2.service";
 import { TranslateService } from "@ngx-translate/core";
 import { tap } from 'rxjs/operators';
-import * as firebase from 'firebase';
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/storage';
 
 @Injectable({
   providedIn: "root"
@@ -68,7 +69,7 @@ export class SplitterService {
         this.authService.registerSubscription(sub);
 
         this.getLanguagePreference().subscribe(doc => {
-          let data = doc.data();
+          let data: any = doc.data();
           this.translate.use(data.language);
         });
       });
@@ -252,20 +253,20 @@ export class SplitterService {
           let data = doc.data();
 
           let p = this.getAllProjects().find(p => {
-            return p.projectId === data.projectId;
+            return p.projectId === (data as any).projectId;
           });
           if (p) {
             this.setCurrentProject(p);
           } else {
             //try to download project by id, in the case it is an archived project
-            this.db.getProject(data.projectId).subscribe(docSnap => {
+            this.db.getProject((data as any).projectId).subscribe(docSnap => {
               if (!docSnap.exists) {
                 this.currentProject = this.allSelfProjects[0];
                 return;
               }
 
-              let data = docSnap.data();
-              let p = this.parseOne({ id: data.projectId, ...docSnap.data() });
+              let data: any = docSnap.data();
+              let p = this.parseOne({ id: data.projectId, ...docSnap.data() as any });
               this.setCurrentProject(p);
             });
           }

@@ -4,7 +4,7 @@ import { User } from "src/app/models/user.model";
 import { Project } from "src/app/models/project.model";
 import { CdkDragDrop, moveItemInArray } from "@angular/cdk/drag-drop";
 import { MatSnackBar } from '@angular/material/snack-bar';
-import * as firebase from "firebase";
+import firebase from 'firebase/compat/app';
 import { Observable, Subject } from 'rxjs';
 import { AppState } from 'src/app/state/app.state';
 import { Store } from '@ngrx/store';
@@ -14,6 +14,7 @@ import { takeUntil, tap } from 'rxjs/operators';
 import { fileUploadProgressToExpense, fileUploadToExpenseSuccess, removeExpense, startRemoveFileFromExpense, startFileUploadToExpense, orderExpenses } from 'src/app/state/app.actions';
 
 @Component({
+  standalone: false,
   selector: "app-expense-list",
   templateUrl: "./expense-list.component.html",
   styleUrls: ["./expense-list.component.css"]

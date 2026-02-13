@@ -11,6 +11,7 @@ import { orderUsers, removeUser, renameUser, setWeight, unsetWeights } from 'src
 import { Project } from 'src/app/models/project.model';
 
 @Component({
+  standalone: false,
   selector: "app-user-list",
   templateUrl: "./user-list.component.html",
   styleUrls: ["./user-list.component.css"]

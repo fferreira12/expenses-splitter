@@ -10,6 +10,7 @@ import { map } from 'rxjs/operators';
 import { addPayment } from 'src/app/state/app.actions';
 
 @Component({
+  standalone: false,
   selector: "app-add-payment",
   templateUrl: "./add-payment.component.html",
   styleUrls: ["./add-payment.component.css"]

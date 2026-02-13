@@ -11,6 +11,7 @@ import { selectProjectById } from "src/app/state/app.selectors";
 import { AppState } from "src/app/state/app.state";
 
 @Component({
+  standalone: false,
   selector: "app-project-summary",
   templateUrl: "./project-summary.component.html",
   styleUrls: ["./project-summary.component.css"],

@@ -12,6 +12,7 @@ import { selectCurrentProject, selectIsSelfProject, selectOrderedProjects } from
 import { Router } from '@angular/router';
 
 @Component({
+  standalone: false,
   selector: "app-projects",
   templateUrl: "./projects.component.html",
   styleUrls: ["./projects.component.css"]

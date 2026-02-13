@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 import * as Teseract from "tesseract.js";
 import { createWorker } from 'tesseract.js';
 import { from, Observable } from "rxjs";
-import { map } from "rxjs/operators";
+import { map, switchMap } from "rxjs/operators";
 import { SplitterService } from './splitter.service';
 
 @Injectable({
@@ -10,18 +10,16 @@ import { SplitterService } from './splitter.service';
 })
 export class OcrService {
   public result$: Observable<Teseract.RecognizeResult>;
-  private worker: Teseract.Worker;
+  private worker: Promise<Teseract.Worker>;
   private workerReady = false;
 
   constructor(private splitterService: SplitterService) {
-    this.worker = createWorker({});
+    this.worker = createWorker('por');
     this.prepareWorker();
   }
 
   async prepareWorker() {
-    await this.worker.load();
-    await this.worker.loadLanguage('por');
-    await this.worker.initialize('por');
+    await this.worker;
     this.workerReady = true;
   }
 
@@ -31,7 +29,7 @@ export class OcrService {
       this.splitterService.finishLoading();
       return;
     }
-    let promise = this.worker.recognize(image);
+    let promise = this.worker.then(w => w.recognize(image));
     this.result$ = from(promise);
     return this.result$.pipe(map(result => {
       this.splitterService.finishLoading();

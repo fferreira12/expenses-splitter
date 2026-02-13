@@ -6,12 +6,12 @@ import { Project } from "../models/project.model";
 import { User } from "../models/user.model";
 import { Expense } from "../models/expense.model";
 import { Payment } from "../models/payment.model";
-import { AngularFirestore, AngularFirestoreDocument } from '@angular/fire/firestore';
+import { AngularFirestore, AngularFirestoreDocument } from '@angular/fire/compat/firestore';
 import { Observable, of } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 import { from } from 'rxjs';
 import { AuthService } from './auth.service';
-import { AngularFireStorage } from '@angular/fire/storage';
+import { AngularFireStorage } from '@angular/fire/compat/storage';
 import { uuid } from '../util/uuid';
 
 @Injectable({
@@ -120,7 +120,7 @@ export class Firebasev2Service {
     }
     return this.db.collection('project-order').doc(userId || this.userId).get().pipe(
       map(snapshot => snapshot.data()),
-      map(data => data?.order)
+      map((data: any) => data?.order)
     );
   }
 

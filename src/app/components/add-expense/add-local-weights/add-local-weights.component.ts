@@ -7,6 +7,7 @@ import { selectUser, selectUsers, selectWeights } from 'src/app/state/app.select
 import { AppState } from 'src/app/state/app.state';
 
 @Component({
+  standalone: false,
   selector: 'app-add-local-weights',
   templateUrl: './add-local-weights.component.html',
   styleUrls: ['./add-local-weights.component.css']

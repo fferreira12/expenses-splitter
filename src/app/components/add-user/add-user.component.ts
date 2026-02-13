@@ -6,6 +6,7 @@ import { Store } from '@ngrx/store';
 import { addUser } from 'src/app/state/app.actions';
 
 @Component({
+  standalone: false,
   selector: 'app-add-user',
   templateUrl: './add-user.component.html',
   styleUrls: ['./add-user.component.css']

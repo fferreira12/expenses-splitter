@@ -5,11 +5,11 @@ import { Routes, RouterModule } from "@angular/router";
 
 import { HttpClientModule, HttpClient } from "@angular/common/http";
 import { TranslateModule, TranslateLoader } from "@ngx-translate/core";
-import { TranslateHttpLoader } from "@ngx-translate/http-loader";
-import { AngularFireModule } from "@angular/fire";
-import { AngularFirestoreModule, FirestoreSettingsToken as SETTINGS } from "@angular/fire/firestore";
-import { AngularFireAuthModule } from "@angular/fire/auth";
-import { AngularFireStorageModule } from "@angular/fire/storage";
+import { TranslateHttpLoader, provideTranslateHttpLoader } from "@ngx-translate/http-loader";
+import { AngularFireModule } from "@angular/fire/compat";
+import { AngularFirestoreModule } from "@angular/fire/compat/firestore";
+import { AngularFireAuthModule } from "@angular/fire/compat/auth";
+import { AngularFireStorageModule } from "@angular/fire/compat/storage";
 import { DragDropModule } from "@angular/cdk/drag-drop";
 import { MatSnackBarModule } from "@angular/material/snack-bar";
 import { environment } from "../environments/environment";
@@ -50,8 +50,8 @@ import { ProjectSummaryComponent } from './components/project/project-summary/pr
 import { CopyClipboardDirective } from './directives/copy-clipboard.directive';
 import { NumberCardComponent } from './components/shared/number-card/number-card.component';
 
-export function HttpLoaderFactory(http: HttpClient) {
-  return new TranslateHttpLoader(http);
+export function HttpLoaderFactory() {
+  return new TranslateHttpLoader();
 }
 
 const appRoutes: Routes = [
@@ -135,14 +135,11 @@ const shouldUseEmulator = () => false;
     TranslateModule.forRoot({
       loader: {
         provide: TranslateLoader,
-        useFactory: HttpLoaderFactory,
-        deps: [HttpClient],
+        useFactory: HttpLoaderFactory
       },
     }),
     AngularFireModule.initializeApp(environment.firebaseconfig), // imports firebase/app needed for everything
-    AngularFirestoreModule.enablePersistence({
-      synchronizeTabs: true
-    }),
+    AngularFirestoreModule,
     AngularFireAuthModule, // imports firebase/auth, only needed for auth features,
     AngularFireStorageModule,
     NoopAnimationsModule,
@@ -164,15 +161,7 @@ const shouldUseEmulator = () => false;
     EffectsModule.forRoot([AppEffects]),
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
   ],
-  providers: [
-    {
-      provide: SETTINGS,
-      useValue: environment.emulator ? {
-        host: 'localhost:8080',
-        ssl: false
-      } : undefined
-    }
-  ],
+  providers: [],
   bootstrap: [AppComponent],
 })
 export class AppModule {}
