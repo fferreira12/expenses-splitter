@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Expense } from 'src/app/models/expense.model';
 
 @Component({
+  standalone: false,
   selector: 'app-expenses',
   templateUrl: './expenses.component.html',
   styleUrls: ['./expenses.component.css']

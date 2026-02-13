@@ -5,6 +5,7 @@ import { Router } from "@angular/router";
 import { AuthService } from "src/app/services/auth.service";
 
 @Component({
+  standalone: false,
   selector: "app-signup",
   templateUrl: "./signup.component.html",
   styleUrls: ["./signup.component.css"]

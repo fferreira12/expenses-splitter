@@ -17,6 +17,7 @@ import { loadProjects, setCurrentProject } from 'src/app/state/app.actions';
 
 
 @Component({
+  standalone: false,
   selector: 'app-user-report',
   templateUrl: './user-report.component.html',
   styleUrls: ['./user-report.component.css']

@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { AngularFireUploadTask } from "@angular/fire/storage";
+import { AngularFireUploadTask } from "@angular/fire/compat/storage";
 import { Actions, createEffect, ofType } from "@ngrx/effects";
 import { Store } from "@ngrx/store";
 import copy from "fast-copy";
@@ -114,10 +114,10 @@ export class AppEffects {
       mergeMap((action) => {
         return this.db.getLastProject(action.userId).pipe(
           map((lastProjectSnap) => {
-            let projectId: string = lastProjectSnap?.data()?.projectId;
+            let projectId: string = (lastProjectSnap?.data() as any)?.projectId;
             if (projectId) {
               return setCurrentProject({
-                projectId: lastProjectSnap.data().projectId,
+                projectId: (lastProjectSnap.data() as any).projectId,
               });
             } else {
               return noOp();

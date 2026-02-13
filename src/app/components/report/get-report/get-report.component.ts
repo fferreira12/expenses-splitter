@@ -5,6 +5,7 @@ import { User } from 'src/app/models/user.model';
 import { ReportService } from 'src/app/services/report.service';
 
 @Component({
+  standalone: false,
   selector: 'app-get-report',
   templateUrl: './get-report.component.html',
   styleUrls: ['./get-report.component.css']

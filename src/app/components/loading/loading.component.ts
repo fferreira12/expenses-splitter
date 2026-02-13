@@ -3,6 +3,7 @@ import { SplitterService } from "src/app/services/splitter.service";
 import { Observable } from 'rxjs';
 
 @Component({
+  standalone: false,
   selector: "app-loading",
   templateUrl: "./loading.component.html",
   styleUrls: ["./loading.component.css"]

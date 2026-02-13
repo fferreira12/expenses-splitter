@@ -3,7 +3,7 @@ import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { Payment } from 'src/app/models/payment.model';
-import * as firebase from 'firebase';
+import firebase from 'firebase/compat/app';
 import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { AppState } from 'src/app/state/app.state';
@@ -13,6 +13,7 @@ import { Actions, ofType } from '@ngrx/effects';
 import { tap } from 'rxjs/operators';
 
 @Component({
+  standalone: false,
   selector: "app-payment-list",
   templateUrl: "./payment-list.component.html",
   styleUrls: ["./payment-list.component.css"],

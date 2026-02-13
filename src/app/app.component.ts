@@ -6,6 +6,7 @@ import { appStartup } from './state/app.actions';
 import { AppState } from './state/app.state';
 
 @Component({
+  standalone: false,
   selector: "app-root",
   templateUrl: "./app.component.html",
   styleUrls: ["./app.component.css"]

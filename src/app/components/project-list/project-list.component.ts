@@ -9,6 +9,7 @@ import { map } from 'rxjs/operators';
 import { selectCurrentProject, selectOrderedProjects } from 'src/app/state/app.selectors';
 
 @Component({
+  standalone: false,
   selector: 'app-project-list',
   templateUrl: './project-list.component.html',
   styleUrls: ['./project-list.component.css']
